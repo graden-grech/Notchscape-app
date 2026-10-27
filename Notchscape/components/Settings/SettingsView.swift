@@ -1958,11 +1958,11 @@ private struct ThemePreviewCard: View {
                 .foregroundStyle(.white)
                 .padding(12)
             }
-            .aspectRatio(theme.isWhiteHouse ? 16.0 / 9.0 : 3.0, contentMode: .fit)
+            .aspectRatio(theme.usesArchitecturalPhotoLayout ? 16.0 / 9.0 : 3.0, contentMode: .fit)
             .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
 
             HStack {
-                Text(theme.isWhiteHouse ? "White House" : theme.isStarWars ? "Star Wars" : theme.title).font(.callout.weight(.semibold))
+                Text(theme.pickerTitle).font(.callout.weight(.semibold))
                 Spacer()
                 Image(systemName: selected ? "checkmark.circle.fill" : "circle")
                     .foregroundStyle(selected ? Color.effectiveAccent : .secondary.opacity(0.45))
@@ -2112,6 +2112,7 @@ struct Appearance: View {
     @Default(.selectedVisualizer) var selectedVisualizer
     @Default(.appTheme) var appTheme
     @Default(.whiteHousePreferredVariant) private var whiteHousePreferredVariant
+    @Default(.cityscapePreferredScene) private var cityscapePreferredScene
     @Default(.appIconVariant) var appIconVariant
     @Default(.appIconFollowsTheme) private var appIconFollowsTheme
     @Default(.useCustomAccentColor) private var useCustomAccentColor
@@ -2124,17 +2125,22 @@ struct Appearance: View {
     @State private var speed: CGFloat = 1.0
     @State private var starWarsSettingsPresented = false
     @State private var whiteHouseSettingsPresented = false
+    @State private var cityscapeSettingsPresented = false
 
     private func previewTheme(for theme: AppTheme) -> AppTheme {
         if theme.isStarWars && appTheme.isStarWars { return appTheme }
         if theme.isWhiteHouse {
             return appTheme.isWhiteHouse ? appTheme : AppTheme(rawValue: whiteHousePreferredVariant.rawValue) ?? .whiteHouse
         }
+        if theme.isCityscape {
+            return appTheme.isCityscape ? appTheme : AppTheme(rawValue: cityscapePreferredScene.rawValue) ?? .cityNewYork
+        }
         return theme
     }
 
     private func isSelected(_ theme: AppTheme) -> Bool {
         appTheme == theme || (theme.isStarWars && appTheme.isStarWars) || (theme.isWhiteHouse && appTheme.isWhiteHouse)
+            || (theme.isCityscape && appTheme.isCityscape)
     }
 
     var body: some View {
@@ -2155,6 +2161,7 @@ struct Appearance: View {
                         Button {
                             let selectedTheme = previewTheme(for: theme)
                             if let current = appTheme.whiteHouseVariant { whiteHousePreferredVariant = current }
+                            if let current = appTheme.cityscapeScene { cityscapePreferredScene = current }
                             withAnimation(performance.suppressAnimations ? nil : .smooth(duration: 0.22)) {
                                 Defaults[.automaticSeasonalThemes] = false
                                 appTheme = selectedTheme
@@ -2165,23 +2172,25 @@ struct Appearance: View {
                             if appIconFollowsTheme { selectedTheme.matchingIcon.apply() }
                             if theme.isStarWars { starWarsSettingsPresented = true }
                             if theme.isWhiteHouse { whiteHouseSettingsPresented = true }
+                            if theme.isCityscape { cityscapeSettingsPresented = true }
                         } label: {
                             ThemePreviewCard(theme: previewTheme(for: theme), selected: isSelected(theme))
                         }
                         .buttonStyle(.plain)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                        .accessibilityLabel(theme.isWhiteHouse ? "White House theme" : theme.isStarWars ? "Star Wars themes" : theme.title)
-                        .accessibilityHint(theme.isWhiteHouse ? "Choose neutral, Republican or Democrat décor, four rooms or views, and optional Christmas decorations." : theme.isStarWars ? "Choose Jedi, Dark Side, or a character, and customize your lightsaber music bar." : "Apply this theme")
+                        .accessibilityLabel(theme.pickerTitle + " theme")
+                        .accessibilityHint(theme.isWhiteHouse ? "Choose neutral, Republican or Democrat décor, four rooms or views, and optional Christmas decorations." : theme.isCityscape ? "Choose from twelve city views in navy and warm light." : theme.isStarWars ? "Choose Jedi, Dark Side, or a character, and customize your lightsaber music bar." : "Apply this theme")
                         .accessibilityAddTraits(isSelected(theme) ? [.isSelected] : [])
                     }
                 }
             } header: {
                 Text("Menu theme")
             } footer: {
-                Text("Preview Home’s scenes and six quiet, scalable palette themes. White House opens its own room and accent choices. Star Wars opens Jedi, Dark Side, and Characters. Winter has no holiday decorations.")
+                Text("Preview Home’s scenes and six quiet, scalable palette themes. White House opens its own room and accent choices. Cityscapes opens twelve city views. Star Wars opens Jedi, Dark Side, and Characters. Winter has no holiday decorations.")
             }
             .sheet(isPresented: $starWarsSettingsPresented) { StarWarsThemeSettingsView() }
             .sheet(isPresented: $whiteHouseSettingsPresented) { WhiteHouseThemeSettingsView() }
+            .sheet(isPresented: $cityscapeSettingsPresented) { CityscapeThemeSettingsView() }
 
             Section {
                 Defaults.Toggle("Quiet scene detail", key: .themeDetailsEnabled)

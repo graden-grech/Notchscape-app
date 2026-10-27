@@ -27,6 +27,10 @@ extension Color {
     static var effectiveAccent: Color {
         Color(nsColor: .effectiveAccent)
     }
+
+    static var effectiveAccentForeground: Color {
+        Color(nsColor: .effectiveAccentForeground)
+    }
     
     /// Returns a darker version of the accent color suitable for backgrounds
     static var effectiveAccentBackground: Color {
@@ -37,6 +41,28 @@ extension Color {
 extension NSColor {
     static var effectiveAccent: NSColor {
         resolvedAccent(theme: Defaults[.appTheme], customEnabled: Defaults[.useCustomAccentColor], customData: Defaults[.customAccentColorData])
+    }
+
+    /// Choose readable text for a solid accent fill, including manual colors.
+    /// Keep resolution dynamic so light/dark appearance changes stay in sync.
+    static var effectiveAccentForeground: NSColor {
+        let accent = effectiveAccent
+        return NSColor(name: nil) { appearance in
+            var foreground = NSColor.white
+            appearance.performAsCurrentDrawingAppearance {
+                guard let rgb = accent.usingColorSpace(.sRGB) else { return }
+                let channels = [rgb.redComponent, rgb.greenComponent, rgb.blueComponent]
+                guard channels.allSatisfy(\.isFinite) else { return }
+                let linear = channels.map { component -> CGFloat in
+                    let value = min(1, max(0, component))
+                    return value <= 0.04045 ? value / 12.92 : pow((value + 0.055) / 1.055, 2.4)
+                }
+                let luminance = 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
+                // The crossover chooses the greater black/white contrast ratio.
+                foreground = luminance <= 0.1791287847 ? .white : .black
+            }
+            return foreground
+        }
     }
 
     /// Manual choices override every theme. Invalid/missing saved colors

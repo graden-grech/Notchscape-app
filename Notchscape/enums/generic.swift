@@ -187,19 +187,30 @@ enum AppTheme: String, CaseIterable, Defaults.Serializable, Identifiable {
     case whiteHouseChristmas, whiteHouseChristmasOvalOffice, whiteHouseChristmasEastRoom, whiteHouseChristmasBlueRoom
     case whiteHouseRepublicanChristmas, whiteHouseRepublicanChristmasOvalOffice, whiteHouseRepublicanChristmasEastRoom, whiteHouseRepublicanChristmasBlueRoom
     case whiteHouseDemocratChristmas, whiteHouseDemocratChristmasOvalOffice, whiteHouseDemocratChristmasEastRoom, whiteHouseDemocratChristmasBlueRoom
+    case cityNewYork, cityChicago, cityDetroit, cityBoston, cityPhiladelphia, cityWashingtonDC
+    case cityLosAngeles, citySanFrancisco, citySeattle, cityLasVegas, cityMiami, cityNewOrleans
 
     var id: Self { self }
     var starWarsVariant: StarWarsThemeVariant? { StarWarsThemeVariant(rawValue: rawValue) }
     var isStarWars: Bool { starWarsVariant != nil }
     var whiteHouseVariant: WhiteHouseThemeVariant? { WhiteHouseThemeVariant(rawValue: rawValue) }
     var isWhiteHouse: Bool { whiteHouseVariant != nil }
+    var cityscapeScene: CityscapeScene? { CityscapeScene(rawValue: rawValue) }
+    var isCityscape: Bool { cityscapeScene != nil }
+    var usesArchitecturalPhotoLayout: Bool { isWhiteHouse || isCityscape }
     var nativeSceneStyle: NativeAppearanceStyle? { NativeAppearanceStyle(rawValue: rawValue) }
     static var pickerThemes: [Self] {
-        allCases.filter { (!$0.isStarWars || $0 == .starWars) && (!$0.isWhiteHouse || $0 == .whiteHouse) }
+        allCases.filter {
+            (!$0.isStarWars || $0 == .starWars) && (!$0.isWhiteHouse || $0 == .whiteHouse)
+                && (!$0.isCityscape || $0 == .cityNewYork)
+        }
     }
+
+    var pickerTitle: String { isWhiteHouse ? "White House" : isCityscape ? "Cityscapes" : isStarWars ? "Star Wars" : title }
 
     var title: String {
         if let variant = whiteHouseVariant { return "White House · \(variant.scene.title) · \(variant.style.title)\(variant.isChristmas ? " · Christmas" : "")" }
+        if let scene = cityscapeScene { return "Cityscapes · \(scene.title)" }
         return switch self {
         case .system: "System"
         case .autumn: "Fall"
@@ -219,6 +230,7 @@ enum AppTheme: String, CaseIterable, Defaults.Serializable, Identifiable {
 
     var symbol: String {
         if let variant = whiteHouseVariant { return variant.scene.symbol }
+        if isCityscape { return "building.2" }
         return switch self {
         case .system: "apple.logo"
         case .autumn: "leaf.fill"
@@ -250,7 +262,7 @@ enum AppTheme: String, CaseIterable, Defaults.Serializable, Identifiable {
                 let (r, g, b) = AppearanceRecipe.rgb(dark ? style.darkAccent : style.lightAccent) ?? (128, 128, 128)
                 return NSColor(srgbRed: Double(r)/255, green: Double(g)/255, blue: Double(b)/255, alpha: 1)
             }
-        default: whiteHouseVariant?.accentColor ?? starWarsVariant?.accentColor
+        default: whiteHouseVariant?.accentColor ?? cityscapeScene?.accentColor ?? starWarsVariant?.accentColor
         }
     }
 
@@ -287,7 +299,7 @@ enum AppTheme: String, CaseIterable, Defaults.Serializable, Identifiable {
         case .halloween: "HalloweenBackdrop"
         case .winter: "WinterBackdrop"
         case .easter: "EasterBackdrop"
-        default: whiteHouseVariant?.backdropName ?? starWarsVariant?.backdropName
+        default: whiteHouseVariant?.backdropName ?? cityscapeScene?.backdropName ?? starWarsVariant?.backdropName
         }
     }
 
@@ -298,7 +310,8 @@ enum AppTheme: String, CaseIterable, Defaults.Serializable, Identifiable {
     }
 
     var subtitle: String {
-        switch self {
+        if isCityscape { return "Twelve cities in navy and warm light" }
+        return switch self {
         case .system: "Classic Mac appearance"
         case .autumn: "Golden leaves and a warm cabin"
         case .halloween: "Pumpkin glow and candlelight"
@@ -325,6 +338,16 @@ extension WhiteHouseThemeVariant: Defaults.Serializable {
         NSColor(name: NSColor.Name("Notchscape.\(rawValue)")) { [style] appearance in
             let dark = appearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
             let (r, g, b) = AppearanceRecipe.rgb(dark ? style.darkAccent : style.lightAccent) ?? (128, 128, 128)
+            return NSColor(srgbRed: Double(r)/255, green: Double(g)/255, blue: Double(b)/255, alpha: 1)
+        }
+    }
+}
+
+extension CityscapeScene: Defaults.Serializable {
+    var accentColor: NSColor {
+        NSColor(name: NSColor.Name("Notchscape.\(rawValue)")) { [self] appearance in
+            let dark = appearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
+            let (r, g, b) = AppearanceRecipe.rgb(dark ? darkAccent : lightAccent) ?? (128, 128, 128)
             return NSColor(srgbRed: Double(r)/255, green: Double(g)/255, blue: Double(b)/255, alpha: 1)
         }
     }

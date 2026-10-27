@@ -142,6 +142,7 @@ extension Defaults.Keys {
     static let appIconFollowsTheme = Key<Bool>("appIconFollowsTheme", default: true)
     static let appTheme = Key<AppTheme>("appTheme", default: .system)
     static let whiteHousePreferredVariant = Key<WhiteHouseThemeVariant>("whiteHousePreferredVariant", default: .exterior)
+    static let cityscapePreferredScene = Key<CityscapeScene>("cityscapePreferredScene", default: .newYork)
     static let themeDetailsEnabled = Key<Bool>("themeDetailsEnabled", default: false)
     static let starWarsPreferredCharacter = Key<StarWarsThemeVariant>("starWarsPreferredCharacter", default: .luke)
     static let starWarsVaderArtwork = Key<StarWarsCharacterArtwork>("starWarsVaderArtwork", default: .lightsaber)

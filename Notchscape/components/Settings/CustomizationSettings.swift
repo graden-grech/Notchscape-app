@@ -397,6 +397,107 @@ struct StarWarsThemeSettingsView: View {
     }
 }
 
+/// City photos share White House's complete-photo previews and Home scene.
+/// All choices stay in one native settings sheet instead of twelve theme cards.
+struct CityscapeThemeSettingsView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Default(.appTheme) private var theme
+    @Default(.cityscapePreferredScene) private var preferredScene
+    @Default(.useCustomAccentColor) private var customAccentEnabled
+    @ObservedObject private var performance = AppPerformanceManager.shared
+
+    private var scene: CityscapeScene { theme.cityscapeScene ?? preferredScene }
+    private var previewTheme: AppTheme { AppTheme(rawValue: scene.rawValue) ?? .cityNewYork }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("Cityscapes").font(.title2.weight(.semibold))
+                    Text("Twelve views in blue-hour light.").font(.callout).foregroundStyle(.secondary)
+                }
+                Spacer()
+                Button("Done") { dismiss() }.keyboardShortcut(.defaultAction)
+            }
+            .padding(20)
+            Form {
+                Section {
+                    ZStack(alignment: .bottomLeading) {
+                        HomeThemeScene(theme: previewTheme, vaderArtwork: .lightsaber, preserveEntirePhoto: true)
+                        LinearGradient(colors: [.black.opacity(0.76), .clear], startPoint: .leading, endPoint: .trailing)
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text(scene.title).font(.title3.weight(.semibold))
+                            Text("Navy sky · Warm city lights").font(.caption).foregroundStyle(.white.opacity(0.85))
+                        }
+                        .foregroundStyle(.white).padding(16)
+                    }
+                    .aspectRatio(16.0 / 9.0, contentMode: .fit)
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .accessibilityElement(children: .combine)
+                    if customAccentEnabled {
+                        Label("Your custom accent is still in use. Turn on Match theme in Appearance → Accent color to use this palette.", systemImage: "paintpalette")
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
+                } header: { Text("Selected view") } footer: {
+                    Text("Each city brings warm architectural lighting and a deep navy sky to Home.")
+                }
+
+                Section("Cities") {
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                        ForEach(CityscapeScene.allCases) { scene in
+                            cityButton(scene)
+                        }
+                    }
+                }
+            }
+            .formStyle(.grouped).scrollContentBackground(.hidden)
+        }
+        .frame(width: 610, height: 680)
+        .background(LiquidGlassSettingsBackground())
+        .preferredColorScheme(.dark)
+        .tint(.effectiveAccent)
+        .transaction { if performance.suppressAnimations { $0.animation = nil; $0.disablesAnimations = true } }
+        .onAppear { if let current = theme.cityscapeScene { preferredScene = current } }
+    }
+
+    private func cityButton(_ choice: CityscapeScene) -> some View {
+        let selected = choice == scene
+        return Button { apply(choice) } label: {
+            VStack(alignment: .leading, spacing: 7) {
+                Image(choice.backdropName)
+                    .resizable().scaledToFit().aspectRatio(16.0 / 9.0, contentMode: .fit)
+                    .background(.black)
+                    .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+                HStack {
+                    Text(choice.title).font(.callout.weight(.medium))
+                    Spacer(minLength: 4)
+                    Image(systemName: selected ? "checkmark.circle.fill" : "circle")
+                        .foregroundStyle(selected ? Color.effectiveAccent : .secondary)
+                }
+            }
+            .padding(9)
+            .background(Color.white.opacity(selected ? 0.08 : 0.025), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+            .overlay { RoundedRectangle(cornerRadius: 13, style: .continuous).strokeBorder(selected ? Color.effectiveAccent : .white.opacity(0.12), lineWidth: selected ? 2 : 1) }
+            .contentShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(choice.title)
+        .accessibilityHint("Changes the Home background and matching theme accent.")
+        .accessibilityAddTraits(selected ? [.isSelected] : [])
+    }
+
+    private func apply(_ selection: CityscapeScene) {
+        guard let selected = AppTheme(rawValue: selection.rawValue) else { return }
+        Defaults[.automaticSeasonalThemes] = false
+        preferredScene = selection
+        theme = selected
+        if Defaults[.appIconFollowsTheme] {
+            Defaults[.appIconVariant] = selected.matchingIcon
+            selected.matchingIcon.apply()
+        }
+    }
+}
+
 struct PerformanceSettingsSection: View {
     @Default(.performanceMode) private var mode
     @ObservedObject private var performance = AppPerformanceManager.shared

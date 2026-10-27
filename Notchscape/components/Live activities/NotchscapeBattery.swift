@@ -168,6 +168,112 @@ struct BatteryMenuView: View {
     }
 }
 
+extension BatteryNotificationLayoutPolicy {
+    static var statusFont: NSFont { .preferredFont(forTextStyle: .subheadline) }
+    static var percentageFont: NSFont {
+        .monospacedDigitSystemFont(ofSize: NSFont.preferredFont(forTextStyle: .callout).pointSize, weight: .regular)
+    }
+
+    static func compactLanes(presentation: BatteryNotificationPresentation, level: Double, physicalNotchWidth: Double,
+                             centerOffset: Double = 0) -> BatteryNotificationLanes? {
+        let leadingWidth = presentation.warningTitle.map {
+            Double(($0 as NSString).size(withAttributes: [.font: statusFont]).width)
+        } ?? symbolWidth
+        let percentage = "\(Int(level))%"
+        let percentageWidth = (percentage as NSString).size(withAttributes: [.font: percentageFont]).width
+        return compactLanes(leadingContentWidth: leadingWidth, trailingContentWidth: Double(percentageWidth),
+                            physicalNotchWidth: physicalNotchWidth,
+                            centerOffset: centerOffset)
+    }
+
+    static func symbol(for presentation: BatteryNotificationPresentation, level: Double) -> String {
+        switch presentation {
+        case .charging: "bolt.fill"
+        case .connectedToPower: "powerplug.fill"
+        case .fullyCharged: "battery.100percent"
+        default: BatteryPolicy.symbol(level: level, charging: false)
+        }
+    }
+}
+
+/// The status stays to the left of the real camera housing and the battery
+/// indicator to its right. Notchless displays retain their existing banner.
+struct BatteryNotificationView<Indicator: View>: View {
+    let statusText: String
+    let closedNotchWidth: CGFloat
+    let height: CGFloat
+    let physicalLanes: BatteryNotificationLanes?
+    let presentation: BatteryNotificationPresentation
+    let level: Double
+    let indicator: Indicator
+
+    init(statusText: String, closedNotchWidth: CGFloat, height: CGFloat,
+         physicalLanes: BatteryNotificationLanes?, presentation: BatteryNotificationPresentation, level: Double,
+         @ViewBuilder indicator: () -> Indicator) {
+        self.statusText = statusText
+        self.closedNotchWidth = closedNotchWidth
+        self.height = height
+        self.physicalLanes = physicalLanes
+        self.presentation = presentation
+        self.level = level
+        self.indicator = indicator()
+    }
+
+    var body: some View {
+        Group {
+            if let lanes = physicalLanes {
+                HStack(spacing: 0) {
+                    physicalLeadingContent
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+                        .allowsTightening(true)
+                        .frame(width: CGFloat(lanes.leadingWidth), alignment: .trailing)
+                        .clipped()
+                    Rectangle().fill(.black)
+                        .frame(width: CGFloat(lanes.cutoutWidth))
+                        .accessibilityHidden(true)
+                        .allowsHitTesting(false)
+                    indicator
+                        .frame(width: CGFloat(lanes.trailingWidth), alignment: .leading)
+                        .clipped()
+                }
+                .frame(width: CGFloat(lanes.totalWidth))
+                .accessibilityElement(children: .contain)
+                .accessibilityLabel(statusText)
+                .help("\(statusText) · \(Int(level))%")
+            } else {
+                // Preserve the notchless presentation and its saved indicator
+                // preferences, including the existing center spacer.
+                HStack(spacing: 0) {
+                    HStack { status.font(.subheadline) }
+                    Rectangle().fill(.black)
+                        .frame(width: closedNotchWidth + 10)
+                    HStack { indicator }
+                        .frame(width: 76, alignment: .trailing)
+                }
+            }
+        }
+        .frame(height: height, alignment: .center)
+    }
+
+    private var status: some View {
+        Text(statusText)
+            .foregroundStyle(.white)
+    }
+
+    @ViewBuilder private var physicalLeadingContent: some View {
+        if let title = presentation.warningTitle {
+            Text(title).font(Font(BatteryNotificationLayoutPolicy.statusFont)).foregroundStyle(.white)
+        } else {
+            Image(systemName: BatteryNotificationLayoutPolicy.symbol(for: presentation, level: level))
+                .font(.system(size: 16, weight: .medium))
+                .foregroundStyle(presentation == .onBattery ? Color.white : Color.green)
+                .frame(width: CGFloat(BatteryNotificationLayoutPolicy.symbolWidth), height: 22)
+                .accessibilityHidden(true)
+        }
+    }
+}
+
 /// A view that displays the battery status and allows interaction to show detailed information.
 struct NotchscapeBatteryView: View {
     @Default(.batteryPresentation) private var presentation
@@ -184,6 +290,8 @@ struct NotchscapeBatteryView: View {
     var maxCapacity: Float = 0
     var timeToFullCharge: Int = 0
     @State var isForNotification: Bool = false
+    var notificationPercentageOnly = false
+    var notificationStatusText: String? = nil
     
     @State private var showPopupMenu: Bool = false
     @State private var isPressed: Bool = false
@@ -208,8 +316,9 @@ struct NotchscapeBatteryView: View {
         }
         .buttonStyle(ScaleButtonStyle())
         .accessibilityLabel("Battery")
-        .accessibilityValue(batteryModel.dataAvailable ? "\(Int(levelBattery)) percent" : batteryModel.statusText)
-        .help("Battery status")
+        .accessibilityValue(batteryModel.dataAvailable
+            ? "\(notificationStatusText.map { $0 + ", " } ?? "")\(Int(levelBattery)) percent" : batteryModel.statusText)
+        .help(notificationStatusText ?? "Battery status")
         .popover(
             isPresented: $showPopupMenu,
             arrowEdge: .bottom) {
@@ -254,11 +363,13 @@ struct NotchscapeBatteryView: View {
 
     private var indicator: some View {
         HStack(spacing: 5) {
-            if presentation == .original ? showPercentage : display != .iconOnly {
+            if (isForNotification && notificationPercentageOnly)
+                || (presentation == .original ? showPercentage : display != .iconOnly) {
                 Text(batteryModel.dataAvailable ? "\(Int(levelBattery))%" : "—")
                     .font(.callout).monospacedDigit().foregroundStyle(.white)
             }
-            if presentation == .original || display != .percentageOnly {
+            if !(isForNotification && notificationPercentageOnly)
+                && (presentation == .original || display != .percentageOnly) {
                 if presentation == .enhanced && !isForNotification {
                     Image(systemName: BatteryPolicy.symbol(level: Double(levelBattery),
                         charging: batteryModel.dataAvailable && isCharging && showPowerIcons))

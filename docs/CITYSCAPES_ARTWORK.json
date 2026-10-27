@@ -1,0 +1,144 @@
+{
+  "collection": "Cityscapes",
+  "date": "2026-10-27",
+  "tool": "Built-in OpenAI imagegen",
+  "source": "Original generated White House exterior used as a lighting, sky and composition reference; no random online city photos were imported.",
+  "referenceAsset": "Notchscape/Assets.xcassets/WhiteHouseExteriorBackdrop.imageset/WhiteHouseExteriorBackdrop.png",
+  "referenceSHA256": "3db52fdb09d0d2df9a96537e49611bd5eb6d46e70135acf148c11a9e97bce89f",
+  "style": "Navy blue-hour clouds and warm amber architectural light",
+  "records": [
+    {
+      "city": "New York",
+      "asset": "Notchscape/Assets.xcassets/CityNewYorkBackdrop.imageset/CityNewYorkBackdrop.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 2139692,
+      "sha256": "af571ecfbbe4705bb49f94cbf0d6d9b1edb8b27ae7a9f839eb01eb999df626b6",
+      "review": "Generated and visually reviewed by image agent; composed for a shallow central Home crop. Full photos are shown in the picker."
+    },
+    {
+      "city": "Chicago",
+      "asset": "Notchscape/Assets.xcassets/CityChicagoBackdrop.imageset/CityChicagoBackdrop.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 2132565,
+      "sha256": "75c468ad99a4f8e00a3b9e630482484405c09627ebe571c43f60c19b23e62bff",
+      "review": "Generated and visually reviewed by image agent; composed for a shallow central Home crop. Full photos are shown in the picker."
+    },
+    {
+      "city": "Detroit",
+      "asset": "Notchscape/Assets.xcassets/CityDetroitBackdrop.imageset/CityDetroitBackdrop.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 2125281,
+      "sha256": "e5e7b7fa59fc353d515063613f46b81fb1bfd6284ff26a75f5db10e79fe6e838",
+      "review": "Generated and visually reviewed by image agent; composed for a shallow central Home crop. Full photos are shown in the picker."
+    },
+    {
+      "city": "Boston",
+      "asset": "Notchscape/Assets.xcassets/CityBostonBackdrop.imageset/CityBostonBackdrop.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 2235336,
+      "sha256": "6d587e1591cd45a08efe59bdb03b9450f32e3d0f37dc202f13e1102de56e2af0",
+      "review": "Generated and visually reviewed by image agent; composed for a shallow central Home crop. Full photos are shown in the picker."
+    },
+    {
+      "city": "Philadelphia",
+      "asset": "Notchscape/Assets.xcassets/CityPhiladelphiaBackdrop.imageset/CityPhiladelphiaBackdrop.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 2255019,
+      "sha256": "5c6138ff6df1079318f7a2bd7dd7e9aa9f3aeb9f179cf7076d4206c6b177cd96",
+      "review": "Generated and visually reviewed by image agent; composed for a shallow central Home crop. Full photos are shown in the picker."
+    },
+    {
+      "city": "Washington D.C.",
+      "asset": "Notchscape/Assets.xcassets/CityWashingtonDCBackdrop.imageset/CityWashingtonDCBackdrop.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 2078150,
+      "sha256": "093bda6308ef39b662712d349d747136d5610440bfc544d7944d6550906e3c6b",
+      "review": "Generated and visually reviewed by image agent; composed for a shallow central Home crop. Full photos are shown in the picker."
+    },
+    {
+      "city": "Los Angeles",
+      "asset": "Notchscape/Assets.xcassets/CityLosAngelesBackdrop.imageset/CityLosAngelesBackdrop.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 2158264,
+      "sha256": "f6e814b89bfab95d9f38d6d425cd918756ea95e1f14b9db00ac9a389be381058",
+      "review": "Generated and visually reviewed by image agent; composed for a shallow central Home crop. Full photos are shown in the picker."
+    },
+    {
+      "city": "San Francisco",
+      "asset": "Notchscape/Assets.xcassets/CitySanFranciscoBackdrop.imageset/CitySanFranciscoBackdrop.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 1992541,
+      "sha256": "1c2a41f92b0e038a66d92bbcdcf9da22289fd31e7badd12083764acf6f685b6c",
+      "review": "Generated and visually reviewed by image agent; composed for a shallow central Home crop. Full photos are shown in the picker."
+    },
+    {
+      "city": "Seattle",
+      "asset": "Notchscape/Assets.xcassets/CitySeattleBackdrop.imageset/CitySeattleBackdrop.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 2170793,
+      "sha256": "82b7c44d97b6485585485a61eeb0ff8f899a54fc29f68709b1e0df215308a007",
+      "review": "Generated and visually reviewed by image agent; composed for a shallow central Home crop. Full photos are shown in the picker."
+    },
+    {
+      "city": "Las Vegas",
+      "asset": "Notchscape/Assets.xcassets/CityLasVegasBackdrop.imageset/CityLasVegasBackdrop.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 2311693,
+      "sha256": "7b21d01c455a35cc7236f890b45995a17902fccc4e2f70070657ec7760c4755c",
+      "review": "Generated and visually reviewed by image agent; composed for a shallow central Home crop. Full photos are shown in the picker."
+    },
+    {
+      "city": "Miami",
+      "asset": "Notchscape/Assets.xcassets/CityMiamiBackdrop.imageset/CityMiamiBackdrop.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 2260724,
+      "sha256": "9dcaeabf07a19d0cbaf6c79fa7c17761683e210b65df53b552333c39ecf68b86",
+      "review": "Generated and visually reviewed by image agent; composed for a shallow central Home crop. Full photos are shown in the picker."
+    },
+    {
+      "city": "New Orleans",
+      "asset": "Notchscape/Assets.xcassets/CityNewOrleansBackdrop.imageset/CityNewOrleansBackdrop.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 2275327,
+      "sha256": "a852ac5fede2b23daa0ad23fa067d263e87c4987308cd68ec98ccf0f3f88dcef",
+      "review": "Generated and visually reviewed by image agent; composed for a shallow central Home crop. Full photos are shown in the picker."
+    }
+  ],
+  "limits": "Artistic city scenes, not geographic reference photos. Home intentionally uses a shallow crop; the native picker displays complete images."
+}

@@ -28,16 +28,16 @@ Published by **Notchscape**. Maintained by [Graden Grech](https://github.com/gra
 - An optional six-chapter Settings tour, with Skip and replay from General or Help.
 
 See the [latest release](https://github.com/graden-grech/Notchscape-app/releases/latest)
-for the current public download and verification status. **2.9.3 (296)** moves
-publishing and updates to this new standalone repository, retaining the guided
-setup, White House scenes/icons and other app features. See the
-[migration and release notes](docs/releases/2.9.3.md). Accounts remain disabled;
+for the current public download and verification status. **2.9.4 (297)** source
+adds twelve Cityscapes scenes and fixes physical-notch and battery-alert layout,
+retaining the guided setup, White House scenes/icons and other app features. See
+the [release notes](docs/releases/2.9.4.md). Accounts remain disabled;
 no app account is required.
 
 ## Download and updates
 
 [Public releases](https://github.com/graden-grech/Notchscape-app/releases)
-include version-specific notes and known testing limits. Version 2.9.3 requires
+include version-specific notes and known testing limits. Version 2.9.4 requires
 Apple silicon and macOS 15 or later, matching its linked media framework. Native Liquid Glass is
 available on macOS 26 or later; earlier systems use lighter standard materials.
 

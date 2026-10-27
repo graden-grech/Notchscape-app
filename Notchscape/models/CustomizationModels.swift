@@ -138,6 +138,80 @@ enum WhiteHouseThemeVariant: String, Codable, CaseIterable, Identifiable {
     func selecting(christmas: Bool) -> Self { .init(style: style, scene: scene, christmas: christmas) }
 }
 
+/// One bundled architectural photo per city. These are atomic theme values,
+/// grouped under Cityscapes in Appearance, so selection and restoration use the
+/// same Home, accent, icon, and transition observers as every existing theme.
+enum CityscapeScene: String, Codable, CaseIterable, Identifiable {
+    case newYork = "cityNewYork"
+    case chicago = "cityChicago"
+    case detroit = "cityDetroit"
+    case boston = "cityBoston"
+    case philadelphia = "cityPhiladelphia"
+    case washingtonDC = "cityWashingtonDC"
+    case losAngeles = "cityLosAngeles"
+    case sanFrancisco = "citySanFrancisco"
+    case seattle = "citySeattle"
+    case lasVegas = "cityLasVegas"
+    case miami = "cityMiami"
+    case newOrleans = "cityNewOrleans"
+
+    var id: Self { self }
+    var title: String {
+        switch self {
+        case .newYork: "New York"
+        case .chicago: "Chicago"
+        case .detroit: "Detroit"
+        case .boston: "Boston"
+        case .philadelphia: "Philadelphia"
+        case .washingtonDC: "Washington D.C."
+        case .losAngeles: "Los Angeles"
+        case .sanFrancisco: "San Francisco"
+        case .seattle: "Seattle"
+        case .lasVegas: "Las Vegas"
+        case .miami: "Miami"
+        case .newOrleans: "New Orleans"
+        }
+    }
+    var backdropName: String {
+        switch self {
+        case .newYork: "CityNewYorkBackdrop"
+        case .chicago: "CityChicagoBackdrop"
+        case .detroit: "CityDetroitBackdrop"
+        case .boston: "CityBostonBackdrop"
+        case .philadelphia: "CityPhiladelphiaBackdrop"
+        case .washingtonDC: "CityWashingtonDCBackdrop"
+        case .losAngeles: "CityLosAngelesBackdrop"
+        case .sanFrancisco: "CitySanFranciscoBackdrop"
+        case .seattle: "CitySeattleBackdrop"
+        case .lasVegas: "CityLasVegasBackdrop"
+        case .miami: "CityMiamiBackdrop"
+        case .newOrleans: "CityNewOrleansBackdrop"
+        }
+    }
+    /// Warm architecture colors retain readable contrast on both control planes.
+    /// A manual accent still takes precedence through the shared color resolver.
+    var lightAccent: String {
+        switch self {
+        case .newYork, .washingtonDC: "#645221"
+        case .chicago, .philadelphia: "#5C5532"
+        case .detroit, .boston: "#664D2F"
+        case .losAngeles, .lasVegas: "#6A4C2B"
+        case .sanFrancisco, .newOrleans: "#68503A"
+        case .seattle, .miami: "#5E5737"
+        }
+    }
+    var darkAccent: String {
+        switch self {
+        case .newYork, .washingtonDC: "#DFC891"
+        case .chicago, .philadelphia: "#D9CC9B"
+        case .detroit, .boston: "#E2BF95"
+        case .losAngeles, .lasVegas: "#E7C28C"
+        case .sanFrancisco, .newOrleans: "#DFC2A0"
+        case .seattle, .miami: "#D8CEAA"
+        }
+    }
+}
+
 enum StarWarsThemeCategory: String, CaseIterable, Identifiable {
     case jedi, darkSide, characters
     var id: Self { self }

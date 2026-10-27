@@ -17,6 +17,25 @@ struct NotchscapeHeader: View {
     @Default(.appTheme) private var appTheme
     @Default(.hideBatteryWhenAbsent) private var hideBatteryWhenAbsent
     @Default(.showBatteryIndicator) private var showBatteryIndicator
+
+    private var screen: NSScreen? {
+        if let uuid = vm.screenUUID { return NSScreen.screen(withUUID: uuid) }
+        return NSScreen.main
+    }
+
+    private var physicalNotch: PhysicalNotchGeometry? {
+        guard let screen else { return nil }
+        return PhysicalNotchGeometry.resolve(
+            screenFrame: screen.frame, safeTop: Double(screen.safeAreaInsets.top),
+            leftArea: screen.auxiliaryTopLeftArea, rightArea: screen.auxiliaryTopRightArea)
+    }
+
+    private var headerRowHeight: CGFloat {
+        CGFloat(NotchHeaderLayoutPolicy.rowHeight(
+            closedHeight: Double(vm.effectiveClosedNotchHeight),
+            hasPhysicalNotch: (screen?.safeAreaInsets.top ?? 0) > 0))
+    }
+
     var body: some View {
         HStack(spacing: 0) {
             HStack {
@@ -42,11 +61,17 @@ struct NotchscapeHeader: View {
 
             if vm.notchState == .open {
                 Rectangle()
-                    .fill(NSScreen.screen(withUUID: coordinator.selectedScreenUUID)?.safeAreaInsets.top ?? 0 > 0 ? .black : .clear)
-                    .frame(width: vm.closedNotchSize.width)
+                    .fill(physicalNotch == nil ? Color.clear : Color.black)
+                    .frame(width: CGFloat(physicalNotch?.width ?? Double(vm.closedNotchSize.width)),
+                           height: CGFloat(physicalNotch?.height ?? Double(headerRowHeight)))
                     .mask {
                         NotchShape()
                     }
+                    // Only the controls move down. The physical housing is
+                    // measured independently and remains flush with the screen.
+                    .offset(x: CGFloat(physicalNotch?.centerOffset ?? 0),
+                            y: CGFloat(physicalNotch?.expandedHeaderTopOffset ?? 0))
+                    .frame(width: vm.closedNotchSize.width, height: headerRowHeight, alignment: .top)
                     .overlay {
                         if coordinator.currentView == .home,
                            !appTheme.hasHomeScene,

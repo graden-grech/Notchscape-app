@@ -9,7 +9,9 @@ struct AppearanceRecipePolicyTests {
         "whiteHouseChristmas", "whiteHouseChristmasOvalOffice", "whiteHouseChristmasEastRoom", "whiteHouseChristmasBlueRoom",
         "whiteHouseRepublicanChristmas", "whiteHouseRepublicanChristmasOvalOffice", "whiteHouseRepublicanChristmasEastRoom", "whiteHouseRepublicanChristmasBlueRoom",
         "whiteHouseDemocratChristmas", "whiteHouseDemocratChristmasOvalOffice", "whiteHouseDemocratChristmasEastRoom", "whiteHouseDemocratChristmasBlueRoom"]
-    static let themes = Set(["system", "autumn", "halloween", "christmas", "winter", "easter", "starWars", "starWarsVader"] + NativeAppearanceStyle.allCases.map(\.rawValue) + whiteHouseThemes)
+    static let cityscapeThemes = ["cityNewYork", "cityChicago", "cityDetroit", "cityBoston", "cityPhiladelphia", "cityWashingtonDC",
+        "cityLosAngeles", "citySanFrancisco", "citySeattle", "cityLasVegas", "cityMiami", "cityNewOrleans"]
+    static let themes = Set(["system", "autumn", "halloween", "christmas", "winter", "easter", "starWars", "starWarsVader"] + NativeAppearanceStyle.allCases.map(\.rawValue) + whiteHouseThemes + cityscapeThemes)
     static let icons: Set<String> = ["standard", "autumn", "halloween", "christmas", "winter", "easter", "whiteHouse",
         "whiteHouseRepublican", "whiteHouseDemocrat", "whiteHouseRepublicanChristmas", "whiteHouseDemocratChristmas"]
     static func check(_ result: @autoclosure () -> Bool, _ reason: String) {
@@ -44,6 +46,16 @@ struct AppearanceRecipePolicyTests {
                 let restored = try AppearanceRecipe.decode(JSONEncoder().encode(value), themes: themes, icons: icons)
                 check(restored == value, "White House room, accent style, custom accent and manual/theme icon roundtrip together")
                 check(restored.homeOrder == recipe.homeOrder && restored.hiddenWidgets == recipe.hiddenWidgets, "Theme choices preserve full calendar/music/Home layout")
+            }
+        }
+        for theme in cityscapeThemes {
+            for followsTheme in [false, true] {
+                var value = recipe
+                value.theme = theme; value.icon = followsTheme ? "standard" : "winter"; value.followsThemeIcon = followsTheme
+                let restored = try AppearanceRecipe.decode(JSONEncoder().encode(value), themes: themes, icons: icons)
+                check(restored == value, "Every city restores with its custom accent and manual or matching icon preference")
+                check(restored.homeOrder == recipe.homeOrder && restored.hiddenWidgets == recipe.hiddenWidgets,
+                      "City changes preserve the saved Home layout")
             }
         }
         var object = try JSONSerialization.jsonObject(with: data) as! [String: Any]

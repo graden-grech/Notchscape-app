@@ -25,3 +25,15 @@
   for existing downloads and signed migration feeds. A compatibility-feed update
   there is separate from publishing new app releases here. Do not delete, rename
   or privatize the legacy repository or replace any published archive.
+
+## Collaboration and continuation
+
+- Reuse an idle subagent before starting another agent for a related specialty.
+  Delegate independent requests added during active work and keep the main chat
+  progressing on its existing task. Coordinate file ownership before edits.
+- Check the actual Codex usage windows at substantial work checkpoints. If the
+  five-hour window is nearly exhausted and work remains, save an exact handoff
+  and schedule this chat to resume after the reported reset using the app's
+  heartbeat tool. Inspect/update a matching follow-up instead of creating
+  duplicates. Do not confuse a worker credit error with a five-hour limit or
+  create reset wake-ups while the allowance is healthy.

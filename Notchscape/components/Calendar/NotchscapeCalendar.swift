@@ -124,8 +124,8 @@ struct WheelPicker: View {
             Text("\(date.date)")
                 .font(.body)
                 .fontWeight(.medium)
-                .foregroundColor(isSelected ? .white : Color(white: isToday || appTheme.hasHomeScene ? 0.92 : 0.65))
-                .shadow(color: .black.opacity(appTheme.hasHomeScene ? 0.95 : 0), radius: 1.5)
+                .foregroundColor(isToday ? .effectiveAccentForeground : isSelected ? .white : Color(white: appTheme.hasHomeScene ? 0.92 : 0.65))
+                .shadow(color: .black.opacity(!isToday && appTheme.hasHomeScene ? 0.95 : 0), radius: 1.5)
         }
     }
 

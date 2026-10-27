@@ -52,7 +52,7 @@ struct HomeThemeScene: View {
                 } else {
                     Image(backdrop).resizable().scaledToFill()
                         .frame(width: geometry.size.width, height: geometry.size.height,
-                               alignment: theme.isWhiteHouse ? .trailing : imageAlignment)
+                               alignment: theme.usesArchitecturalPhotoLayout ? .trailing : imageAlignment)
                         .clipped()
                 }
             }

@@ -102,13 +102,13 @@ class WhiteHouseThemeTests(unittest.TestCase):
             self.assertIn("preserveEntirePhoto: true", source)
         self.assertIn(".aspectRatio(16.0 / 9.0, contentMode: .fit)", panel)
         for source in (cards, sample):
-            self.assertIn(".aspectRatio(theme.isWhiteHouse ? 16.0 / 9.0 : 3.0, contentMode: .fit)", source)
+            self.assertIn(".aspectRatio(theme.usesArchitecturalPhotoLayout ? 16.0 / 9.0 : 3.0, contentMode: .fit)", source)
         self.assertNotIn("height: 78", panel)
         self.assertNotIn("height: 82", cards)
         self.assertIn(".scaledToFit()", panel)
-        self.assertIn("theme.isWhiteHouse ? .trailing : imageAlignment", home,
+        self.assertIn("theme.usesArchitecturalPhotoLayout ? .trailing : imageAlignment", home,
                       "Home keeps the building/tree central band, not mostly upper sky")
-        self.assertNotIn("theme.isWhiteHouse ? .topTrailing", home)
+        self.assertNotIn("theme.usesArchitecturalPhotoLayout ? .topTrailing", home)
 
     def test_existing_panoramic_theme_photos_keep_their_original_aspect(self):
         names = {"AutumnBackdrop", "HalloweenBackdrop", "ChristmasBackdrop", "WinterBackdrop", "EasterBackdrop",
@@ -136,7 +136,7 @@ class WhiteHouseThemeTests(unittest.TestCase):
         picker = source.split("ForEach(AppTheme.pickerThemes)", 1)[1].split('Text("Menu theme")', 1)[0]
         self.assertIn(".buttonStyle(.plain)\n                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)", picker)
         self.assertIn("preserveEntirePhoto: true", card)
-        self.assertIn(".aspectRatio(theme.isWhiteHouse ? 16.0 / 9.0 : 3.0, contentMode: .fit)", card)
+        self.assertIn(".aspectRatio(theme.usesArchitecturalPhotoLayout ? 16.0 / 9.0 : 3.0, contentMode: .fit)", card)
         self.assertNotIn("scaledToFill", card, "Equalizing cards must not crop or stretch photos")
 
     def test_new_icon_does_not_replace_global_default(self):

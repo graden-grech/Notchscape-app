@@ -25,6 +25,23 @@ struct CustomizationPolicyTests {
     }
 
     static func main() throws {
+        check(CityscapeScene.allCases == [.newYork, .chicago, .detroit, .boston, .philadelphia, .washingtonDC,
+                                        .losAngeles, .sanFrancisco, .seattle, .lasVegas, .miami, .newOrleans],
+              "Cityscapes presents the twelve requested cities in a stable order")
+        check(Set(CityscapeScene.allCases.map(\.rawValue)).count == 12, "Every city has an independent persisted theme value")
+        check(Set(CityscapeScene.allCases.map(\.backdropName)).count == 12, "Every city resolves to separate bundled photography")
+        check(Set(CityscapeScene.allCases.map(\.title)).count == 12, "Every city has an unambiguous native picker label")
+        for scene in CityscapeScene.allCases {
+            let restored = try JSONDecoder().decode(CityscapeScene.self, from: JSONEncoder().encode(scene))
+            check(restored == scene && restored.backdropName == scene.backdropName, "City selection and photo restore together")
+            check(scene.rawValue.hasPrefix("city") && scene.rawValue.utf8.count < 64, "City IDs stay bounded and separate from existing theme families")
+            check(scene.backdropName.hasPrefix("City") && scene.backdropName.hasSuffix("Backdrop"), "City photos are deterministic bundled assets")
+            for hex in [scene.lightAccent, scene.darkAccent] {
+                check(hex.hasPrefix("#") && hex.count == 7 && UInt32(hex.dropFirst(), radix: 16) != nil, "City accent is finite sRGB")
+            }
+            check(1.05 / (luminance(scene.lightAccent) + 0.05) >= 4.5, "City accent is readable on light controls")
+            check((luminance(scene.darkAccent) + 0.05) / (luminance("#111111") + 0.05) >= 4.5, "City accent is readable on the dark notch plane")
+        }
         check(WhiteHouseStyle.allCases == [.neutral, .republican, .democrat], "Neutral plus both decorative party-color options are explicit choices")
         check(WhiteHouseScene.allCases == [.exterior, .ovalOffice, .eastRoom, .blueRoom], "Four architectural rooms and views are available")
         check(WhiteHouseThemeVariant.allCases.count == 24, "Every style works with every room and Christmas setting")

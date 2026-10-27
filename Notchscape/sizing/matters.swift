@@ -63,10 +63,10 @@ enum MusicPlayerImageSizes {
     // Check if the screen is available
     if let screen = selectedScreen {
         // Calculate and set the exact width of the notch
-        if let topLeftNotchpadding: CGFloat = screen.auxiliaryTopLeftArea?.width,
-           let topRightNotchpadding: CGFloat = screen.auxiliaryTopRightArea?.width
-        {
-            notchWidth = screen.frame.width - topLeftNotchpadding - topRightNotchpadding + 4
+        if let physical = PhysicalNotchGeometry.resolve(
+            screenFrame: screen.frame, safeTop: Double(screen.safeAreaInsets.top),
+            leftArea: screen.auxiliaryTopLeftArea, rightArea: screen.auxiliaryTopRightArea) {
+            notchWidth = CGFloat(physical.width)
         }
 
         // Check if the Mac has a notch

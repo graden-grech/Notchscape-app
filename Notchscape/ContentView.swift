@@ -240,7 +240,13 @@ struct ContentView: View {
     private var computedChinWidth: CGFloat {
         var chinWidth: CGFloat = vm.closedNotchSize.width
 
-        if (upcomingCalendarActivity != nil || timerActivityIsVisible
+        if coordinator.expandingView.type == .battery && coordinator.expandingView.show
+            && vm.notchState == .closed && Defaults[.showPowerStatusNotifications]
+        {
+            chinWidth = batteryNotificationLanes.map {
+                CGFloat($0.totalWidth) + 2 * cornerRadiusInsets.closed.bottom
+            } ?? 640 // Keep the existing notchless chin width.
+        } else if (upcomingCalendarActivity != nil || timerActivityIsVisible
             || activeDownload != nil || activeWeatherAlert != nil)
             && vm.notchState == .closed && !vm.hideOnClosed {
             // Keep equal-width lanes on both sides so the hardware-notch gap
@@ -252,10 +258,6 @@ struct ContentView: View {
             chinWidth += agentDetailExpanded
                 ? 2 * (closedActivityDetailWidth + closedActivitySpacing)
                 : (2 * max(0, vm.effectiveClosedNotchHeight - 12) + 20)
-        } else if coordinator.expandingView.type == .battery && coordinator.expandingView.show
-            && vm.notchState == .closed && Defaults[.showPowerStatusNotifications]
-        {
-            chinWidth = 640
         } else if vm.notchState == .closed && hasMusicActivity
         {
             chinWidth += (2 * max(0, vm.effectiveClosedNotchHeight - 12) + 20)
@@ -313,12 +315,6 @@ struct ContentView: View {
                             }
                         }
                         .allowsHitTesting(false)
-                    }
-                    .overlay(alignment: .top) {
-                        Rectangle()
-                            .fill(sportsUsesPhysicalNotchLayout ? Color.black : Color.clear)
-                            .frame(height: 1)
-                            .padding(.horizontal, topCornerRadius)
                     }
                     .padding(
                         .bottom,
@@ -557,30 +553,7 @@ struct ContentView: View {
                     if coordinator.expandingView.type == .battery && coordinator.expandingView.show
                         && vm.notchState == .closed && Defaults[.showPowerStatusNotifications]
                     {
-                        HStack(spacing: 0) {
-                            HStack {
-                                Text(batteryModel.statusText)
-                                    .font(.subheadline)
-                                    .foregroundStyle(.white)
-                            }
-
-                            Rectangle()
-                                .fill(.black)
-                                .frame(width: vm.closedNotchSize.width + 10)
-
-                            HStack {
-                                NotchscapeBatteryView(
-                                    batteryWidth: 30,
-                                    isCharging: batteryModel.isCharging,
-                                    isInLowPowerMode: batteryModel.isInLowPowerMode,
-                                    isPluggedIn: batteryModel.isPluggedIn,
-                                    levelBattery: batteryModel.levelBattery,
-                                    isForNotification: true
-                                )
-                            }
-                            .frame(width: 76, alignment: .trailing)
-                        }
-                        .frame(height: vm.effectiveClosedNotchHeight, alignment: .center)
+                        batteryNotification()
                       } else if coordinator.sneakPeek.show && Defaults[.inlineHUD] && (coordinator.sneakPeek.type != .music) && (coordinator.sneakPeek.type != .battery) && vm.notchState == .closed {
                           InlineHUD(type: $coordinator.sneakPeek.type, value: $coordinator.sneakPeek.value, icon: $coordinator.sneakPeek.icon, hoverAnimation: $isHovering, gestureProgress: $gestureProgress)
                               .transition(.opacity)
@@ -763,6 +736,48 @@ struct ContentView: View {
             }
         }
         .onDrop(of: [.fileURL, .url, .utf8PlainText, .plainText, .data], delegate: GeneralDropTargetDelegate(isTargeted: $vm.generalDropTargeting))
+    }
+
+    private var batteryNotificationPresentation: BatteryNotificationPresentation {
+        .resolve(lowAlert: batteryModel.statusText == BatteryAlertKind.low20.title,
+                 criticalAlert: batteryModel.statusText == BatteryAlertKind.low10.title,
+                 pluggedIn: batteryModel.isPluggedIn, charging: batteryModel.isCharging,
+                 fullyCharged: batteryModel.isFullyCharged)
+    }
+
+    private var batteryNotificationLanes: BatteryNotificationLanes? {
+        let screen = vm.screenUUID.flatMap { NSScreen.screen(withUUID: $0) } ?? NSScreen.main
+        guard let screen, screen.safeAreaInsets.top > 0 else { return nil }
+        let physical = PhysicalNotchGeometry.resolve(
+            screenFrame: screen.frame, safeTop: Double(screen.safeAreaInsets.top),
+            leftArea: screen.auxiliaryTopLeftArea, rightArea: screen.auxiliaryTopRightArea)
+        return BatteryNotificationLayoutPolicy.compactLanes(
+            presentation: batteryNotificationPresentation, level: Double(batteryModel.levelBattery),
+            physicalNotchWidth: physical?.width ?? Double(vm.closedNotchSize.width),
+            centerOffset: physical?.centerOffset ?? 0)
+    }
+
+    private func batteryNotification() -> some View {
+        let lanes = batteryNotificationLanes
+        return BatteryNotificationView(
+            statusText: batteryModel.statusText,
+            closedNotchWidth: vm.closedNotchSize.width,
+            height: vm.effectiveClosedNotchHeight,
+            physicalLanes: lanes,
+            presentation: batteryNotificationPresentation,
+            level: Double(batteryModel.levelBattery)
+        ) {
+            NotchscapeBatteryView(
+                batteryWidth: 30,
+                isCharging: batteryModel.isCharging,
+                isInLowPowerMode: batteryModel.isInLowPowerMode,
+                isPluggedIn: batteryModel.isPluggedIn,
+                levelBattery: batteryModel.levelBattery,
+                isForNotification: true,
+                notificationPercentageOnly: lanes != nil,
+                notificationStatusText: lanes != nil ? batteryModel.statusText : nil
+            )
+        }
     }
 
     @ViewBuilder

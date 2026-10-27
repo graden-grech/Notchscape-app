@@ -50,6 +50,7 @@ final class AppearanceRecipes: ObservableObject {
         Defaults[.automaticSeasonalThemes] = false
         Defaults[.appTheme] = theme; Defaults[.appIconFollowsTheme] = value.followsThemeIcon
         if let variant = theme.whiteHouseVariant { Defaults[.whiteHousePreferredVariant] = variant }
+        if let scene = theme.cityscapeScene { Defaults[.cityscapePreferredScene] = scene }
         Defaults[.appIconVariant] = value.followsThemeIcon ? theme.matchingIcon : icon
         Defaults[.appIconVariant].apply()
         if let hex = value.accentHex, let (r,g,b) = AppearanceRecipe.rgb(hex),
@@ -155,6 +156,7 @@ private struct AppearanceRecipeEditor: View {
     @State private var name = "My Appearance"
     @State private var base = Defaults[.appTheme]
     @State private var lastWhiteHouseVariant = Defaults[.whiteHousePreferredVariant]
+    @State private var lastCityscapeScene = Defaults[.cityscapePreferredScene]
     @State private var custom = Defaults[.useCustomAccentColor]
     @State private var accent = Color(nsColor: .effectiveAccent)
     @State private var followsIcon = Defaults[.appIconFollowsTheme]
@@ -164,9 +166,22 @@ private struct AppearanceRecipeEditor: View {
     @State private var hidden = Defaults[.hiddenHomeWidgets]
     private var tint: Color { custom ? accent : Color(nsColor: base.accentColor ?? .controlAccentColor) }
     private var themeSelection: Binding<AppTheme> {
-        Binding(get: { base.isWhiteHouse ? .whiteHouse : base }, set: { selected in
+        Binding(get: { base.isWhiteHouse ? .whiteHouse : base.isCityscape ? .cityNewYork : base }, set: { selected in
             if let variant = base.whiteHouseVariant { lastWhiteHouseVariant = variant }
-            base = selected.isWhiteHouse ? AppTheme(rawValue: lastWhiteHouseVariant.rawValue) ?? .whiteHouse : selected
+            if let scene = base.cityscapeScene { lastCityscapeScene = scene }
+            if selected.isWhiteHouse {
+                base = AppTheme(rawValue: lastWhiteHouseVariant.rawValue) ?? .whiteHouse
+            } else if selected.isCityscape {
+                base = AppTheme(rawValue: lastCityscapeScene.rawValue) ?? .cityNewYork
+            } else {
+                base = selected
+            }
+        })
+    }
+    private var cityscapeScene: Binding<CityscapeScene> {
+        Binding(get: { base.cityscapeScene ?? lastCityscapeScene }, set: { scene in
+            lastCityscapeScene = scene
+            base = AppTheme(rawValue: scene.rawValue) ?? .cityNewYork
         })
     }
     private var whiteHouseStyle: Binding<WhiteHouseStyle> {
@@ -205,8 +220,13 @@ private struct AppearanceRecipeEditor: View {
                 }
                 Section("Style") {
                     Picker("Theme", selection: themeSelection) {
-                        ForEach(AppTheme.allCases.filter { !$0.isWhiteHouse || $0 == .whiteHouse }) {
-                            Text($0.isWhiteHouse ? "White House" : $0.title).tag($0)
+                        ForEach(AppTheme.allCases.filter { (!$0.isWhiteHouse || $0 == .whiteHouse) && (!$0.isCityscape || $0 == .cityNewYork) }) {
+                            Text($0.isCityscape || $0.isWhiteHouse ? $0.pickerTitle : $0.title).tag($0)
+                        }
+                    }
+                    if base.isCityscape {
+                        Picker("City", selection: cityscapeScene) {
+                            ForEach(CityscapeScene.allCases) { Text($0.title).tag($0) }
                         }
                     }
                     if base.isWhiteHouse {
@@ -305,7 +325,7 @@ private struct AppearanceRecipeSample: View {
                         .padding(9).background(.black.opacity(0.45), in: RoundedRectangle(cornerRadius: 8))
                 }
             }.foregroundStyle(.white).padding(12)
-        }.aspectRatio(theme.isWhiteHouse ? 16.0 / 9.0 : 3.0, contentMode: .fit).clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        }.aspectRatio(theme.usesArchitecturalPhotoLayout ? 16.0 / 9.0 : 3.0, contentMode: .fit).clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             .overlay(alignment: .topTrailing) { Circle().fill(color).frame(width: 12, height: 12).padding(10) }
             .accessibilityElement(children: .ignore).accessibilityLabel("Preview of \(theme.title), with chosen Home tile order and accent")
     }
