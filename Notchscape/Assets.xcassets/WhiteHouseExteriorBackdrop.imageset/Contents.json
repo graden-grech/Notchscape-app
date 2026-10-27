@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "WhiteHouseExteriorBackdrop.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

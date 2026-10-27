@@ -1,0 +1,17 @@
+{
+  "generator": "built-in image_gen",
+  "assets": [
+    {
+      "path": "Notchscape/Assets.xcassets/StarWarsJediBackdrop.imageset/StarWarsJediBackdrop.png",
+      "prompt": "Use case: stylized-concept. Asset type: production panoramic background for the expanded Home menu of a macOS notch app, Star Wars Jedi theme. Create original cinematic photoreal environment artwork, not a movie still or poster. A tranquil ancient Jedi sanctuary carved into a misty green forest, subtle blue sky light, one elegantly lit blue lightsaber standing vertically on a stone ledge at the far RIGHT, realistically detailed stone and foliage. Extremely wide 3:1 landscape composition. Left 70 percent calm, dark, low-detail negative space for white calendar/music text; all recognizable scene interest concentrated on the right 25 percent. Sophisticated, believable photographic film lighting, restrained glow, no character faces, no people, no logos, no writing, no UI, no borders, no watermark. It must crop well to a wide shallow 5:1 app header without losing the scene's right-side focal point."
+    },
+    {
+      "path": "Notchscape/Assets.xcassets/StarWarsDarkSideBackdrop.imageset/StarWarsDarkSideBackdrop.png",
+      "prompt": "Use case: stylized-concept. Asset type: production panoramic background for the expanded Home menu of a macOS notch app, Star Wars Dark Side theme. Original cinematic photoreal environment artwork, not a movie still or poster. A vast dark obsidian space-fortress observation chamber above a distant red volcanic planet, black metallic architectural ribs, realistic subtle red illumination, one upright crimson lightsaber on a dark console at the far RIGHT. Extremely wide 3:1 landscape composition. Left 70 percent calm near-black low-detail negative space for white music/calendar UI; architectural and planet detail in right 25 percent. Elegant ominous atmosphere, physical metallic textures, restrained glow, not gaming wallpaper, no people, no faces, no logos, no text, no UI, no borders, no watermark. Must crop to a very shallow wide 5:1 header."
+    },
+    {
+      "path": "Notchscape/Assets.xcassets/StarWarsDesertBackdrop.imageset/StarWarsDesertBackdrop.png",
+      "prompt": "Use case: stylized-concept. Asset type: production panoramic background for a Star Wars character-inspired macOS notch theme. Original cinematic photoreal Tatooine-inspired desert at blue hour, distant twin suns dipping to horizon, one blue lightsaber hilt resting on a worn sandstone plinth at the far RIGHT with a small upward blue blade. Realistic dunes and stone, cool charcoal blue shadows with subtle warm horizon. Extremely wide 3:1 landscape. Left 70 percent dark, clean low-detail negative space where white calendar/music UI will sit; visual interest in far right quarter. Photograph-like cinematic realism, no people or faces, no logos, no words, no UI or frame. Crop-safe to shallow 5:1 header."
+    }
+  ]
+}

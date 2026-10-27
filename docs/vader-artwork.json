@@ -1,0 +1,11 @@
+{
+  "requestedAsset": "Notchscape/Assets.xcassets/StarWarsVaderSceneBackdrop.imageset/StarWarsVaderSceneBackdrop.png",
+  "reference": "Notchscape/Assets.xcassets/StarWarsDarkSideBackdrop.imageset/StarWarsDarkSideBackdrop.png",
+  "status": "Blocked by image generator. No finished character scene is bundled. Original lightsaber scene is retained.",
+  "onlineSubstituteRemoved": true,
+  "generationAttempt": {
+    "tool": "built-in image_gen",
+    "status": "rejected on both attempts; no generated image used",
+    "prompt": "Use case: precise-object-edit. Asset type: panoramic macOS notch Home theme background. The supplied image is the edit target and composition reference. Preserve its panoramic 3:1 aspect ratio, the black obsidian space-fortress setting, red volcanic planet, subtle cinematic red illumination, and especially its calm, very dark left 70 percent where white app controls and calendar text will be displayed. Change only the far-right focal artwork: remove the upright red lightsaber and replace it with the actual recognizable Darth Vader character in his iconic glossy black helmet, armored chest control panel and flowing black cape. A realistic cinematic costume photograph, not cartoon, not a toy or plastic figurine. Darth Vader is a large waist-up portrait occupying the RIGHTMOST 22 percent, at about x=88 percent, with his entire helmet visible between y=15 percent and y=42 percent and torso extending downwards. IMPORTANT: this will be cropped to a very shallow wide 5:1 strip showing the TOP half of the image, so his face mask and helmet must be completely recognizable near the top-right, not cut off or hidden. Soft neutral fill on the helmet and restrained red rim light separate black armor from the dark background. No extra lightsaber or other people, no text, no logos, no UI, no border, no watermark. Keep this a single coherent scene, not a portrait pasted into a separate square."
+  }
+}

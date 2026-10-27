@@ -1,0 +1,14 @@
+{
+  "version": "2.9.0-beta.1",
+  "build": "285",
+  "channel": "preview",
+  "stableAutomaticUpdate": false,
+  "archiveURL": "https://github.com/graden-grech/boringNotch-custom/releases/download/v2.9.0-beta.1/boringNotch-custom.zip",
+  "length": 21817683,
+  "sha256": "eb908532796dfa3fac5e810942cade8d9b8508d6a15ed541d359fc9d690a7196",
+  "sparkleEdSignature": "YAkMIeFmH1Q7uUHeowpa1WB3aVPysQUfJHpZ/wIWXBC9cB3B+VFkycDoRDB8CtctrkdX0CeC+HjsaR8KnyMpCw==",
+  "sparklePublicKey": "nqZKiSN++X9uwH4MqHVLSJ9RQ6bvbT9Y2B07flQ34OQ=",
+  "signingTeam": "6H86CTRJCP",
+  "bundleID": "theboringteam.boringnotch",
+  "notarized": false
+}

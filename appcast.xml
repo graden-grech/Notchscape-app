@@ -1,0 +1,218 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Notchscape</title>
+        <item>
+            <title>2.9.2</title>
+            <pubDate>Tue, 27 Oct 2026 08:12:29 -0400</pubDate>
+            <link>https://github.com/graden-grech/Notchscape/releases/tag/v2.9.2</link>
+            <sparkle:version>295</sparkle:version>
+            <sparkle:shortVersionString>2.9.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <description sparkle:format="markdown"><![CDATA[# Notchscape 2.9.2 — Guided setup and White House
+
+- Optional six-chapter setup explains every public Settings section, with Back, Next and Skip. Replay it from General settings or Help.
+- Permission connections are grouped on one optional page. Calendar and Reminders request access only when you choose Connect, with the current macOS purpose strings. Skipped setup stays skipped on relaunch.
+- White House includes 24 room, color and Christmas scenes: four views, neutral/red/blue décor, and festive versions with snow outside.
+- Four matching icons: Republican red, Democrat blue, and a Christmas version of each. Match the theme automatically or choose any icon manually.
+- Better full-photo previews, aligned theme cards and Home framing. Expanded Mirror, Settings and Battery controls have space below the screen edge.
+- Weather starts off and Show on all displays starts on for new users. Existing settings, signing identity, HUD permissions and updater key are preserved. Accounts remain disabled.
+
+Requires Apple silicon and macOS 15 or later, matching the linked music framework. Native Liquid Glass needs macOS 26; earlier supported systems use standard materials. Install Notchscape.app in shared /Applications to make the app available to other local accounts; settings, privacy access and login startup remain separate for each account.
+
+Development-signed, not Developer ID signed or notarized. The unsigned installer preview is not included. The complete fresh-account, macOS, hardware, DisplayLink and accessibility/performance matrix is not fully verified. See the [release verification and limits](https://github.com/graden-grech/Notchscape/blob/v2.9.2/docs/releases/2.9.2.md).
+]]></description>
+            <enclosure url="https://github.com/graden-grech/Notchscape/releases/download/v2.9.2/Notchscape.zip" length="81347851" type="application/octet-stream" sparkle:edSignature="oqB8cBTmIJFT0VEYTjmQFYKfRIDmM9dU0dI5glChkfFjUYeu28KEnj/a9ndXy9YcR4Y2jFMmkPU6MZcA13+ECg=="/>
+        </item>
+        <item>
+            <title>Notchscape 2.9.1</title>
+            <pubDate>Sun, 25 Oct 2026 21:13:48 -0400</pubDate>
+            <link>https://github.com/graden-grech/Notchscape/releases/tag/v2.9.1</link>
+            <sparkle:version>290</sparkle:version>
+            <sparkle:shortVersionString>2.9.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <description sparkle:format="markdown"><![CDATA[# Notchscape 2.9.1 — Complete product branding
+
+- Fresh downloads contain Notchscape.app with a Notchscape executable and matching helper product name.
+- Project/source folders, onboarding, About, localized labels and installer names use Notchscape.
+- Removes unused old logos and welcome audio. Legal notices remain in the Legal section.
+- Restart opens the exact current app instead of resolving an older duplicate.
+- Keeps existing settings, app/helper signing identity and update key. Accounts remain disabled.
+
+Existing installations: Sparkle preserves the installed app's filename. After updating, quit and rename that installed copy to Notchscape.app once if it retains an older filename. Keep one installed copy; do not reset permissions or delete settings. Fresh downloads are already named correctly.
+
+Development-signed, not notarized; this is a branding correction, not a claim of full production readiness. Apple silicon only; native Liquid Glass needs macOS 26. macOS 14 compatibility, other hardware, external-display/DisplayLink and the complete fresh-device permission matrix remain unverified. The new White House theme is a separate follow-up, not part of this archive.
+]]></description>
+            <enclosure url="https://github.com/graden-grech/Notchscape/releases/download/v2.9.1/Notchscape.zip" length="30568390" type="application/octet-stream" sparkle:edSignature="Xi5ZjsVkwdfsmIpi1/3e4cMRm6kw618t3cD2FuFxdfDkIoDH6x1q4y7o3cst7HimjG9q8Tuga+LSbEm8H1sjCg=="/>
+        </item>
+        <item>
+            <title>Notchscape 2.9.0</title>
+            <pubDate>Fri, 23 Oct 2026 13:08:12 -0400</pubDate>
+            <link>https://github.com/graden-grech/Notchscape/releases/tag/v2.9.0</link>
+            <sparkle:version>289</sparkle:version>
+            <sparkle:shortVersionString>2.9.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <description sparkle:format="markdown"><![CDATA[# Notchscape 2.9.0 — Workspace, capture and appearance
+
+- Commands search, calculator/conversions, encrypted snippets, Quicklinks and saved colors.
+- Stopwatch/laps, focus cycles, Keep Awake and pinned event countdowns.
+- Capture Studio: markup/redaction, optional searchable library, QR/barcodes, explicit silent recording, trimming and MP4/M4A/GIF export.
+- Window positioning/Undo, saved layouts and app/window switching with optional one-shot previews.
+- Preferred audio outputs, input selection, supported hardware mute and accessory low-battery alerts.
+- Additional watched download folders, pinned notes, Finder Services and Apple Shortcuts actions.
+- Network/disk/memory-pressure stats, saved appearance presets and six new static palette scenes.
+- Includes the AI chat-title fix. Existing settings, signing identity, HUD permissions and update key are preserved. Accounts remain disabled.
+
+New capture/routing/alert actions are explicit or opt-in. Recording is silent and selected with Apple's picker. A real music Up Next queue remains unavailable. Requires Apple silicon/macOS 14; recording needs macOS 15 and native Liquid Glass needs macOS 26. Development-signed, not notarized. Hardware, multi-display, other macOS versions and the complete live export/appearance/permission matrix are not fully verified. See the release notes and feature tracker for limits.
+]]></description>
+            <enclosure url="https://github.com/graden-grech/Notchscape/releases/download/v2.9.0/Notchscape.zip" length="31126207" type="application/octet-stream" sparkle:edSignature="CP/NuFfubm+q9LY9tQsSm0qN9u1Sl+eDcOykVX6CBJNnVCjLqu3iGW/emgIf7DMKzJfF+1yD/v0fQcIwCphZAA=="/>
+        </item>
+        <item>
+            <title>Notchscape 2.8.5</title>
+            <pubDate>Fri, 23 Oct 2026 11:00:22 -0400</pubDate>
+            <link>https://github.com/graden-grech/Notchscape/releases/tag/v2.8.5</link>
+            <sparkle:version>288</sparkle:version>
+            <sparkle:shortVersionString>2.8.5</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <description sparkle:format="markdown"><![CDATA[# Notchscape 2.8.5 — AI chat names
+
+- AI activities show matching chat names instead of `/` or folder labels when local title metadata is available.
+- Click the compact AI activity to reveal its chat title. Readable fallbacks are used if a provider has no title.
+- Exact-session matching, background lookups, bounded reads and short-lived caching; no provider data is changed or uploaded.
+- Existing preferences, HUD permissions, signing identity and update key are preserved. Accounts remain disabled.
+
+This focused release excludes the larger unfinished workspace-tools, capture, window-management and theme feature batch. Development-signed; not notarized. Requires Apple silicon and macOS 14 or later; native Liquid Glass requires macOS 26. Other hardware/macOS versions and fresh-device permission flows remain unverified.
+]]></description>
+            <enclosure url="https://github.com/graden-grech/Notchscape/releases/download/v2.8.5/Notchscape.zip" length="30449900" type="application/octet-stream" sparkle:edSignature="cxOPD7WLeGf/68iPtX0el3YbawnOaueKG6qrCRM52nFAorKNhEs5zsR5cd+W9BXcz2KtqG5CmKo3y0NEJKUfBw=="/>
+        </item>
+        <item>
+            <title>2.8.4</title>
+            <pubDate>Sat, 17 Oct 2026 12:32:24 -0400</pubDate>
+            <link>https://github.com/graden-grech/boringNotch-custom/releases/tag/v2.8.4</link>
+            <sparkle:version>287</sparkle:version>
+            <sparkle:shortVersionString>2.8.4</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <description sparkle:format="markdown"><![CDATA[# boringNotch Custom 2.8.4
+
+- No account required: Continue Without an Account skips account setup. Sign-in, account pages, passkeys and cloud sync stay disabled; existing saved credentials and cloud settings are not deleted.
+- A release check keeps unfinished account features disabled. The earlier account preview remains withdrawn.
+- The optional lock-screen Home dropdown shows only a lock inside the expanded menu, with no closed-notch badge or explanatory text.
+- External-display visibility can be turned off, with dependent controls clearly disabled.
+- Lighter Settings surfaces and a clearer terminal symbol for AI activity.
+
+The lock-screen option remains experimental, off by default, and uses inherited private SkyLight integration rather than an official Apple extension. Development-signed with the existing app/helper identity and update key; not notarized. Requires Apple silicon and macOS 14 or later; native Liquid Glass requires macOS 26. Fresh-device onboarding, other macOS versions, full VoiceOver coverage, multiple displays/DisplayLink, rapid lock transitions and permission revocation remain unverified.
+]]></description>
+            <enclosure url="https://github.com/graden-grech/boringNotch-custom/releases/download/v2.8.4/boringNotch-custom.zip" length="21818606" type="application/octet-stream" sparkle:edSignature="iqGP2pnk240QGMIfbjyhe1jtnCNl6Mq0HeRgJkMMJaNy61/8sWAD9OHBV0632nG2rXOmMXWVaFNHYdHcFWBZCw=="/>
+        </item>
+        <item>
+            <title>2.8.3</title>
+            <pubDate>Wed, 14 Oct 2026 12:01:56 -0400</pubDate>
+            <link>https://github.com/graden-grech/boringNotch-custom/releases/tag/v2.8.3</link>
+            <sparkle:version>284</sparkle:version>
+            <sparkle:shortVersionString>2.8.3</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <description sparkle:format="markdown"><![CDATA[# boringNotch Custom 2.8.3
+
+- Bounded HUD recovery after launch, activation, and wake, with no permanent watchdog.
+- Accurate interceptor status, a Restart HUD control, and permission monitoring that survives closing Settings.
+- Stale event-tap cleanup and recovery that respects the user's HUD on/off choice.
+- Matching 30-point native glass capsules for the Home battery, Mirror, and Settings controls. Small native switches stay unchanged.
+- Signed-build identity checks and a live HUD smoke test to catch future regressions.
+
+Uses the same signing identity and update key. Development-signed; not notarized. Requires Apple silicon and macOS 14 or later; native Liquid Glass requires macOS 26. Full sleep/wake, permission-revocation, VoiceOver, and external-display/DisplayLink testing remain pending.
+]]></description>
+            <enclosure url="https://github.com/graden-grech/boringNotch-custom/releases/download/v2.8.3/boringNotch-custom.zip" length="21114719" type="application/octet-stream" sparkle:edSignature="jAydkGwSzmevjgMVcvmOlcNh3Fq3fu88WjAFK5yrq54lL/VxYcvT2yeyu43rsDtCxHqiv9+n6o7Rf8kf2OauDg=="/>
+        </item>
+        <item>
+            <title>2.8.2</title>
+            <pubDate>Tue, 13 Oct 2026 22:20:13 -0400</pubDate>
+            <link>https://github.com/graden-grech/boringNotch-custom/releases/tag/v2.8.2</link>
+            <sparkle:version>283</sparkle:version>
+            <sparkle:shortVersionString>2.8.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <description sparkle:format="markdown"><![CDATA[# boringNotch Custom 2.8.2
+
+- Optional Enhanced battery controls, real local history, and brief optional battery alerts. Original style remains available.
+- Battery glass stays inside the Home header, including when charging.
+- Small native Apple switches with Liquid Glass and drag interaction on macOS 26.
+- Lighter content materials, improved settings scrolling and resizing, and better accessibility for media, Mirror, Shelf, and opening the menu.
+- Home widget ordering, Quick Actions, local AI outcome history, and battery-conscious rendering modes.
+- Refined seasonal backgrounds, inclusive Winter theme, manual or theme-matched app icons, and custom accents.
+- Improved Dock visibility and opt-in setup for inherited publishing workflows.
+
+Development-signed; not notarized. Requires Apple silicon and macOS 14 or later. Native Liquid Glass requires macOS 26. Full external-display/DisplayLink, VoiceOver, onboarding permission-dialog, and HUD permission/restart regression tests remain pending.
+]]></description>
+            <enclosure url="https://github.com/graden-grech/boringNotch-custom/releases/download/v2.8.2/boringNotch-custom.zip" length="21107401" type="application/octet-stream" sparkle:edSignature="9OyHWw+pXWMBQd8yQ5tC7/G2Ne2UJo2MIfiVXNSfBGUL7UT1rTcEaHoUWvPvpam9I8gvwnq4zw3vF/s9crw1Ag=="/>
+        </item>
+        <item>
+            <title>2.8.1</title>
+            <pubDate>Sun, 11 Oct 2026 22:28:29 -0400</pubDate>
+            <link>https://github.com/graden-grech/boringNotch-custom/releases/tag/v2.8.1</link>
+            <sparkle:version>281</sparkle:version>
+            <sparkle:shortVersionString>2.8.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <description sparkle:format="markdown"><![CDATA[# boringNotch Custom 2.8.1
+
+- Choose Dynamic Island or Notch for notchless displays.
+- Seasonal themes and matching icons, including a full-sized Christmas tree beside the Home calendar.
+- Sports favorites, compact scores, and score notifications.
+- Improved AI quota handling: low-usage warnings stay active and quota failures cannot turn into completion checks.
+- Native Liquid Glass on macOS 26 with lighter fallbacks on older macOS.
+- Fewer AI redraws and paused music timers for better efficiency.
+
+Physical-notch and DisplayLink hardware validation and the full HUD restart regression remain pending. Developer-signed; not notarized.
+]]></description>
+            <enclosure url="https://github.com/graden-grech/boringNotch-custom/releases/download/v2.8.1/boringNotch-custom.zip" length="15035356" type="application/octet-stream" sparkle:edSignature="iftUEVrxW7crcIA4OmyUc2d4HxI5eJCPzVbadbHmtaOghUhm/3HMGPNKdzDQh5hI/8COwdBCP8+/yUyhqRlECA=="/>
+        </item>
+        <item>
+            <title>2.8.0</title>
+            <pubDate>Sat, 10 Oct 2026 17:16:38 -0400</pubDate>
+            <link>https://github.com/graden-grech/boringNotch-custom/releases/tag/v2.8.0</link>
+            <sparkle:version>280</sparkle:version>
+            <sparkle:shortVersionString>2.8.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <description sparkle:format="markdown"><![CDATA[# boringNotch Custom 2.8.0
+
+- Shows a single Apple-style green completion check on one side of the notch.
+- Detects AI usage and rate limits, shows a red three-second alert, and clears
+  abandoned working states automatically.
+- Adds an optional System tab with efficient, on-demand CPU, memory, storage,
+  and thermal-pressure monitoring plus safe Mac controls.
+- Adds rounded rectangle, squircle, and capsule mirror shapes.
+- Introduces a new Liquid Glass app icon, native Apple Liquid Glass navigation
+  and music controls, plus translucent Settings, Live, System, and Shelf surfaces.
+- Replaces the separate top buttons with a compact Apple-style segmented
+  control and removes the stray pressed-symbol animation from music controls.
+- Keeps the HUD enabled across launches and rebuilds, automatically restarts
+  its media-key interceptor after Accessibility approval, and uses a stable
+  local signing identity so macOS keeps the permission grant.
+- Removes costly activation-policy switching when Settings opens and closes,
+  making the custom Settings window significantly smoother.
+- Keeps Sparkle automatic updates on the public
+  `graden-grech/boringNotch-custom` GitHub feed.
+
+- Adds Codex and Claude Code activities with provider colors, Music/AI priority,
+  dual-activity layouts, and four-second completion indicators.
+- Adds a location-aware weather tile that can live on Home or the Live page.
+- Restores native notch sizing when weather is on the Live page and keeps the
+  calendar at its normal size.
+- Adds Live Activity controls, timers, download status, calendar alerts, and
+  Apple-style privacy indicators.
+- Improves the HUD permission flow and keeps the original rounded notch shape.
+- Refines the AI completion checkmark and music waveform with a cleaner,
+  Apple-like appearance.
+- Moves Sparkle updates to the public `graden-grech/boringNotch-custom` feed.
+]]></description>
+            <enclosure url="https://github.com/graden-grech/boringNotch-custom/releases/download/v2.8.0/boringNotch-custom.zip" length="10439073" type="application/octet-stream" sparkle:edSignature="k3NQsP38VbQVP+bUaVa8KR8pDmsCo7p04vAyZozLjYVkGfrBUTFalNmosmhFyGKsV60RvzcuaaWCaGymcFOLAQ=="/>
+        </item>
+    </channel>
+</rss>

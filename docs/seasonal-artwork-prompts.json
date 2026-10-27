@@ -1,0 +1,19 @@
+{
+  "mode": "built-in image generation",
+  "assets": [
+    {
+      "path": "Notchscape/Assets.xcassets/AutumnBackdrop.imageset/AutumnBackdrop.png",
+      "prompt": "Use case: photorealistic-natural. Asset type: wide photographic background for the expanded Home panel of a macOS notch app. Primary request: a realistic cozy autumn cabin scene, holiday-neutral Fall theme. One continuous photograph, panoramic 4:1 composition. Real wood cabin interior, soft warm amber afternoon light, windows looking onto golden maple foliage. Left 70 percent quiet, dark walnut wood and subdued cabin window surfaces, negative space suitable for white music and calendar text. Rightmost 25 percent showcase a beautiful natural branch arrangement of red, copper and golden maple leaves on a wooden table beside the window; prominent and fully visible within the shallow panorama with generous top and bottom breathing room. Natural leaf veins and worn wood grain, credible real-world photographic texture, not a render. Consistent premium cozy photographic feel with other seasonal cabin themes. No people, no text, no UI, no borders, no separate inset photographs, no pumpkins or jack-o-lanterns, no Halloween symbols, no Christmas ornaments or decorations, no artificial neon."
+    },
+    {
+      "path": "Notchscape/Assets.xcassets/WinterBackdrop.imageset/WinterBackdrop.png",
+      "prompt": "Use case: photorealistic-natural. Asset type: wide photographic background for the expanded Home panel of a macOS notch app. Primary request: peaceful snowy winter cabin, inclusive seasonal theme with absolutely no Christmas or religious symbols. One continuous realistic photograph, panoramic 4:1 composition. A dark warm timber cabin interior at blue hour, window overlooking snowy forest, subdued pale blue winter light, believable wood grain and frost on glass. Left 70 percent quiet dark interior and low-detail window shadows for white music and calendar text. Rightmost 25 percent a large picture window showcasing a prominent beautiful natural snow-covered pine tree outdoors, softly illuminated by pale winter dusk, the tree completely undecorated; compose the tree so its recognizable crown and snow-laden branches sit inside the upper and middle portion of the very shallow panorama with generous breathing room. Cozy but calm real interior architectural photography, photographic texture and balanced natural contrast. No people, text, UI, borders, collage, inset photo, no Christmas lights, ornaments, stockings, presents, Santa, wreaths, stars on trees, red-green festive decorations, no religious imagery, no cartoon or CGI look."
+    },
+    {
+      "path": "Notchscape/Assets.xcassets/AppIconWinter.imageset/AppIconWinter.png",
+      "transparent_background": true,
+      "reference": "Notchscape/Assets.xcassets/AppIconStandard.imageset/AppIconStandard.png",
+      "prompt": "Use case: precise-object-edit. Edit the reference app icon into a Winter variant. Preserve its silver glass rounded-square silhouette and central black notch shape exactly. Replace purple light with subtle ice blue and silver. Add restrained frosted glass detail inside the upper-right corner. Clean, minimal and legible small. No Christmas or religious symbols: no gifts, ornaments, Santa, decorated trees or wreaths. Genuine transparent background outside the rounded-square icon, clean alpha edges with no scattered flecks. No text or watermark."
+    }
+  ]
+}

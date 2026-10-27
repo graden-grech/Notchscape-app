@@ -1,0 +1,151 @@
+name: Build for macOS
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+# https://stackoverflow.com/a/72408109/6942800
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+# Least-privilege: only needs to read code for building.
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Notchscape
+    strategy:
+      matrix:
+        platform:
+          - macOS
+        xcode:
+          - ^26
+        scheme:
+          - Notchscape
+    # Native Liquid Glass requires the macOS 26 SDK. Hosted Intel complements
+    # locally verified signed ARM builds without relying on the congested ARM pool.
+    runs-on: macos-26-intel
+    steps:
+    - name: Code Checkout
+      # TODO: pin to immutable SHA
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+    - name: Keep unfinished accounts out of public builds
+      run: python3 .github/scripts/verify_public_feature_flags.py Notchscape/Info.plist
+    - name: Check customization policies
+      run: |
+        set -euo pipefail
+        swiftc -D CUSTOMIZATION_POLICY_TEST \
+          Notchscape/models/CustomizationModels.swift \
+          tests/CustomizationPolicyTests.swift \
+          -o "$RUNNER_TEMP/customization-policy-tests"
+        "$RUNNER_TEMP/customization-policy-tests"
+    - name: Check workflow and release helpers
+      run: python3 -m unittest discover -s .github/scripts/tests -v
+    - name: Check local tools privacy and usage policies
+      run: |
+        set -euo pipefail
+        swiftc Notchscape/models/ProductivityModels.swift tests/ProductivityPolicyTests.swift \
+          -o "$RUNNER_TEMP/productivity-policy-tests"
+        "$RUNNER_TEMP/productivity-policy-tests"
+        swiftc -D APPLE_NOTES_SCRIPT_TEST \
+          Notchscape/models/ProductivityModels.swift \
+          Notchscape/managers/AppleNotesSyncManager.swift tests/AppleNotesScriptTests.swift \
+          -o "$RUNNER_TEMP/apple-notes-script-tests"
+        "$RUNNER_TEMP/apple-notes-script-tests"
+    - name: Check AI chat titles and read-only metadata fallbacks
+      run: |
+        set -euo pipefail
+        swiftc Notchscape/models/AgentChatTitle.swift tests/AgentChatTitleTests.swift \
+          -o "$RUNNER_TEMP/agent-chat-title-tests"
+        "$RUNNER_TEMP/agent-chat-title-tests"
+    - name: Check wallpaper, utility and settings navigation policies
+      run: |
+        set -euo pipefail
+        swiftc Notchscape/models/WallpaperModels.swift \
+          Notchscape/models/WallpaperCatalog.swift \
+          Notchscape/models/WindowsWallpaperCatalog.swift \
+          Notchscape/models/NotchUtilityModels.swift tests/NotchUtilitiesPolicyTests.swift \
+          -o "$RUNNER_TEMP/notch-utilities-policy-tests"
+        "$RUNNER_TEMP/notch-utilities-policy-tests"
+    - name: Check temporary workspace Modes and privacy policies
+      run: |
+        set -euo pipefail
+        swiftc Notchscape/models/WorkspaceModeModels.swift \
+          tests/WorkspaceModePolicyTests.swift -o "$RUNNER_TEMP/workspace-mode-tests"
+        "$RUNNER_TEMP/workspace-mode-tests"
+    - name: Check personal workspace tools and input-safety policies
+      run: |
+        set -euo pipefail
+        swiftc Notchscape/models/WorkspaceToolsModels.swift \
+          Notchscape/models/WindowGeometry.swift \
+          tests/WorkspaceToolsPolicyTests.swift -o "$RUNNER_TEMP/workspace-tools-tests"
+        "$RUNNER_TEMP/workspace-tools-tests"
+    - name: Check bounded appearance recipe import and export policies
+      run: |
+        set -euo pipefail
+        swiftc Notchscape/models/AppearanceRecipe.swift \
+          tests/AppearanceRecipePolicyTests.swift -o "$RUNNER_TEMP/appearance-recipe-tests"
+        "$RUNNER_TEMP/appearance-recipe-tests"
+    - name: Check local capture redaction and QR policies
+      run: |
+        set -euo pipefail
+        swiftc Notchscape/models/CapturePolicy.swift \
+          tests/CapturePolicyTests.swift -o "$RUNNER_TEMP/capture-policy-tests"
+        "$RUNNER_TEMP/capture-policy-tests"
+    - name: Check portable window layout geometry policies
+      run: |
+        set -euo pipefail
+        swiftc Notchscape/models/WindowGeometry.swift \
+          tests/WindowGeometryTests.swift -o "$RUNNER_TEMP/window-geometry-tests"
+        "$RUNNER_TEMP/window-geometry-tests"
+    # Initial defaults must not overwrite an existing user's implicit choices.
+    # Header safety is independent of the closed island/menu-bar height.
+    - name: Check initial defaults and expanded header layout
+      run: |
+        set -euo pipefail
+        swiftc Notchscape/models/AppPresentationPolicy.swift \
+          tests/AppPresentationPolicyTests.swift -o "$RUNNER_TEMP/app-presentation-tests"
+        "$RUNNER_TEMP/app-presentation-tests"
+    - name: Check guided settings navigation
+      run: |
+        set -euo pipefail
+        swiftc Notchscape/models/SettingsTourPolicy.swift \
+          tests/SettingsTourPolicyTests.swift -o "$RUNNER_TEMP/settings-tour-tests"
+        "$RUNNER_TEMP/settings-tour-tests"
+    - name: Check synthetic media export without screen capture
+      run: |
+        set -euo pipefail
+        xcrun swiftc -D MEDIA_TOOLS_SMOKE Notchscape/managers/MediaToolsManager.swift \
+          tests/MediaToolsSmoke.swift -o "$RUNNER_TEMP/media-tools-smoke"
+        "$RUNNER_TEMP/media-tools-smoke"
+    - name: Check account settings allowlist
+      run: |
+        set -euo pipefail
+        swiftc Notchscape/models/AccountSettingsPolicy.swift \
+          tests/AccountSettingsPolicyTests.swift -o "$RUNNER_TEMP/account-policy-tests"
+        "$RUNNER_TEMP/account-policy-tests"
+    - name: Check first-login Keychain handling
+      run: bash .github/scripts/test_account_storage.sh
+    - name: Check sign-in cancellation and timeout
+      run: |
+        set -euo pipefail
+        swiftc -parse-as-library -swift-version 6 \
+          Notchscape/managers/AccountSignInAttempt.swift \
+          tests/AccountSignInAttemptTests.swift -o "$RUNNER_TEMP/account-sign-in-tests"
+        "$RUNNER_TEMP/account-sign-in-tests"
+    - # TODO: pin to immutable SHA
+      uses: mxcl/xcodebuild@d3ee9b419c1be9a988086c58fe0988f32d99cfc5 # v3.6.0
+      with:
+        xcode: ${{ matrix.xcode }}
+        platform: ${{ matrix.platform }}
+        scheme: ${{ matrix.scheme }}
+        action: build
+        verbosity: xcpretty
+        upload-logs: always
+        configuration: release

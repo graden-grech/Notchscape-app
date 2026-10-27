@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "createdOn": "2026-10-26",
+  "tool": "image_gen.imagegen",
+  "mode": "built-in targeted image edit",
+  "transparentBackground": true,
+  "originalAndDefaultIconsUnchanged": true,
+  "entries": [
+    {
+      "id": "whiteHouseRepublican",
+      "editTarget": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/boring.notch/Notchscape/Assets.xcassets/AppIconWhiteHouse.imageset/AppIconWhiteHouse-v2.png",
+      "prompt": "Use case: precise-object-edit.\nAsset type: Notchscape macOS app icon, Republican red White House variant.\nInput image 1 is the edit target, the existing Notchscape White House icon.\nChange only the glass palette and lighting to a rich Republican ruby/crimson red version with warm limestone and restrained champagne-gold highlights. The lower and side glass should read clearly deep red, not navy, purple, orange or pink. Preserve the architectural White House column detail visible through the upper glass.\nKeep unchanged: the exact rounded-square silhouette, corner radius, proportions and centered scale/padding; the continuous polished liquid-glass rim; the wide black notch-shaped mark and its contours, position and dimensions; the premium realistic refractive glass appearance. Keep the black notch legible at small Dock sizes. Make a coherent sibling icon, not a new logo concept.\nGenuinely transparent background and transparent corners outside the existing icon outline. Clean contained edges: no exterior colored speckles, glow, loose particles or opaque canvas, and no shadow outside the silhouette. No text, watermark, official seal, party emblem, elephant, political figure, flag or additional symbol. Square composition, same framing as the target.",
+      "generatedSource": "/Users/gradengrech/.codex/generated_images/01a17b07-dee1-7f30-a9ca-aaade938e539/exec-7bdd06ac-b21d-48bf-9bf3-dad357ee47d5.png",
+      "asset": "Notchscape/Assets.xcassets/AppIconWhiteHouseRepublican.imageset/AppIconWhiteHouseRepublican.png",
+      "width": 1254,
+      "height": 1254,
+      "pngColorType": 6,
+      "bitDepth": 8,
+      "sha256": "fb62f0c2d8a636734273b67a70c267eabdde735e3deab93ced0ed3163fb0cd7d",
+      "byteIdenticalCopy": true,
+      "visuallyInspected": true,
+      "transparentCornerAndOuterEdgeSamplesPassed": true
+    },
+    {
+      "id": "whiteHouseRepublicanChristmas",
+      "editTarget": "/Users/gradengrech/.codex/generated_images/01a17b07-dee1-7f30-a9ca-aaade938e539/exec-7bdd06ac-b21d-48bf-9bf3-dad357ee47d5.png",
+      "prompt": "Use case: precise-object-edit.\nAsset type: Notchscape macOS app icon, Republican red White House Christmas variant.\nInput image 1 is the edit target: the accepted ruby-red White House Notchscape icon.\nAdd only restrained Christmas details INSIDE the existing glass icon silhouette: a delicate evergreen garland with tiny warm-white fairy lights along the upper inner glass edge, a light dusting of natural snow resting on the inside architectural cornice, and one very small softly lit evergreen Christmas tree visible through the lower glass. Keep the Christmas decoration clearly recognizable but uncluttered and sophisticated at Dock size. Retain rich ruby/crimson red glass, warm limestone White House columns and restrained champagne-gold highlights.\nKeep unchanged: exact rounded-square silhouette and corner radius, proportions and centered scale/padding; continuous polished liquid-glass rim; the wide BLACK NOTCH mark, its contours, position and dimensions; architectural columns; realistic premium refractive glass. Decorations must not cover or modify the black notch. No replacement logo concept.\nGenuinely transparent background with clean transparent corners outside the existing outline. No decoration, snowflake, speckle, glow, particle or shadow outside the silhouette. No purple, navy glass, text, watermark, official seal, party emblem, elephant, political figure, flag or extra symbol. Same square composition and framing as the target.",
+      "generatedSource": "/Users/gradengrech/.codex/generated_images/01a17b07-dee1-7f30-a9ca-aaade938e539/exec-ff590e43-fad4-40ff-a3cf-1f89a549020c.png",
+      "asset": "Notchscape/Assets.xcassets/AppIconWhiteHouseRepublicanChristmas.imageset/AppIconWhiteHouseRepublicanChristmas.png",
+      "width": 1254,
+      "height": 1254,
+      "pngColorType": 6,
+      "bitDepth": 8,
+      "sha256": "e4b3ad666c2f44e77a2b4a190d91293ece2ffbcdd9814a4878377b5bd2fab1e1",
+      "byteIdenticalCopy": true,
+      "visuallyInspected": true,
+      "transparentCornerAndOuterEdgeSamplesPassed": true
+    }
+  ],
+  "checks": {
+    "preservedShapeAndNotch": true,
+    "whiteHouseColumnsVisible": true,
+    "partyPalette": "ruby/crimson red, warm limestone, champagne gold",
+    "christmasDecoration": "contained evergreen garland, warm lights, snow and tree",
+    "noOfficialSealTextOrPoliticalFigure": true
+  },
+  "note": "Artwork only. Main integration owns matching/manual icon logic, tests, signed build, runtime checks and publication."
+}

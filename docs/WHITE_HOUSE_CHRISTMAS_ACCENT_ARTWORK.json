@@ -1,0 +1,301 @@
+{
+  "schema_version": 1,
+  "scope": "Eight non-destructive Christmas red/blue decor variants. Originals and neutral Christmas assets preserved.",
+  "tool": "built-in image_gen",
+  "requests": [
+    {
+      "asset": "WhiteHouseExteriorRepublicanChristmasBackdrop",
+      "scene": "Exterior",
+      "accent": "Republican",
+      "status": "validated",
+      "target": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseExteriorChristmasBackdrop.imageset/WhiteHouseExteriorChristmasBackdrop.png",
+      "output_path": "/Users/gradengrech/.codex/generated_images/01a1785b-d0c7-79e1-9491-b4e63bd2eaf2/exec-4fd626f8-20a1-4360-92da-a3206ab250cd.png",
+      "asset_path": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseExteriorRepublicanChristmasBackdrop.imageset/WhiteHouseExteriorRepublicanChristmasBackdrop.png",
+      "contents_path": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseExteriorRepublicanChristmasBackdrop.imageset/Contents.json",
+      "prompt": "Use case: precise-object-edit. Asset type: bundled photographic architectural background for Notchscape, a dark macOS app. Input image 1 is the exact edit target. Change only the specified small-scale decor/material and accent-lighting colors; preserve the SAME recognizable White House-inspired architecture, camera position, geometry, furniture positions, dusk exposure, realistic natural stone/fabric/wood textures, and exact landscape 16:9 composition. This is an imagined decorative theme, not a documentary claim about any administration. Keep most limestone/ivory, natural wood, evergreen, warm gold light and sky neutral, with realistic reflected accent light only near its source. IMPORTANT: no flat overall red/blue filter or color wash, no repainting the whole facade/walls, no CGI/neon look. Keep a calm dark left and central area for separate UI widgets; key accents/focal detail mainly in right half and central vertical band. No new people, politicians, portraits, official seals, flags, party emblems, text, signage, campaign objects, watermark or embedded UI. Do not move, zoom or crop the base framing. Accent version: Republican red/burgundy Christmas decorative art. On this exact snowy Christmas exterior, recolor only EXISTING ribbons and bows on the portico garlands, roofline garlands, wreaths, and the Christmas tree at the far right, plus a minority of existing tree baubles, to rich restrained burgundy-red velvet and lacquer, visibly red decor accents; preserve the majority of ornaments as warm gold/ivory. Add only very subtle localized warm ruby-red portico-base uplighting in the right half, with realistic low-output reflected color limited near the columns' bases. Preserve neutral pale limestone, warm white window and holiday lights, all snow-covered ground/roofs/branches, every visible falling snowflake, tree and garland positions, unaltered blue dusk sky, and the exact wide framing. Snow stays natural white; no overall color cast. Preserve landscape 16:9 at the original 1672x940 size, with no zoom or crop.",
+      "options": {
+        "mode": "built-in image_gen edit",
+        "referenced_image_paths": [
+          "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseExteriorChristmasBackdrop.imageset/WhiteHouseExteriorChristmasBackdrop.png"
+        ],
+        "transparent_background": false
+      },
+      "visual_inspection": {
+        "passed": true,
+        "notes": "Same exterior geometry, framing, tree/garland placements, warm white majority lighting, neutral snow and dusk sky retained. Red or blue bows/baubles and localized low portico-base light are visible; left and center remain calm. No people, text, logos, seals, flags, or UI."
+      },
+      "source_copy_equal": true,
+      "native_png": {
+        "width": 1672,
+        "height": 941,
+        "format": "png",
+        "color_space": "RGB",
+        "has_alpha": false,
+        "file_type": "PNG image data, 1672 x 941, 8-bit/color RGB, non-interlaced",
+        "sha256": "1b77f73cdc0fde0c8f916aa055b5f69e36ac9ce3e3e2abb0de1a2065cfa315c4",
+        "generated_original_sha256": "1b77f73cdc0fde0c8f916aa055b5f69e36ac9ce3e3e2abb0de1a2065cfa315c4",
+        "source_copy_equal": true,
+        "catalog_valid": true
+      }
+    },
+    {
+      "asset": "WhiteHouseExteriorDemocratChristmasBackdrop",
+      "scene": "Exterior",
+      "accent": "Democrat",
+      "status": "validated",
+      "target": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseExteriorChristmasBackdrop.imageset/WhiteHouseExteriorChristmasBackdrop.png",
+      "output_path": "/Users/gradengrech/.codex/generated_images/01a1785b-d0c7-79e1-9491-b4e63bd2eaf2/exec-ef506acc-a414-4e97-a6ce-92247cab1c64.png",
+      "asset_path": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseExteriorDemocratChristmasBackdrop.imageset/WhiteHouseExteriorDemocratChristmasBackdrop.png",
+      "contents_path": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseExteriorDemocratChristmasBackdrop.imageset/Contents.json",
+      "prompt": "Use case: precise-object-edit. Asset type: bundled photographic architectural background for Notchscape, a dark macOS app. Input image 1 is the exact edit target. Change only the specified small-scale decor/material and accent-lighting colors; preserve the SAME recognizable White House-inspired architecture, camera position, geometry, furniture positions, dusk exposure, realistic natural stone/fabric/wood textures, and exact landscape 16:9 composition. This is an imagined decorative theme, not a documentary claim about any administration. Keep most limestone/ivory, natural wood, evergreen, warm gold light and sky neutral, with realistic reflected accent light only near its source. IMPORTANT: no flat overall red/blue filter or color wash, no repainting the whole facade/walls, no CGI/neon look. Keep a calm dark left and central area for separate UI widgets; key accents/focal detail mainly in right half and central vertical band. No new people, politicians, portraits, official seals, flags, party emblems, text, signage, campaign objects, watermark or embedded UI. Do not move, zoom or crop the base framing. Accent version: Democrat sapphire-blue/navy Christmas decorative art. On this exact snowy Christmas exterior, recolor only EXISTING ribbons and bows on the portico garlands, roofline garlands, wreaths, and the Christmas tree at the far right, plus a minority of existing tree baubles, to refined sapphire-blue and navy velvet and lacquer, visibly blue decor accents; preserve the majority of ornaments as warm gold/ivory. Add only very subtle localized soft sapphire-blue portico-base uplighting in the right half, with realistic low-output reflected color limited near the columns' bases. Preserve neutral pale limestone, warm white window and holiday lights, all snow-covered ground/roofs/branches, every visible falling snowflake, tree and garland positions, unaltered blue dusk sky, and the exact wide framing. Snow stays natural white; no overall color cast. Preserve landscape 16:9 at the original 1672x940 size, with no zoom or crop.",
+      "options": {
+        "mode": "built-in image_gen edit",
+        "referenced_image_paths": [
+          "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseExteriorChristmasBackdrop.imageset/WhiteHouseExteriorChristmasBackdrop.png"
+        ],
+        "transparent_background": false
+      },
+      "visual_inspection": {
+        "passed": true,
+        "notes": "Same exterior geometry, framing, tree/garland placements, warm white majority lighting, neutral snow and dusk sky retained. Red or blue bows/baubles and localized low portico-base light are visible; left and center remain calm. No people, text, logos, seals, flags, or UI."
+      },
+      "source_copy_equal": true,
+      "native_png": {
+        "width": 1672,
+        "height": 941,
+        "format": "png",
+        "color_space": "RGB",
+        "has_alpha": false,
+        "file_type": "PNG image data, 1672 x 941, 8-bit/color RGB, non-interlaced",
+        "sha256": "81bdee3e1b76252def6b5a5fedba70c62c7b544df762035f78626fe4b3f05cdd",
+        "generated_original_sha256": "81bdee3e1b76252def6b5a5fedba70c62c7b544df762035f78626fe4b3f05cdd",
+        "source_copy_equal": true,
+        "catalog_valid": true
+      }
+    },
+    {
+      "asset": "WhiteHouseOvalOfficeRepublicanChristmasBackdrop",
+      "scene": "OvalOffice",
+      "accent": "Republican",
+      "status": "validated",
+      "target": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseOvalOfficeChristmasBackdrop.imageset/WhiteHouseOvalOfficeChristmasBackdrop.png",
+      "output_path": "/Users/gradengrech/.codex/generated_images/01a1785b-d0c7-79e1-9491-b4e63bd2eaf2/exec-f8472891-35ac-4554-ab9e-860b5a9dda85.png",
+      "asset_path": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseOvalOfficeRepublicanChristmasBackdrop.imageset/WhiteHouseOvalOfficeRepublicanChristmasBackdrop.png",
+      "contents_path": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseOvalOfficeRepublicanChristmasBackdrop.imageset/Contents.json",
+      "prompt": "Use case: precise-object-edit. Asset type: bundled photographic architectural background for Notchscape, a dark macOS app. Input image 1 is the exact edit target. Change only the specified small-scale decor/material and accent-lighting colors; preserve the SAME recognizable White House-inspired architecture, camera position, geometry, furniture positions, dusk exposure, realistic natural stone/fabric/wood textures, and exact landscape 16:9 composition. This is an imagined decorative theme, not a documentary claim about any administration. Keep most limestone/ivory, natural wood, evergreen, warm gold light and sky neutral, with realistic reflected accent light only near its source. IMPORTANT: no flat overall red/blue filter or color wash, no repainting the whole facade/walls, no CGI/neon look. Keep a calm dark left and central area for separate UI widgets; key accents/focal detail mainly in right half and central vertical band. No new people, politicians, portraits, official seals, flags, party emblems, text, signage, campaign objects, watermark or embedded UI. Do not move, zoom or crop the base framing. Accent version: Republican red/burgundy Christmas decorative art. On this exact Christmas Oval Office interior, recolor only EXISTING tree ribbons and bows, selected existing round tree ornaments, the bows on the window-top evergreen swags, and the mantel/wreath bows to rich restrained burgundy-red velvet and lacquer, visibly red decor accents; keep most baubles warm gold/ivory and every light warm white. A narrow existing rug-edge decorative line may carry the same accent, while the broad dark blue rug field, wooden desk, chairs, wall color, curtains, potted tree, fireplace, and all furniture positions stay unchanged. Preserve the Christmas tree at the same right-of-center window, exact garland routes, snowy outdoor view, clean indoor floor, warm gold/ivory/evergreen room light, and calm shadowed left/central space. No snow indoors. Preserve landscape 16:9 at the original 1672x940 size, with no zoom or crop.",
+      "options": {
+        "mode": "built-in image_gen edit",
+        "referenced_image_paths": [
+          "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseOvalOfficeChristmasBackdrop.imageset/WhiteHouseOvalOfficeChristmasBackdrop.png"
+        ],
+        "transparent_background": false
+      },
+      "visual_inspection": {
+        "passed": true,
+        "notes": "Same Oval Office framing, architecture, furniture, tree/window/garland positions and warm lighting. Accent bows, ribbons, selected baubles, and a narrow rug edge are red or blue; rug field and stone/wood/ivory remain natural. Calm left/center preserved; snow remains outdoors only. No people, text, logos, seals, flags, or UI."
+      },
+      "source_copy_equal": true,
+      "native_png": {
+        "width": 1672,
+        "height": 940,
+        "format": "png",
+        "color_space": "RGB",
+        "has_alpha": false,
+        "file_type": "PNG image data, 1672 x 940, 8-bit/color RGB, non-interlaced",
+        "sha256": "2955c417c2c3b08b330cf3d0275477ccaa31d3b8c99088d3f50bc12d779b564a",
+        "generated_original_sha256": "2955c417c2c3b08b330cf3d0275477ccaa31d3b8c99088d3f50bc12d779b564a",
+        "source_copy_equal": true,
+        "catalog_valid": true
+      }
+    },
+    {
+      "asset": "WhiteHouseOvalOfficeDemocratChristmasBackdrop",
+      "scene": "OvalOffice",
+      "accent": "Democrat",
+      "status": "validated",
+      "target": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseOvalOfficeChristmasBackdrop.imageset/WhiteHouseOvalOfficeChristmasBackdrop.png",
+      "output_path": "/Users/gradengrech/.codex/generated_images/01a1785b-d0c7-79e1-9491-b4e63bd2eaf2/exec-217e92ba-b39c-4e7d-81ee-2adcb94aef48.png",
+      "asset_path": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseOvalOfficeDemocratChristmasBackdrop.imageset/WhiteHouseOvalOfficeDemocratChristmasBackdrop.png",
+      "contents_path": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseOvalOfficeDemocratChristmasBackdrop.imageset/Contents.json",
+      "prompt": "Use case: precise-object-edit. Asset type: bundled photographic architectural background for Notchscape, a dark macOS app. Input image 1 is the exact edit target. Change only the specified small-scale decor/material and accent-lighting colors; preserve the SAME recognizable White House-inspired architecture, camera position, geometry, furniture positions, dusk exposure, realistic natural stone/fabric/wood textures, and exact landscape 16:9 composition. This is an imagined decorative theme, not a documentary claim about any administration. Keep most limestone/ivory, natural wood, evergreen, warm gold light and sky neutral, with realistic reflected accent light only near its source. IMPORTANT: no flat overall red/blue filter or color wash, no repainting the whole facade/walls, no CGI/neon look. Keep a calm dark left and central area for separate UI widgets; key accents/focal detail mainly in right half and central vertical band. No new people, politicians, portraits, official seals, flags, party emblems, text, signage, campaign objects, watermark or embedded UI. Do not move, zoom or crop the base framing. Accent version: Democrat sapphire-blue/navy Christmas decorative art. On this exact Christmas Oval Office interior, recolor only EXISTING tree ribbons and bows, selected existing round tree ornaments, the bows on the window-top evergreen swags, and the mantel/wreath bows to refined sapphire-blue and navy velvet and lacquer, visibly blue decor accents; keep most baubles warm gold/ivory and every light warm white. A narrow existing rug-edge decorative line may carry the same accent, while the broad dark blue rug field, wooden desk, chairs, wall color, curtains, potted tree, fireplace, and all furniture positions stay unchanged. Preserve the Christmas tree at the same right-of-center window, exact garland routes, snowy outdoor view, clean indoor floor, warm gold/ivory/evergreen room light, and calm shadowed left/central space. No snow indoors. Preserve landscape 16:9 at the original 1672x940 size, with no zoom or crop.",
+      "options": {
+        "mode": "built-in image_gen edit",
+        "referenced_image_paths": [
+          "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseOvalOfficeChristmasBackdrop.imageset/WhiteHouseOvalOfficeChristmasBackdrop.png"
+        ],
+        "transparent_background": false
+      },
+      "visual_inspection": {
+        "passed": true,
+        "notes": "Same Oval Office framing, architecture, furniture, tree/window/garland positions and warm lighting. Accent bows, ribbons, selected baubles, and a narrow rug edge are red or blue; rug field and stone/wood/ivory remain natural. Calm left/center preserved; snow remains outdoors only. No people, text, logos, seals, flags, or UI."
+      },
+      "source_copy_equal": true,
+      "native_png": {
+        "width": 1673,
+        "height": 940,
+        "format": "png",
+        "color_space": "RGB",
+        "has_alpha": false,
+        "file_type": "PNG image data, 1673 x 940, 8-bit/color RGB, non-interlaced",
+        "sha256": "d5839abddc46643eef8266e066c77777046c7b9b5852ff033e4986dafa1fa72d",
+        "generated_original_sha256": "d5839abddc46643eef8266e066c77777046c7b9b5852ff033e4986dafa1fa72d",
+        "source_copy_equal": true,
+        "catalog_valid": true
+      }
+    },
+    {
+      "asset": "WhiteHouseEastRoomRepublicanChristmasBackdrop",
+      "scene": "EastRoom",
+      "accent": "Republican",
+      "status": "validated",
+      "target": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseEastRoomChristmasBackdrop.imageset/WhiteHouseEastRoomChristmasBackdrop.png",
+      "output_path": "/Users/gradengrech/.codex/generated_images/01a1785b-d0c7-79e1-9491-b4e63bd2eaf2/exec-ff2b69ca-da4e-432a-b6de-bb2b99344f7e.png",
+      "asset_path": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseEastRoomRepublicanChristmasBackdrop.imageset/WhiteHouseEastRoomRepublicanChristmasBackdrop.png",
+      "contents_path": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseEastRoomRepublicanChristmasBackdrop.imageset/Contents.json",
+      "prompt": "Use case: precise-object-edit. Asset type: bundled photographic architectural background for Notchscape, a dark macOS app. Input image 1 is the exact edit target. Change only the specified small-scale decor/material and accent-lighting colors; preserve the SAME recognizable White House-inspired architecture, camera position, geometry, furniture positions, dusk exposure, realistic natural stone/fabric/wood textures, and exact landscape 16:9 composition. This is an imagined decorative theme, not a documentary claim about any administration. Keep most limestone/ivory, natural wood, evergreen, warm gold light and sky neutral, with realistic reflected accent light only near its source. IMPORTANT: no flat overall red/blue filter or color wash, no repainting the whole facade/walls, no CGI/neon look. Keep a calm dark left and central area for separate UI widgets; key accents/focal detail mainly in right half and central vertical band. No new people, politicians, portraits, official seals, flags, party emblems, text, signage, campaign objects, watermark or embedded UI. Do not move, zoom or crop the base framing. Accent version: Republican red/burgundy Christmas decorative art. On this exact Christmas East Room interior, recolor only EXISTING bows and ribbons on the large right-hand Christmas tree, the small tree near center, window garlands, and the left doorway garland, plus selected existing round baubles, to rich restrained burgundy-red velvet and lacquer, visibly red decor accents; keep most ornaments warm gold/ivory and every light warm white. Keep the ivory walls, gold molding, parquet floor, chandeliers, windows, bare central floor, every tree/garland placement, snowy view outside, warm gold exposure, and the exact wide perspective unchanged. Keep the left/central room calm and dark enough for UI. No snow indoors. Preserve landscape 16:9 at the original 1672x940 size, with no zoom or crop.",
+      "options": {
+        "mode": "built-in image_gen edit",
+        "referenced_image_paths": [
+          "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseEastRoomChristmasBackdrop.imageset/WhiteHouseEastRoomChristmasBackdrop.png"
+        ],
+        "transparent_background": false
+      },
+      "visual_inspection": {
+        "passed": true,
+        "notes": "Same East Room architecture, parquet perspective, two tree positions, window/door garland routes, chandeliers, and wide framing retained. Red or blue decor appears in existing bows, ribbons, and selected baubles. Gold/ivory surfaces and warm white lighting stay neutral; left and center remain calm and dark, snow only outside. No people, text, logos, seals, flags, or UI."
+      },
+      "source_copy_equal": true,
+      "native_png": {
+        "width": 1672,
+        "height": 941,
+        "format": "png",
+        "color_space": "RGB",
+        "has_alpha": false,
+        "file_type": "PNG image data, 1672 x 941, 8-bit/color RGB, non-interlaced",
+        "sha256": "aedea9669e3f3ed70f60de3aac4535acec36b005353cdd304d57282fc48d4b8d",
+        "generated_original_sha256": "aedea9669e3f3ed70f60de3aac4535acec36b005353cdd304d57282fc48d4b8d",
+        "source_copy_equal": true,
+        "catalog_valid": true
+      }
+    },
+    {
+      "asset": "WhiteHouseEastRoomDemocratChristmasBackdrop",
+      "scene": "EastRoom",
+      "accent": "Democrat",
+      "status": "validated",
+      "target": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseEastRoomChristmasBackdrop.imageset/WhiteHouseEastRoomChristmasBackdrop.png",
+      "output_path": "/Users/gradengrech/.codex/generated_images/01a1785b-d0c7-79e1-9491-b4e63bd2eaf2/exec-eb5adb79-5109-49e7-b1d6-055380f3064f.png",
+      "asset_path": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseEastRoomDemocratChristmasBackdrop.imageset/WhiteHouseEastRoomDemocratChristmasBackdrop.png",
+      "contents_path": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseEastRoomDemocratChristmasBackdrop.imageset/Contents.json",
+      "prompt": "Use case: precise-object-edit. Asset type: bundled photographic architectural background for Notchscape, a dark macOS app. Input image 1 is the exact edit target. Change only the specified small-scale decor/material and accent-lighting colors; preserve the SAME recognizable White House-inspired architecture, camera position, geometry, furniture positions, dusk exposure, realistic natural stone/fabric/wood textures, and exact landscape 16:9 composition. This is an imagined decorative theme, not a documentary claim about any administration. Keep most limestone/ivory, natural wood, evergreen, warm gold light and sky neutral, with realistic reflected accent light only near its source. IMPORTANT: no flat overall red/blue filter or color wash, no repainting the whole facade/walls, no CGI/neon look. Keep a calm dark left and central area for separate UI widgets; key accents/focal detail mainly in right half and central vertical band. No new people, politicians, portraits, official seals, flags, party emblems, text, signage, campaign objects, watermark or embedded UI. Do not move, zoom or crop the base framing. Accent version: Democrat sapphire-blue/navy Christmas decorative art. On this exact Christmas East Room interior, recolor only EXISTING bows and ribbons on the large right-hand Christmas tree, the small tree near center, window garlands, and the left doorway garland, plus selected existing round baubles, to refined sapphire-blue and navy velvet and lacquer, visibly blue decor accents; keep most ornaments warm gold/ivory and every light warm white. Keep the ivory walls, gold molding, parquet floor, chandeliers, windows, bare central floor, every tree/garland placement, snowy view outside, warm gold exposure, and the exact wide perspective unchanged. Keep the left/central room calm and dark enough for UI. No snow indoors. Preserve landscape 16:9 at the original 1672x940 size, with no zoom or crop.",
+      "options": {
+        "mode": "built-in image_gen edit",
+        "referenced_image_paths": [
+          "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseEastRoomChristmasBackdrop.imageset/WhiteHouseEastRoomChristmasBackdrop.png"
+        ],
+        "transparent_background": false
+      },
+      "visual_inspection": {
+        "passed": true,
+        "notes": "Same East Room architecture, parquet perspective, two tree positions, window/door garland routes, chandeliers, and wide framing retained. Red or blue decor appears in existing bows, ribbons, and selected baubles. Gold/ivory surfaces and warm white lighting stay neutral; left and center remain calm and dark, snow only outside. No people, text, logos, seals, flags, or UI."
+      },
+      "source_copy_equal": true,
+      "native_png": {
+        "width": 1672,
+        "height": 941,
+        "format": "png",
+        "color_space": "RGB",
+        "has_alpha": false,
+        "file_type": "PNG image data, 1672 x 941, 8-bit/color RGB, non-interlaced",
+        "sha256": "fa444705a4435f579907b68aa30045d72d90c737e60ae9baaa2c81c496ec446d",
+        "generated_original_sha256": "fa444705a4435f579907b68aa30045d72d90c737e60ae9baaa2c81c496ec446d",
+        "source_copy_equal": true,
+        "catalog_valid": true
+      }
+    },
+    {
+      "asset": "WhiteHouseBlueRoomRepublicanChristmasBackdrop",
+      "scene": "BlueRoom",
+      "accent": "Republican",
+      "status": "validated",
+      "target": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseBlueRoomChristmasBackdrop.imageset/WhiteHouseBlueRoomChristmasBackdrop.png",
+      "output_path": "/Users/gradengrech/.codex/generated_images/01a1785b-d0c7-79e1-9491-b4e63bd2eaf2/exec-2f6d7939-acff-490d-ae80-ed0d7b235aea.png",
+      "asset_path": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseBlueRoomRepublicanChristmasBackdrop.imageset/WhiteHouseBlueRoomRepublicanChristmasBackdrop.png",
+      "contents_path": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseBlueRoomRepublicanChristmasBackdrop.imageset/Contents.json",
+      "prompt": "Use case: precise-object-edit. Asset type: bundled photographic architectural background for Notchscape, a dark macOS app. Input image 1 is the exact edit target. Change only the specified small-scale decor/material and accent-lighting colors; preserve the SAME recognizable White House-inspired architecture, camera position, geometry, furniture positions, dusk exposure, realistic natural stone/fabric/wood textures, and exact landscape 16:9 composition. This is an imagined decorative theme, not a documentary claim about any administration. Keep most limestone/ivory, natural wood, evergreen, warm gold light and sky neutral, with realistic reflected accent light only near its source. IMPORTANT: no flat overall red/blue filter or color wash, no repainting the whole facade/walls, no CGI/neon look. Keep a calm dark left and central area for separate UI widgets; key accents/focal detail mainly in right half and central vertical band. No new people, politicians, portraits, official seals, flags, party emblems, text, signage, campaign objects, watermark or embedded UI. Do not move, zoom or crop the base framing. Accent version: Republican red/burgundy Christmas decorative art. On this exact Christmas Blue Room interior, recolor only EXISTING ribbons and bows on the right-hand Christmas tree, doorway and window garlands, window wreaths, and selected existing round baubles to rich restrained burgundy-red velvet and lacquer, visibly red decor accents; keep most ornaments warm gold/ivory and every light warm white. Recolor only the existing small dark sofa throw cushions to matching deep burgundy-red fabric; preserve the ivory sofa upholstery itself. Deep navy walls MUST remain the exact same navy, and cream curtains, gold trim, rug, chair, tables, gifts, wood floor, floral centerpiece, every tree/garland placement, snowy outdoor view, and composition stay unchanged. Maintain warm gold/ivory/evergreen light, calm dark left wall, and no indoor snow. Preserve landscape 16:9 at the original 1672x940 size, with no zoom or crop.",
+      "options": {
+        "mode": "built-in image_gen edit",
+        "referenced_image_paths": [
+          "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseBlueRoomChristmasBackdrop.imageset/WhiteHouseBlueRoomChristmasBackdrop.png"
+        ],
+        "transparent_background": false
+      },
+      "visual_inspection": {
+        "passed": true,
+        "notes": "Same Blue Room framing, navy wall, cream curtains, ivory sofa, tree/garland/wreath placements, furniture, rug and architectural geometry retained. Red or blue ribbons, selected baubles, and small sofa cushions visibly match the accent; warm white lights and gold/ivory/evergreen remain natural. Calm dark left wall preserved; snow only outside. No people, text, logos, seals, flags, or UI."
+      },
+      "source_copy_equal": true,
+      "native_png": {
+        "width": 1672,
+        "height": 941,
+        "format": "png",
+        "color_space": "RGB",
+        "has_alpha": false,
+        "file_type": "PNG image data, 1672 x 941, 8-bit/color RGB, non-interlaced",
+        "sha256": "f3036426be05c4e917e3b7d44fedb84ecb2b25c0d36ef34269798d886a42af50",
+        "generated_original_sha256": "f3036426be05c4e917e3b7d44fedb84ecb2b25c0d36ef34269798d886a42af50",
+        "source_copy_equal": true,
+        "catalog_valid": true
+      }
+    },
+    {
+      "asset": "WhiteHouseBlueRoomDemocratChristmasBackdrop",
+      "scene": "BlueRoom",
+      "accent": "Democrat",
+      "status": "validated",
+      "target": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseBlueRoomChristmasBackdrop.imageset/WhiteHouseBlueRoomChristmasBackdrop.png",
+      "output_path": "/Users/gradengrech/.codex/generated_images/01a1785b-d0c7-79e1-9491-b4e63bd2eaf2/exec-de33810e-98ea-4095-b61a-9e54e579cca1.png",
+      "asset_path": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseBlueRoomDemocratChristmasBackdrop.imageset/WhiteHouseBlueRoomDemocratChristmasBackdrop.png",
+      "contents_path": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseBlueRoomDemocratChristmasBackdrop.imageset/Contents.json",
+      "prompt": "Use case: precise-object-edit. Asset type: bundled photographic architectural background for Notchscape, a dark macOS app. Input image 1 is the exact edit target. Change only the specified small-scale decor/material and accent-lighting colors; preserve the SAME recognizable White House-inspired architecture, camera position, geometry, furniture positions, dusk exposure, realistic natural stone/fabric/wood textures, and exact landscape 16:9 composition. This is an imagined decorative theme, not a documentary claim about any administration. Keep most limestone/ivory, natural wood, evergreen, warm gold light and sky neutral, with realistic reflected accent light only near its source. IMPORTANT: no flat overall red/blue filter or color wash, no repainting the whole facade/walls, no CGI/neon look. Keep a calm dark left and central area for separate UI widgets; key accents/focal detail mainly in right half and central vertical band. No new people, politicians, portraits, official seals, flags, party emblems, text, signage, campaign objects, watermark or embedded UI. Do not move, zoom or crop the base framing. Accent version: Democrat sapphire-blue/navy Christmas decorative art. On this exact Christmas Blue Room interior, recolor only EXISTING ribbons and bows on the right-hand Christmas tree, doorway and window garlands, window wreaths, and selected existing round baubles to refined sapphire-blue and navy velvet and lacquer, visibly blue decor accents; keep most ornaments warm gold/ivory and every light warm white. Recolor only the existing small dark sofa throw cushions to matching refined sapphire-blue/navy fabric; preserve the ivory sofa upholstery itself. Deep navy walls MUST remain the exact same navy, and cream curtains, gold trim, rug, chair, tables, gifts, wood floor, floral centerpiece, every tree/garland placement, snowy outdoor view, and composition stay unchanged. Maintain warm gold/ivory/evergreen light, calm dark left wall, and no indoor snow. Preserve landscape 16:9 at the original 1672x940 size, with no zoom or crop.",
+      "options": {
+        "mode": "built-in image_gen edit",
+        "referenced_image_paths": [
+          "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-white-house-finish/Notchscape/Assets.xcassets/WhiteHouseBlueRoomChristmasBackdrop.imageset/WhiteHouseBlueRoomChristmasBackdrop.png"
+        ],
+        "transparent_background": false
+      },
+      "visual_inspection": {
+        "passed": true,
+        "notes": "Same Blue Room framing, navy wall, cream curtains, ivory sofa, tree/garland/wreath placements, furniture, rug and architectural geometry retained. Red or blue ribbons, selected baubles, and small sofa cushions visibly match the accent; warm white lights and gold/ivory/evergreen remain natural. Calm dark left wall preserved; snow only outside. No people, text, logos, seals, flags, or UI."
+      },
+      "source_copy_equal": true,
+      "native_png": {
+        "width": 1672,
+        "height": 941,
+        "format": "png",
+        "color_space": "RGB",
+        "has_alpha": false,
+        "file_type": "PNG image data, 1672 x 941, 8-bit/color RGB, non-interlaced",
+        "sha256": "1c88323753eaec27217a7d8c0c9d089e2bed04b664846b2f2481d4d2afa0582a",
+        "generated_original_sha256": "1c88323753eaec27217a7d8c0c9d089e2bed04b664846b2f2481d4d2afa0582a",
+        "source_copy_equal": true,
+        "catalog_valid": true
+      }
+    }
+  ],
+  "completed": true,
+  "summary": {
+    "requested": 8,
+    "generated": 8,
+    "saved": 8,
+    "visually_inspected": 8,
+    "native_png_validated": 8,
+    "unique_hashes": 8,
+    "missing": 0,
+    "built_in_edit_calls": 8,
+    "raw_generated_outputs_preserved": true,
+    "programmatic_image_edits": false,
+    "canvas_note": "Native built-in PNG canvases retained without resizing or cropping: six 1672x941, one 1672x940, one 1673x940; all approximately 16:9."
+  }
+}

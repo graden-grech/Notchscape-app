@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-26",
+  "tool": "image_gen.imagegen",
+  "mode": "built-in",
+  "apiKeyRequired": false,
+  "scope": "White House Democrat blue and Democrat Christmas app-icon siblings. Original neutral/default icon preserved.",
+  "generationArguments": {
+    "transparent_background": true,
+    "localEditTargets": "referenced_image_paths",
+    "num_last_images_to_include": "omitted"
+  },
+  "calls": [
+    {
+      "id": "democrat-blue-draft",
+      "intent": "precise-object-edit",
+      "editTarget": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/boring.notch/Notchscape/Assets.xcassets/AppIconWhiteHouse.imageset/AppIconWhiteHouse-v2.png",
+      "generatedOutput": "/Users/gradengrech/.codex/generated_images/01a17b08-090b-7a12-ad81-9c2a70dbd18b/exec-1c2cadeb-bce0-4e67-bb7e-29904aa26bf8.png",
+      "prompt": "Use case: precise-object-edit.\nAsset type: transparent macOS app icon for Notchscape, White House Democrat blue appearance.\nInput image 1 is the edit target, the existing Notchscape White House icon. Edit this icon rather than inventing a new logo.\nChange only its material palette to unmistakable rich sapphire/cobalt blue liquid glass, with crisp cool silver and warm limestone highlights. Keep the same White House architectural columns visible behind the glass.\nPreserve the exact centered rounded-square silhouette, optical scale, continuous glass rim, corner curvature and generous outer transparent margin. Preserve the existing black horizontal notch emblem, its proportions, placement and clean sharp edge. It must remain legible at Dock and settings-thumbnail size.\nThe blue should be visibly distinct from the original navy/gold neutral icon: luminous sapphire blue through the front glass and cobalt edge reflections, without purple.\nFinish: polished photorealistic glass and restrained metallic edging that fits native Apple macOS icons, no noisy texture or excessive glow.\nBackground: actual transparent alpha outside the icon. Keep all highlights, reflections and details contained inside the rounded silhouette. No floating speckles, halo, shadows, colored pixels or decorative objects beyond it.\nNo text, lettering, political figure, official seal, stars, party animal or added symbol. No Christmas decorations in this ordinary blue version. Keep the original size/aspect and square canvas.",
+      "consumed": false
+    },
+    {
+      "id": "democrat-blue-cleanup",
+      "intent": "background-extraction",
+      "editTarget": "/Users/gradengrech/.codex/generated_images/01a17b08-090b-7a12-ad81-9c2a70dbd18b/exec-1c2cadeb-bce0-4e67-bb7e-29904aa26bf8.png",
+      "generatedOutput": "/Users/gradengrech/.codex/generated_images/01a17b08-090b-7a12-ad81-9c2a70dbd18b/exec-c47bd51d-b654-41ec-829e-7ca18cd22678.png",
+      "prompt": "Use case: background-extraction / precise-object-edit.\nInput image 1 is the edit target: the finished blue White House Notchscape icon. Make a single cleanup only: clean the transparent boundary outside the rounded-square outline. Remove the small white protrusion near the middle-lower right outer edge and every blue speck or stray colored/white pixel beyond the continuous rounded-square silhouette, especially along the lower-left/lower-right corners. Exterior must be genuine fully transparent alpha with no bloom, drop shadow, halo or detached details.\nPreserve the icon itself exactly: same sapphire and cobalt blue colors, silver continuous glass rim, White House architecture, internal lighting, black notch emblem, original canvas dimensions, scale, rounded-corner shape and placement. Do not redesign, recolor, smooth away the architectural imagery, change its proportion, or add anything. Keep clean antialiased contour pixels belonging to the continuous outline, and make the exterior transparent.",
+      "consumed": true
+    },
+    {
+      "id": "democrat-christmas-draft",
+      "intent": "precise-object-edit",
+      "editTarget": "/Users/gradengrech/.codex/generated_images/01a17b08-090b-7a12-ad81-9c2a70dbd18b/exec-c47bd51d-b654-41ec-829e-7ca18cd22678.png",
+      "generatedOutput": "/Users/gradengrech/.codex/generated_images/01a17b08-090b-7a12-ad81-9c2a70dbd18b/exec-a11e4417-5a49-4cf2-b2c1-2b0a504a7546.png",
+      "prompt": "Use case: precise-object-edit.\nAsset type: transparent macOS app icon for Notchscape, White House Democrat Christmas appearance.\nInput image 1 is the edit target: the completed sapphire-blue White House Notchscape icon. Create its Christmas sibling by adding restrained realistic festive details inside the glass icon only.\nPreserve the exact centered rounded-square silhouette, scale, generous transparent exterior margin, continuous liquid-glass rim, silver edging, blue sapphire/cobalt palette, White House columns and completely legible black horizontal notch emblem. Keep the architectural identity visible. No purple.\nChristmas details: delicate evergreen garland and a few tiny warm white lights across the architectural upper area, with a subtle snow/frost accent on the architecture. It should feel like a festive White House in blue and silver, polished and elegant at Dock size. Keep decorations contained inside the outline and clear of the black notch. No huge Christmas tree, no Santa hat or exterior objects.\nReal transparent alpha outside the icon. No checkerboard, colored glow, stray speckles, shadows, halo or pixels beyond the continuous rounded silhouette. Antialias cleanly.\nNo text, lettering, political figure, official seal, party animal, stars or added campaign symbols. Retain the original canvas aspect and icon proportions.",
+      "consumed": false
+    },
+    {
+      "id": "democrat-christmas-cleanup",
+      "intent": "background-extraction",
+      "editTarget": "/Users/gradengrech/.codex/generated_images/01a17b08-090b-7a12-ad81-9c2a70dbd18b/exec-a11e4417-5a49-4cf2-b2c1-2b0a504a7546.png",
+      "generatedOutput": "/Users/gradengrech/.codex/generated_images/01a17b08-090b-7a12-ad81-9c2a70dbd18b/exec-e6443720-bd3d-4afc-9f87-0f4a46e6847b.png",
+      "prompt": "Use case: background-extraction.\nInput image 1 is the exact edit target. Clean ONLY the transparent exterior of this blue Christmas White House Notchscape icon.\nRemove the detached bright blue blob at the very top of the canvas above the icon, the white fleck outside the upper-left outline, and any faint stray blue pixels or colored glow outside its continuous rounded-square outer rim. Outside the icon must be pure fully transparent alpha.\nKeep the entire actual icon unchanged: the same blue Christmas glass, White House columns, garland, warm lights and snow inside, black notch, cool silver rim, original square canvas, placement, scale and continuous rounded shape. No redesign, recoloring, shadow, cropping, flattening, new element or re-render of the interior. Only clean stray external artifacts.",
+      "consumed": true
+    }
+  ],
+  "assets": [
+    {
+      "assetName": "AppIconWhiteHouseDemocrat",
+      "source": "/Users/gradengrech/.codex/generated_images/01a17b08-090b-7a12-ad81-9c2a70dbd18b/exec-c47bd51d-b654-41ec-829e-7ca18cd22678.png",
+      "destination": "Notchscape/Assets.xcassets/AppIconWhiteHouseDemocrat.imageset/AppIconWhiteHouseDemocrat.png",
+      "sha256": "9ba27c633f5495230c29abd45420f0e78bbed3106dacc071142bd21075286031",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 1700954,
+      "png": "8-bit RGBA",
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alphaGreaterThan16Bounds": [
+        95,
+        80,
+        1159,
+        1125
+      ],
+      "maxAlphaInOuter8Pixels": 1,
+      "nonzeroAlphaPixelsInOuter8Pixels": 51,
+      "byteIdenticalToGeneratedSource": true
+    },
+    {
+      "assetName": "AppIconWhiteHouseDemocratChristmas",
+      "source": "/Users/gradengrech/.codex/generated_images/01a17b08-090b-7a12-ad81-9c2a70dbd18b/exec-e6443720-bd3d-4afc-9f87-0f4a46e6847b.png",
+      "destination": "Notchscape/Assets.xcassets/AppIconWhiteHouseDemocratChristmas.imageset/AppIconWhiteHouseDemocratChristmas.png",
+      "sha256": "cd041bd19b704277fac48c9715de849b5f330d220b65e130533f65997545ee48",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 1850193,
+      "png": "8-bit RGBA",
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alphaGreaterThan16Bounds": [
+        94,
+        78,
+        1161,
+        1127
+      ],
+      "maxAlphaInOuter8Pixels": 1,
+      "nonzeroAlphaPixelsInOuter8Pixels": 21,
+      "byteIdenticalToGeneratedSource": true
+    }
+  ],
+  "verification": {
+    "visuallyInspected": true,
+    "checkedMetadata": true,
+    "readOnlyAlphaInspection": "Standard-library PNG unfilter/decode. No image editing, resampling, cropping, compositing or alpha rewriting outside built-in image generation.",
+    "limitations": "The built-in tool leaves very faint alpha1/255 specks outside the main outline; they are documented rather than removed by a separate image editor. All corners are alpha0; no significant alpha greater than16 exists beyond the normal silhouette bounds. Visible detached Christmas top blob and ordinary right-edge protrusion were removed by targeted built-in edits.",
+    "originalAndDefaultIconsUnchanged": true
+  },
+  "integration": {
+    "consumingCode": "Parent agent owns theme matching/manual picker changes and build/test/install.",
+    "built": false,
+    "installed": false,
+    "published": false
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "notsoboringnotch-settings",
+  "account_id": "abc452f4d802890c06602667f4427c93",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": true,
+  "vars": {
+    "AUTH0_ISSUER": "https://dev-f31y4vcdyhkcfqf0.us.auth0.com/",
+    "AUTH0_AUDIENCE": "https://notsoboringnotch.app/settings",
+    "AUTH0_NATIVE_CLIENT_ID": "iT6fqxlZSQANST8qrPs7wMEOgpLPDXFi"
+  },
+  "d1_databases": [{
+    "binding": "DB",
+    "database_name": "notsoboringnotch-settings",
+    "database_id": "267e7669-5837-401b-b652-8bb66ad40df5",
+    "migrations_dir": "migrations"
+  }],
+  "ratelimits": [{
+    "name": "ACCOUNT_RATE_LIMITER",
+    "namespace_id": "1001",
+    "simple": { "limit": 30, "period": 60 }
+  }],
+  "observability": { "enabled": false }
+}

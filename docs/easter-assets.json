@@ -1,0 +1,14 @@
+{
+  "generator": "built-in image_gen",
+  "assets": [
+    {
+      "path": "Notchscape/Assets.xcassets/EasterBackdrop.imageset/EasterBackdrop.png",
+      "prompt": "Use case: photorealistic-natural. Asset type: ultra-wide 3:1 Easter seasonal background for a compact macOS notch Home menu, a real photographed scene, not a UI mockup. A tasteful cozy spring conservatory at dusk with warm timber and stone, a window showing a green garden with blossom trees. On the RIGHTMOST quarter, a prominent natural woven Easter basket with softly painted pastel eggs, a small realistic white ceramic bunny and a vase of spring tulips; the basket/flowers should be large and clear even in a 190-point-tall strip. LEFT THREE QUARTERS are darker calm low-detail interior and table surface suitable behind white UI text. One seamless photographic scene, realistic textures and restrained premium lighting, no cartoon, no words, no logos, no text, no watermark. Similar mood to a cozy seasonal cabin photograph. Wide panoramic composition, not a collage."
+    },
+    {
+      "path": "Notchscape/Assets.xcassets/AppIconEaster.imageset/AppIconEaster.png",
+      "reference": "Notchscape/Assets.xcassets/AppIconWinter.imageset/AppIconWinter.png",
+      "prompt": "Use case: style-transfer. Asset type: 1024x1024 transparent-background macOS app icon, Easter seasonal variant of the supplied Boring Notch winter icon. Preserve the same rounded glass square silhouette with generous transparent outer margin and the distinctive black horizontal notch/inward dip mark centered in the middle. Replace the icy-blue winter glass and frost entirely with restrained pale spring mint and soft warm pink iridescent glass. Add a tiny realistic pastel egg and subtle tulip detail in the lower right of the glass square, leaving the central black notch mark unobscured. Elegant dimensional clear optical glass, smooth high-quality edges, real transparency outside the rounded square. No lettering, no Apple logos, no winter snowflakes, no heavy ornament."
+    }
+  ]
+}
