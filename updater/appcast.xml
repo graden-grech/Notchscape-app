@@ -2,6 +2,46 @@
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
         <item>
+            <title>2.9.3</title>
+            <pubDate>Tue, 27 Oct 2026 10:40:22 -0400</pubDate>
+            <link>https://github.com/graden-grech/Notchscape-app/releases/tag/v2.9.3</link>
+            <sparkle:version>296</sparkle:version>
+            <sparkle:shortVersionString>2.9.3</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <description sparkle:format="markdown"><![CDATA[# Notchscape 2.9.3 (296) — New repository and update destination
+
+The active project and new releases move to
+[graden-grech/Notchscape-app](https://github.com/graden-grech/Notchscape-app), a
+new standalone repository with fresh history. The app remains **Notchscape**.
+
+- New builds check the new repository's signed Sparkle feed.
+- Existing Notchscape feeds provide the signed migration update, while older
+  release/download URLs remain available.
+- App/helper signing identity, update key, saved settings and permissions remain
+  the same. Accounts remain disabled.
+- Includes the optional six-chapter setup with Skip/Back/Next and replay from
+  General or Help; 24 White House scene combinations; red/blue and Christmas
+  icons; improved header spacing; and the earlier features.
+- New users start with Weather off and Show on all displays on. Existing users'
+  explicit and old implicit settings are retained.
+
+Requires Apple silicon and macOS 15 or later; native Liquid Glass requires
+macOS 26. The app is Apple Development signed, not Developer ID signed or
+notarized. The unsigned installer preview is not distributed. Full other-OS,
+hardware/DisplayLink, fresh-account permissions and accessibility/performance
+coverage remain incomplete.
+
+Published archive hashes, source revision, independent signature verification,
+hosted CI and real updater/HUD outcomes are recorded separately in the release's
+verification assets. A source push alone does not establish those results.
+See [migration details](https://github.com/graden-grech/Notchscape-app/blob/v2.9.3/docs/NEW_REPOSITORY_MIGRATION.md) and
+[distribution readiness](https://github.com/graden-grech/Notchscape-app/blob/v2.9.3/docs/DISTRIBUTION_READINESS.md). Original-source licenses
+and notices are preserved.
+]]></description>
+            <enclosure url="https://github.com/graden-grech/Notchscape-app/releases/download/v2.9.3/Notchscape.zip" length="81347852" type="application/octet-stream" sparkle:edSignature="MvQjKRCZR4nUIDbvvxGEAbHGJvhtwEq4iMY29/qYNNKn7YE+YRlY7SdoDlC2mjYX37jbw8z3+rKk8NxlChkhDQ=="/>
+        </item>
+        <item>
             <title>2.9.2</title>
             <pubDate>Tue, 27 Oct 2026 08:12:29 -0400</pubDate>
             <link>https://github.com/graden-grech/Notchscape/releases/tag/v2.9.2</link>
