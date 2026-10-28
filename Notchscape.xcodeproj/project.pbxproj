@@ -1576,7 +1576,7 @@
 		ACCE00040000000000000004 /* XCRemoteSwiftPackageReference "Auth0.swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/auth0/Auth0.swift";
-			requirement = {kind = exactVersion; version = 3.1.0; };
+			requirement = {kind = exactVersion; version = 3.2.0; };
 		};
 		111BE95B2ECD71E10079DD4E /* XCRemoteSwiftPackageReference "AsyncXPCConnection" */ = {
 			isa = XCRemoteSwiftPackageReference;
