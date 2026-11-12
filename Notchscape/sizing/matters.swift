@@ -27,7 +27,7 @@ let cornerRadiusInsets: (opened: (top: CGFloat, bottom: CGFloat), closed: (top: 
         ? weatherHomeOpenNotchSize
         : standardOpenNotchSize
     let quickActionsWidth: CGFloat = !Defaults[.quickActions].isEmpty && !hidden.contains(.quickActions) ? 144 : 0
-    return CGSize(width: base.width + (Defaults[.appTheme].hasHomeScene ? 144 : 0) + quickActionsWidth, height: base.height)
+    return CGSize(width: base.width + (Defaults[.appTheme].reservesHomeArtworkSpace ? 144 : 0) + quickActionsWidth, height: base.height)
 }
 
 enum MusicPlayerImageSizes {
@@ -62,19 +62,19 @@ enum MusicPlayerImageSizes {
 
     // Check if the screen is available
     if let screen = selectedScreen {
+        let geometry = NSScreenDisplayGeometryAdapter.snapshot(for: screen)
         // Calculate and set the exact width of the notch
-        if let physical = PhysicalNotchGeometry.resolve(
-            screenFrame: screen.frame, safeTop: Double(screen.safeAreaInsets.top),
-            leftArea: screen.auxiliaryTopLeftArea, rightArea: screen.auxiliaryTopRightArea) {
-            notchWidth = CGFloat(physical.width)
+        if let gap = geometry?.reportedTopGap {
+            notchWidth = CGFloat(gap.width)
         }
 
-        // Check if the Mac has a notch
-        if screen.safeAreaInsets.top > 0 {
+        // Preserve the established layout for a system-reported top safe inset.
+        // This does not infer a new floating camera from a product name.
+        if geometry?.usesLegacyNotchLayout == true {
             // This is a display WITH a notch - use notch height settings
             notchHeight = Defaults[.notchHeight]
             if Defaults[.notchHeightMode] == .matchRealNotchSize {
-                notchHeight = screen.safeAreaInsets.top
+                notchHeight = geometry?.systemTopSafeInset ?? notchHeight
             } else if Defaults[.notchHeightMode] == .matchMenuBar {
                 notchHeight = screen.frame.maxY - screen.visibleFrame.maxY
             }

@@ -14,6 +14,8 @@
 	<string>Notchscape shows your selected calendar events and meeting links in your notch.</string>
 	<key>NSRemindersFullAccessUsageDescription</key>
 	<string>Notchscape shows your selected reminders alongside your calendar in your notch.</string>
+	<key>NotchFaceUnlockEnabled</key>
+	<true/>
 	<key>NotchAccountsEnabled</key>
 	<false/>
 	<key>NotchAccountDomain</key>

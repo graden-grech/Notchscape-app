@@ -14,6 +14,14 @@ enum NotchHeaderLayoutPolicy {
     }
 }
 
+enum NotchGestureLayoutPolicy {
+    /// Hardware does not shrink with a software gesture. Keep its horizontal
+    /// exclusion at display scale while retaining the existing vertical motion.
+    static func horizontalScale(requested: Double, hasPhysicalNotch: Bool) -> Double {
+        hasPhysicalNotch ? 1 : requested
+    }
+}
+
 /// The camera housing stays at the display's top edge even when the expanded
 /// header's controls have additional breathing room. All values are in points.
 struct PhysicalNotchGeometry: Equatable {
@@ -34,6 +42,33 @@ struct PhysicalNotchGeometry: Equatable {
         let left = Double(leftArea.maxX), right = Double(rightArea.minX)
         return .init(width: right - left, height: safeTop,
                      centerOffset: (left + right) / 2 - Double(screenFrame.midX))
+    }
+}
+
+/// Fixed visible lanes around the measured camera gap. Implicit stack spacing
+/// or shorter decorative notch widths must not put the start of a HUD slider
+/// behind the physical housing. Values are in logical display points.
+struct InlineHUDLanes: Equatable {
+    let leadingWidth: Double
+    let cutoutWidth: Double
+    let trailingWidth: Double
+    var totalWidth: Double { leadingWidth + cutoutWidth + trailingWidth }
+}
+
+enum InlineHUDLayoutPolicy {
+    static let cutoutClearance = 10.0
+
+    static func lanes(sideWidth: Double, physicalNotchWidth: Double,
+                      centerOffset: Double = 0) -> InlineHUDLanes? {
+        guard sideWidth.isFinite, sideWidth > 0,
+              physicalNotchWidth.isFinite, physicalNotchWidth > 0,
+              centerOffset.isFinite else { return nil }
+        let cutout = physicalNotchWidth + 2 * cutoutClearance
+        let side = sideWidth + abs(centerOffset)
+        let leading = side + centerOffset, trailing = side - centerOffset
+        guard cutout.isFinite, leading.isFinite, trailing.isFinite,
+              (leading + cutout + trailing).isFinite else { return nil }
+        return .init(leadingWidth: leading, cutoutWidth: cutout, trailingWidth: trailing)
     }
 }
 

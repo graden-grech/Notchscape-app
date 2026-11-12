@@ -1,0 +1,29 @@
+{
+  "revision": "48b10fa505aeb51fbd127fc60a5c660040e823b7",
+  "files": [
+    {
+      "path": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-face-camera-2026-10-29/source/README.md",
+      "url": "https://raw.githubusercontent.com/opencv/opencv_zoo/48b10fa505aeb51fbd127fc60a5c660040e823b7/models/face_recognition_sface/README.md",
+      "bytes": 2267,
+      "sha256": "e090e126f3fb5c0b0b2d84ee644b17e42a70b2e45a90616814970b811e91d063"
+    },
+    {
+      "path": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-face-camera-2026-10-29/source/LICENSE",
+      "url": "https://raw.githubusercontent.com/opencv/opencv_zoo/48b10fa505aeb51fbd127fc60a5c660040e823b7/models/face_recognition_sface/LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-face-camera-2026-10-29/source/sface.py",
+      "url": "https://raw.githubusercontent.com/opencv/opencv_zoo/48b10fa505aeb51fbd127fc60a5c660040e823b7/models/face_recognition_sface/sface.py",
+      "bytes": 2277,
+      "sha256": "a2351d8387a0fc6b4ddb5f13f5e30d2afa32bc25ede9d80c39d1ebf212a48ef7"
+    },
+    {
+      "path": "/Users/gradengrech/Documents/Codex/2026-10-08/i-w/work/notchscape-face-camera-2026-10-29/source/face_recognition_sface_2021dec.onnx",
+      "url": "https://media.githubusercontent.com/media/opencv/opencv_zoo/48b10fa505aeb51fbd127fc60a5c660040e823b7/models/face_recognition_sface/face_recognition_sface_2021dec.onnx",
+      "bytes": 38696353,
+      "sha256": "0ba9fbfa01b5270c96627c4ef784da859931e02f04419c829e83484087c34e79"
+    }
+  ]
+}

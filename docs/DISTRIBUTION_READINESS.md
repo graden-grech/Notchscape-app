@@ -6,9 +6,22 @@ and third-party notices remain in [ATTRIBUTION.md](ATTRIBUTION.md), LICENSE and
 THIRD_PARTY_LICENSES. Routine UI and download branding use Notchscape.
 
 The active project from October 27 is the newly created standalone
-`graden-grech/Notchscape-app` repository. New releases use its canonical feed;
-the previous `graden-grech/Notchscape` repository remains public for downloads
-and signed migration updates. See [the migration record](NEW_REPOSITORY_MIGRATION.md).
+`graden-grech/Notchscape-app` repository. It was recreated after deletion on
+October 28, with the exact previously public 2.9.3 and 2.9.4 archives and its
+canonical update feed. Both earlier repositories were deleted and are not
+restored. Installations with feeds pointing to a deleted legacy address need a
+fresh download. The [migration record](NEW_REPOSITORY_MIGRATION.md) describes
+the earlier migration; it does not establish that deleted feeds still work.
+
+## Current 2.9.6 public boundary
+
+Public build330 explicitly disables Face Unlock and excludes the local-only
+broker, its profile and model weights. Its immutable signed archive is verified
+independently against the existing Sparkle key. The separate local331 preview
+retains the device-bound helper and is never uploaded. Public and local builds
+keep the main/original-helper signing identity; accounts stay disabled.
+The older preview reports below are historical. See [2.9.6](releases/2.9.6.md)
+for current UI/release coverage and its remaining device/notarization limits.
 
 ## 2.9.1 branding correction
 
@@ -51,6 +64,30 @@ the public release or establish a new Sparkle update test. Installer production
 requirements are recorded in [shared installation](SHARED_INSTALLATION.md).
 
 ## Remaining production blockers
+
+The unpublished 2.9.5 previews remain local. Build 305 passed the harmless Face
+helper preflight after its caller-session configuration fix, and the human
+confirmed camera-guide entry and the physical HUD. Corrected Dock build
+308 is signed and installed, with bounded live scrolling/folder-launch/resource
+checks, preserved settings and human-confirmed physical HUD. No new public
+release or updater test has been performed.
+Enrollment completion, actual unlock/Apple Watch behavior and recognition
+calibration remain human checks. The Add-ons Store is a truthful catalog preview: current capabilities
+remain bundled and no separate downloads are published. Real resource packs,
+signed companion components and WidgetKit hosts still need packaging and live
+install/remove verification. See [the local preview](releases/2.9.5.md).
+
+Its broker's Personal Team profile expires November 6, 2026 at 01:45:35 UTC
+and permits only one registered Mac. Both ZIP and shared-installer packaging
+refuse this local-only profile. Suitable distribution provisioning is required
+before it can ship to other customers.
+
+Synthetic conversion/policy tests
+are not a security evaluation. Real Keychain setup, camera recognition,
+false-match/spoof calibration and macOS login-field delivery need separate
+user-controlled verification before this can be offered as a tested unlock
+feature. The display-compatibility prototype likewise does not enable native
+island suppression or establish new-hardware support.
 
 The current signing identity is Apple Development, not Developer ID distribution,
 and the app is not notarized. Proper broadly trusted macOS distribution needs
@@ -97,3 +134,6 @@ that API result does not verify the homepage sidebar refreshed. The old failed
 build email was already in recoverable Trash; no further deletion was needed.
 No new support message, public discussion, history rewrite or release mutation
 was made during this follow-up check.
+
+
+Local305 human follow-up (2 November2026): the user authenticated manually and confirmed the oval camera guide opens. The user also confirmed the real volume-key HUD appears inside Notchscape. Enrollment completion, recognition quality, automatic unlock and Apple Watch races are not validated by those checks. No public release or updater test was performed for305.

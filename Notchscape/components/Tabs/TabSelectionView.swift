@@ -15,14 +15,18 @@ struct TabModel: Identifiable {
     let view: NotchViews
 }
 
-let standardTabs = [
+@MainActor private let standardTabs = [
     TabModel(label: "Home", icon: "house.fill", view: .home),
     TabModel(label: "Live", icon: "sparkles", view: .live),
     TabModel(label: "Shelf", icon: "tray.fill", view: .shelf)
 ]
 
+@MainActor
 struct TabSelectionView: View {
     @ObservedObject private var performance = AppPerformanceManager.shared
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.colorSchemeContrast) private var contrast
     @ObservedObject var coordinator = NotchscapeCoordinator.shared
     @Default(.systemDashboardEnabled) private var systemDashboardEnabled
     @Default(.showToolsTab) private var showToolsTab
@@ -38,6 +42,14 @@ struct TabSelectionView: View {
     private var bubbleX: CGFloat {
         if let dragX { return min(max(4, dragX - (cellWidth - 2) / 2), trackWidth - cellWidth - 2) }
         return 4 + CGFloat(selectedIndex) * cellWidth
+    }
+    private var rendering: GlassPresentationPolicy {
+        let native: Bool
+        if #available(macOS 26.0, *) { native = true } else { native = false }
+        return .init(supportsNativeGlass: native,
+                     reduceTransparency: performance.reduceTransparency || reduceTransparency,
+                     increasedContrast: contrast == .increased, lowImpact: performance.lowImpact,
+                     reduceMotion: performance.reduceMotion || reduceMotion)
     }
 
     private var allTabs: [TabModel] {
@@ -55,11 +67,14 @@ struct TabSelectionView: View {
 
     var body: some View {
         ZStack(alignment: .leading) {
-            Capsule().fill(Color.white.opacity(performance.reduceTransparency ? 0.13 : 0.065))
+            Capsule().fill(rendering.usesOpaqueSurfaces ? Color(white: 0.13) : Color.white.opacity(0.065))
             selectionBubble
                 .frame(width: cellWidth - 2, height: 26)
                 .offset(x: bubbleX)
+                .animation(rendering.allowsDecorativeMotion && dragX == nil
+                           ? .spring(response: 0.26, dampingFraction: 0.82) : nil, value: bubbleX)
                 .allowsHitTesting(false)
+                .accessibilityHidden(true)
             HStack(spacing: 0) {
                 ForEach(tabs) { tab in tabControl(tab) }
             }.padding(.horizontal, 3)
@@ -74,7 +89,7 @@ struct TabSelectionView: View {
                 }
                 .onEnded { value in
                     select(at: value.location.x)
-                    withAnimation(.spring(response: 0.26, dampingFraction: 0.82)) { dragX = nil }
+                    dragX = nil
                 }
         )
         .onChange(of: systemDashboardEnabled) { _, enabled in
@@ -88,17 +103,23 @@ struct TabSelectionView: View {
         .onChange(of: showWallpapersTab) { _, enabled in
             if !enabled && coordinator.currentView == .wallpapers { coordinator.currentView = .home }
         }
+        .transaction {
+            if !rendering.allowsDecorativeMotion { $0.animation = nil; $0.disablesAnimations = true }
+        }
     }
 
     @ViewBuilder private var selectionBubble: some View {
-        if #available(macOS 26.0, *), !performance.lowImpact, !performance.reduceTransparency {
+        if #available(macOS 26.0, *), rendering.usesNativeGlass {
             GlassEffectContainer {
                 Color.clear
-                    .glassEffect(.regular.tint(accent.opacity(0.28)).interactive(), in: Capsule())
+                    .glassEffect(.regular.tint(accent.opacity(0.28)).interactive(rendering.allowsDecorativeMotion), in: Capsule())
                     .glassEffectID("selected-notch-tab", in: selectionAnimation)
             }
         } else {
-            Capsule().fill(performance.reduceTransparency ? Color(white: 0.3) : accent.opacity(0.32))
+            Capsule().fill(rendering.usesOpaqueSurfaces ? Color(white: 0.3) : accent.opacity(0.32))
+                .overlay {
+                    if rendering.usesOpaqueSurfaces { Capsule().strokeBorder(accent, lineWidth: 1.5) }
+                }
         }
     }
     private var accent: Color {
@@ -112,16 +133,20 @@ struct TabSelectionView: View {
                 Menu {
                     ForEach(Array(allTabs.dropFirst(4))) { extra in
                         Button { select(extra) } label: { Label(extra.label, systemImage: extra.icon) }
+                            .accessibilityAddTraits(coordinator.currentView == extra.view ? [.isSelected] : [])
                     }
                 } label: { Image(systemName: selected ? (allTabs.first { $0.view == coordinator.currentView }?.icon ?? tab.icon) : tab.icon).frame(width: cellWidth, height: 26) }
-                .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize()
+                .menuStyle(.borderlessButton).menuIndicator(.hidden)
+                .frame(width: cellWidth, height: 26)
                 .help("More pages").accessibilityLabel("More pages")
+                .accessibilityValue(selected ? (allTabs.first { $0.view == coordinator.currentView }?.label ?? "") : "")
+                .accessibilityAddTraits(selected ? [.isSelected] : [])
             } else {
                 TabButton(label: tab.label, icon: tab.icon, selected: selected, onClick: { select(tab) }, width: cellWidth)
                     .buttonStyle(.plain)
             }
         }.font(.system(size: 12, weight: .semibold))
-            .foregroundStyle(selected ? .white : Color.white.opacity(0.58))
+            .foregroundStyle(selected ? .white : Color.white.opacity(rendering.usesOpaqueSurfaces ? 0.82 : 0.66))
     }
 
     private func select(at x: CGFloat) {
@@ -132,12 +157,7 @@ struct TabSelectionView: View {
 
     private func select(_ tab: TabModel) {
         guard coordinator.currentView != tab.view else { return }
-        if Defaults[.enableHaptics], !performance.suppressAnimations {
-            NSHapticFeedbackManager.defaultPerformer.perform(.alignment, performanceTime: .default)
-        }
-        withAnimation(.smooth(duration: 0.25)) {
-            coordinator.currentView = tab.view
-        }
+        coordinator.currentView = tab.view
     }
 }
 

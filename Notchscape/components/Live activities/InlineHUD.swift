@@ -10,13 +10,35 @@ import Defaults
 
 struct InlineHUD: View {
     @EnvironmentObject var vm: NotchscapeViewModel
+    @Environment(\.layoutDirection) private var layoutDirection
     @Binding var type: SneakContentType
     @Binding var value: CGFloat
     @Binding var icon: String
     @Binding var hoverAnimation: Bool
     @Binding var gestureProgress: CGFloat
+
+    private var sideWidth: CGFloat {
+        100 - (hoverAnimation ? 0 : 12) + gestureProgress / 2
+    }
+
+    private var physicalLanes: InlineHUDLanes? {
+        let screen: NSScreen?
+        if let uuid = vm.screenUUID { screen = NSScreen.screen(withUUID: uuid) }
+        else { screen = NSScreen.main }
+        guard let screen,
+              let geometry = NSScreenDisplayGeometryAdapter.snapshot(for: screen),
+              geometry.usesLegacyNotchLayout else { return nil }
+        let width = geometry.reportedTopGap?.width ?? Double(vm.closedNotchSize.width)
+        let centerOffset = geometry.reportedTopGap?.centerOffset ?? 0
+        // HStack reverses semantic leading/trailing in right-to-left layouts.
+        let offset = layoutDirection == .rightToLeft ? -centerOffset : centerOffset
+        return InlineHUDLayoutPolicy.lanes(sideWidth: Double(sideWidth),
+            physicalNotchWidth: width, centerOffset: offset)
+    }
+
     var body: some View {
-        HStack {
+        let lanes = physicalLanes
+        HStack(spacing: lanes == nil ? nil : 0) {
             HStack(spacing: 5) {
                 Group {
                     switch (type) {
@@ -61,11 +83,12 @@ struct InlineHUD: View {
                     .allowsTightening(true)
                     .contentTransition(.numericText())
             }
-            .frame(width: 100 - (hoverAnimation ? 0 : 12) + gestureProgress / 2, height: vm.notchSize.height - (hoverAnimation ? 0 : 12), alignment: .leading)
+            .frame(width: CGFloat(lanes?.leadingWidth ?? Double(sideWidth)), height: vm.notchSize.height - (hoverAnimation ? 0 : 12), alignment: .leading)
+            .conditionalModifier(lanes != nil) { view in view.clipped() }
             
             Rectangle()
                 .fill(.black)
-                .frame(width: vm.closedNotchSize.width - 20)
+                .frame(width: lanes.map { CGFloat($0.cutoutWidth) } ?? (vm.closedNotchSize.width - 20))
             
             HStack {
                 if (type == .mic) {
@@ -106,7 +129,8 @@ struct InlineHUD: View {
                 }
             }
             .padding(.trailing, 4)
-            .frame(width: 100 - (hoverAnimation ? 0 : 12) + gestureProgress / 2, height: vm.closedNotchSize.height - (hoverAnimation ? 0 : 12), alignment: .center)
+            .frame(width: CGFloat(lanes?.trailingWidth ?? Double(sideWidth)), height: vm.closedNotchSize.height - (hoverAnimation ? 0 : 12), alignment: .center)
+            .conditionalModifier(lanes != nil) { view in view.clipped() }
         }
         .frame(height: vm.closedNotchSize.height + (hoverAnimation ? 8 : 0), alignment: .center)
     }

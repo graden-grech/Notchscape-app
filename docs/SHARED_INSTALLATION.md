@@ -64,3 +64,19 @@ matches the installed app and extracted ZIP. This verifies package structure
 and filesystem access; it is not an administrator-install or second-account
 launch test. Exact hashes and remaining signing/release gates are in
 [the preview report](releases/2.9.2-preview.md).
+
+## November 2 follow-up
+
+The signed local build 304 at `/Applications/Notchscape.app` passes the shared
+permissions gate across 380 entries. Five obsolete build products carrying the
+old display name were unregistered and moved into recoverable `.noindex`
+storage; the app-name Spotlight query now returns none of those copies. The
+active bundle's display name and indexed filename are Notchscape. This does not
+remove source-license notices or change the compatibility bundle identifier.
+
+The native installer now applies the same private-development-profile refusal
+as ZIP packaging, before it stages a payload. A synthetic renamed-helper test
+proves that no output directory is created when that marker is present.
+Shared filesystem access remains distinct from another user's own permissions,
+login-item choice and runtime testing. Current local Face development signing
+is not a signed/notarized customer installer.

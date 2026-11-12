@@ -50,6 +50,7 @@ final class MediaToolsManager: NSObject, ObservableObject, SCContentSharingPicke
                 guard let self, WorkspaceAccess.privateToolsAllowed, self.requestGeneration == request, CaptureStudioController.shared.window?.isVisible == true else { return }
                 guard !self.isBusy, !FileManager.default.fileExists(atPath: url.path) else { self.message = "Choose a new filename; existing files are never overwritten."; return }
                 self.destination = url; self.choosingSource = true; self.message = nil
+                DesktopSnowManager.shared.setCaptureSuppressed(true)
                 let picker = SCContentSharingPicker.shared
                 var config = SCContentSharingPickerConfiguration()
                 config.allowedPickerModes = [.singleWindow, .singleDisplay]; config.allowsChangingSelectedContent = false
@@ -90,6 +91,9 @@ final class MediaToolsManager: NSObject, ObservableObject, SCContentSharingPicke
         choosingSource = false
         SCContentSharingPicker.shared.remove(self)
         if stream == nil { SCContentSharingPicker.shared.isActive = false }
+        if stream == nil && !recording && !finalizing {
+            DesktopSnowManager.shared.setCaptureSuppressed(false)
+        }
     }
     private func monitorRecording() {
         recordMonitor?.cancel()

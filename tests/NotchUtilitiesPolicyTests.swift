@@ -1,6 +1,7 @@
 import Foundation
 
 @main
+@MainActor
 struct NotchUtilitiesPolicyTests {
     static var checks = 0
     static func check(_ value: @autoclosure () -> Bool, _ message: String) {
@@ -54,6 +55,55 @@ struct NotchUtilitiesPolicyTests {
         check(!NotchSettingsDestination.all.first { $0.id == "Tools" }!.matches("color volcano"), "All search words must match")
         check(NotchSettingsDestination.all.allSatisfy { $0.matches("  \n ") }, "Empty query restores sidebar")
         check(Set(NotchSettingsDestination.all.map(\.id)).count == NotchSettingsDestination.all.count, "Unique navigation IDs")
+        for id in ["Themes", "HomeLayout", "AppIcon", "Effects", "MediaAppearance", "Weather", "Agents", "Sports", "Shortcuts", "Shelf", "Battery", "HUD"] {
+            let parent = NotchSettingsDestination.parentID(for: id)
+            check(parent != id && NotchSettingsDestination.sidebar.contains { $0.id == parent }, "Existing leaf routes retain a visible parent")
+            check(NotchSettingsDestination.all.contains { $0.id == id }, "Existing section links remain addressable")
+        }
+        check(NotchSettingsDestination.sidebar.filter { $0.id != "Account" }.count == 14, "Related sections, Dock Workspace and the Add-ons store have native destinations")
+        check(NotchSettingsDestination.sidebar.first { $0.id == "Dock" }!.matches("launcher widgets"), "Dock Workspace has its own searchable settings")
+        check(NotchSettingsDestination.sidebar.first { $0.id == "Store" }!.matches("download plugins"), "Add-ons store is searchable")
+        check(NotchSettingsDestination.sidebar.first { $0.id == "Appearance" }!.matchesIncludingChildren("fahrenheit"), "Weather search finds Appearance")
+        check(NotchSettingsDestination.sidebar.first { $0.id == "Activities" }!.matchesIncludingChildren("codex"), "Agent search finds Live Activities")
+        check(NotchSettingsDestination.sidebar.first { $0.id == "FaceUnlock" }!.matches("face id"), "Face Unlock has its own searchable destination")
+
+        func results(_ query: String, accountsEnabled: Bool = false) -> [NotchSettingsDestination] {
+            NotchSettingsDestination.destinations(matching: query, accountsEnabled: accountsEnabled)
+        }
+        let normalSidebarIDs = NotchSettingsDestination.sidebar.filter { $0.id != "Account" }.map(\.id)
+        check(results("").map(\.id) == normalSidebarIDs, "Empty search preserves the grouped sidebar and its order")
+        check(results(" \n\t ").map(\.id) == normalSidebarIDs, "Whitespace-only search restores the grouped sidebar")
+        check(results("HUD").map(\.id) == ["HUD"], "Searching a child title exposes its actual destination, not the parent")
+        check(results("volume permissions").map(\.id) == ["HUD"], "Multiple keywords navigate directly to HUD settings")
+        check(results("fahrenheit").map(\.id) == ["Weather"], "Weather keyword no longer forces a detour through Appearance")
+        check(results("codex").map(\.id) == ["Agents"], "Agent keyword exposes the actual AI Agents destination")
+        check(results("system brightness").map(\.id) == ["HUD"], "A search can combine parent context and child keywords")
+        check(results("appearance fahrenheit").map(\.id) == ["Weather"], "Parent context can qualify a child search")
+        check(results("BATTERY").first?.id == "Battery", "A case-insensitive exact title outranks another page's keyword")
+        check(results(" battery ").map(\.id) == results("BATTERY").map(\.id), "Search ignores outer whitespace and casing")
+        check(results("face \n unlock").first?.id == "FaceUnlock", "Title ranking normalizes repeated whitespace")
+        check(results("volcano xyz").isEmpty, "Unknown searches have an explicit empty result")
+        check(results("volume volcano").isEmpty, "A matching keyword cannot hide another unmatched query word")
+        check(!results("password passkey").contains { $0.id == "Account" }, "Disabled accounts stay absent from keyword results")
+        check(results("account").isEmpty, "Disabled Account cannot be opened by searching its title")
+        check(results("account", accountsEnabled: true).first?.id == "Account", "Enabled accounts are directly searchable")
+        check(results("password passkey", accountsEnabled: true).map(\.id) == ["Account"], "Enabled account keywords use the established route")
+        check(results("", accountsEnabled: true).map(\.id) == NotchSettingsDestination.sidebar.map(\.id), "Account enablement preserves normal sidebar order")
+        check(results("Themes & Colors").first?.id == "Themes", "Theme controls have a direct focused search destination")
+        check(results("Home Layout").first?.id == "HomeLayout", "Home controls are directly addressable")
+        check(results("App Icon").first?.id == "AppIcon", "Icon controls are directly addressable")
+        check(results("Player Appearance").first?.id == "MediaAppearance", "Player styling remains grouped under Media")
+        let parentTitles = ["Themes": "Appearance", "HomeLayout": "Appearance", "AppIcon": "Appearance", "Effects": "Appearance", "MediaAppearance": "Media", "Weather": "Appearance", "Agents": "Live Activities", "Sports": "Live Activities",
+                            "Shortcuts": "Tools & Shortcuts", "Shelf": "Tools & Shortcuts", "Battery": "System & Power", "HUD": "System & Power"]
+        for destination in NotchSettingsDestination.all {
+            check(destination.parentTitle == parentTitles[destination.id], "Only child results carry their existing parent breadcrumb")
+        }
+        for query in ["HUD", "volume", "weather", "codex", "live activities", "system", "battery", "dock", "appearance", "face unlock", "\u{1F383}"] {
+            let first = results(query), second = results(query)
+            check(first.map(\.id) == second.map(\.id), "Repeated search has stable ranking")
+            check(Set(first.map(\.id)).count == first.count, "A destination appears only once in search results")
+            check(first.allSatisfy { result in NotchSettingsDestination.all.contains { $0.id == result.id } && result.id != "Account" }, "Search exposes only known enabled routes")
+        }
         print("PASS: \(checks) wallpaper, utilities and settings search checks")
     }
 }

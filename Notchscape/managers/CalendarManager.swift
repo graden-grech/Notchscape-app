@@ -113,6 +113,16 @@ class CalendarManager: ObservableObject {
         updateSelectedCalendars()
     }
 
+    /// A visible Dock consumer can read its own upcoming interval without
+    /// changing Home's selected date or initiating a permission prompt.
+    func upcomingEventsForDock(now: Date) async -> [EventModel] {
+        guard EKEventStore.authorizationStatus(for: .event) == .fullAccess else { return [] }
+        let ids = selectedCalendars.filter { !$0.isReminder }.map(\.id)
+        guard !ids.isEmpty else { return [] }
+        return await calendarService.events(from: now, to: now.addingTimeInterval(7 * 86_400),
+            calendars: ids)
+    }
+
     /// Refreshing status must never open a consent dialog. Only an explicit
     /// Connect action may request access on a previously undecided account.
     func checkCalendarAuthorization(requestIfNeeded: Bool = false) async {

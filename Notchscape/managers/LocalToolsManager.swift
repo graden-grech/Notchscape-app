@@ -15,6 +15,7 @@ actor LocalToolsVault {
         var notes: [QuickNote]
         var appleNotes: AppleNotesState?
         var workspace: PersonalWorkspace?
+        var clipboardBoards: [ClipboardBoard]?
     }
     private var key: SymmetricKey?
     private var file: URL {
@@ -47,18 +48,18 @@ actor LocalToolsVault {
         key = value
         return value
     }
-    func load() throws -> ([ClipboardEntry], [QuickNote], AppleNotesState, PersonalWorkspace) {
+    func load() throws -> ([ClipboardEntry], [QuickNote], AppleNotesState, PersonalWorkspace, [ClipboardBoard]) {
         let key = try encryptionKey()
-        guard FileManager.default.fileExists(atPath: file.path) else { return ([], [], .init(), .init()) }
+        guard FileManager.default.fileExists(atPath: file.path) else { return ([], [], .init(), .init(), []) }
         let data = try Data(contentsOf: file)
         guard data.count < 64_000_000 else { throw CocoaError(.fileReadCorruptFile) }
         let clear = try AES.GCM.open(AES.GCM.SealedBox(combined: data), using: key)
         let snapshot = try JSONDecoder().decode(Snapshot.self, from: clear)
-        return (snapshot.clipboard, snapshot.notes, snapshot.appleNotes ?? .init(), snapshot.workspace?.bounded ?? .init())
+        return (snapshot.clipboard, snapshot.notes, snapshot.appleNotes ?? .init(), snapshot.workspace?.bounded ?? .init(), snapshot.clipboardBoards ?? [])
     }
-    func save(clipboard: [ClipboardEntry], notes: [QuickNote], appleNotes: AppleNotesState, workspace: PersonalWorkspace) throws {
+    func save(clipboard: [ClipboardEntry], notes: [QuickNote], appleNotes: AppleNotesState, workspace: PersonalWorkspace, clipboardBoards: [ClipboardBoard]) throws {
         let key = try encryptionKey()
-        let data = try JSONEncoder().encode(Snapshot(clipboard: clipboard, notes: notes, appleNotes: appleNotes, workspace: workspace.bounded))
+        let data = try JSONEncoder().encode(Snapshot(clipboard: clipboard, notes: notes, appleNotes: appleNotes, workspace: workspace.bounded, clipboardBoards: clipboardBoards))
         // Link baselines add to the snapshot. Never write a file that the bounded
         // loader would reject on the next launch; retain the previous file.
         guard data.count < 63_999_936 else { throw CocoaError(.fileWriteOutOfSpace) }
@@ -74,6 +75,8 @@ actor LocalToolsVault {
 final class LocalToolsManager: ObservableObject {
     static let shared = LocalToolsManager()
     @Published private(set) var clipboard: [ClipboardEntry] = []
+    @Published private(set) var clipboardBoards: [ClipboardBoard] = []
+    @Published private(set) var clipboardPrivacyGeneration = 0
     @Published private(set) var notes: [QuickNote] = []
     @Published private(set) var appleNotesState = AppleNotesState()
     @Published private(set) var workspace = PersonalWorkspace()
@@ -90,6 +93,7 @@ final class LocalToolsManager: ObservableObject {
     private var loadTask: Task<Void, Never>?
     private var saveTask: Task<Void, Never>?
     private var timer: Timer?
+    private var expiryTask: Task<Void, Never>?
     private var changeCount = NSPasteboard.general.changeCount
     private var observations = Set<AnyCancellable>()
     private var started = false
@@ -113,9 +117,13 @@ final class LocalToolsManager: ObservableObject {
         }.store(in: &observations)
         WorkspaceModeManager.shared.$session.dropFirst().receive(on: RunLoop.main).sink { [weak self] session in
             guard let self else { return }
-            if session?.mode.hidesPrivateContent == true { captureGeneration += 1; captureText = ""; capturedCodes = [] }
+            if session?.mode.hidesPrivateContent == true { captureGeneration += 1; captureText = ""; capturedCodes = []; clipboardPrivacyGeneration += 1 }
             configureClipboard()
         }.store(in: &observations)
+        NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didWakeNotification)
+            .receive(on: RunLoop.main).sink { [weak self] _ in self?.expireSensitiveClipboard() }.store(in: &observations)
+        NotificationCenter.default.publisher(for: .NSSystemClockDidChange)
+            .receive(on: RunLoop.main).sink { [weak self] _ in self?.expireSensitiveClipboard() }.store(in: &observations)
         configureClipboard()
     }
     func load() async {
@@ -125,11 +133,18 @@ final class LocalToolsManager: ObservableObject {
             guard let self else { return }
             do {
                 let snapshot = try await vault.load()
-                clipboard = ClipboardPolicy.retained(snapshot.0, now: Date(), days: Defaults[.clipboardRetentionDays])
+                clipboard = ClipboardPolicy.retained(snapshot.0.map(ClipboardPolicy.prepared), now: Date(), days: Defaults[.clipboardRetentionDays])
                 notes = Array(snapshot.1.prefix(100)).map { var n = $0; n.text = NotePolicy.bounded(n.text); return n }
                 appleNotesState = snapshot.2
                 workspace = snapshot.3
+                var boardIDs = Set<UUID>()
+                clipboardBoards = Array(snapshot.4.filter { ClipboardBoard.validName($0.name) != nil && boardIDs.insert($0.id).inserted }.prefix(20))
+                let validIDs = Set(clipboardBoards.map(\.id))
+                clipboard = clipboard.map { var entry = $0; if let id = entry.boardID, !validIDs.contains(id) { entry.boardID = nil }; return entry }
                 loaded = true; error = nil
+                // Persist pruning/migration without touching the system clipboard.
+                if clipboard != snapshot.0 { persist() }
+                scheduleClipboardExpiry()
             } catch { self.error = "Private tools couldn’t open their encrypted storage. Nothing has been replaced." }
         }
         loadTask = task; await task.value; loadTask = nil
@@ -137,6 +152,7 @@ final class LocalToolsManager: ObservableObject {
     private func configureClipboard() {
         clipboardGeneration += 1
         paused = locked || userPaused || privateContentHidden
+        if !Defaults[.clipboardHistoryEnabled] { clipboardPrivacyGeneration += 1 }
         configureShortcuts()
         timer?.invalidate(); timer = nil
         changeCount = NSPasteboard.general.changeCount // Never capture an old copy on opt-in/unlock.
@@ -148,7 +164,7 @@ final class LocalToolsManager: ObservableObject {
         timer?.tolerance = 0.3
     }
     func setLocked(_ locked: Bool) {
-        if locked { captureGeneration += 1 }
+        if locked { captureGeneration += 1; clipboardPrivacyGeneration += 1 }
         self.locked = locked; captureText = ""; capturedCodes = []
         configureClipboard()
     }
@@ -202,29 +218,86 @@ final class LocalToolsManager: ObservableObject {
         addClipboardEntry(entry)
     }
     private func addClipboardEntry(_ value: ClipboardEntry) {
-        var entry = value
+        var entry = ClipboardPolicy.captured(value)
         // Keep a pin on duplicate copies rather than creating unbounded copies.
         if let duplicate = clipboard.first(where: { $0.text == entry.text && $0.image == entry.image }) {
-            entry.id = duplicate.id; entry.pinned = duplicate.pinned
+            entry.id = duplicate.id; entry.pinned = duplicate.pinned; entry.boardID = duplicate.boardID
             clipboard.removeAll { $0.id == duplicate.id }
         }
         clipboard.insert(entry, at: 0); prune()
     }
-    func copy(_ entry: ClipboardEntry) {
+    @discardableResult
+    func copy(_ entry: ClipboardEntry, revealingSensitive: Bool = false) -> Bool {
+        guard clipboardAvailable, let entry = clipboard.first(where: { $0.id == entry.id }),
+              entry.expiresAt.map({ $0 > Date() }) ?? true,
+              entry.sensitive != true || revealingSensitive else { return false }
         let board = NSPasteboard.general; board.clearContents()
-        if let text = entry.text { board.setString(text, forType: .string) }
-        else if let image = entry.image { board.setData(image, forType: .png) }
+        let written: Bool
+        if let text = entry.text { written = board.setString(text, forType: .string) }
+        else if let image = entry.image { written = board.setData(image, forType: .png) }
+        else { return false }
+        if entry.sensitive == true { board.setString("", forType: .init("org.nspasteboard.ConcealedType")) }
+        board.setString("", forType: .init("org.nspasteboard.AutoGeneratedType"))
         changeCount = board.changeCount
+        return written
     }
     func pin(_ entry: ClipboardEntry) {
-        guard let index = clipboard.firstIndex(where: { $0.id == entry.id }) else { return }
-        clipboard[index].pinned.toggle(); prune()
+        guard clipboardAvailable, let index = clipboard.firstIndex(where: { $0.id == entry.id }) else { return }
+        clipboard[index].pinned.toggle()
+        if !clipboard[index].pinned { clipboard[index].boardID = nil }
+        prune()
     }
-    func remove(_ entry: ClipboardEntry) { clipboard.removeAll { $0.id == entry.id }; persist() }
-    func clearClipboard() { clipboard.removeAll { !$0.pinned }; persist() }
+    func remove(_ entry: ClipboardEntry) { guard clipboardAvailable else { return }; clipboard.removeAll { $0.id == entry.id }; persist(); scheduleClipboardExpiry() }
+    func clearClipboard() { guard clipboardAvailable else { return }; clipboard.removeAll { !$0.pinned }; persist(); scheduleClipboardExpiry() }
+    private var clipboardAvailable: Bool { loaded && Defaults[.clipboardHistoryEnabled] && !locked && !privateContentHidden }
+    @discardableResult
+    func createClipboardBoard(name: String) -> UUID? {
+        guard clipboardAvailable, clipboardBoards.count < 20, let name = ClipboardBoard.validName(name) else { return nil }
+        let value = ClipboardBoard(name: name); clipboardBoards.append(value); persist(); return value.id
+    }
+    func removeClipboardBoard(_ id: UUID) {
+        guard clipboardAvailable else { return }
+        clipboardBoards.removeAll { $0.id == id }
+        for index in clipboard.indices where clipboard[index].boardID == id { clipboard[index].boardID = nil }
+        persist() // Board removal keeps every copy and its pin.
+    }
+    func assignClipboardEntry(_ entry: ClipboardEntry, boardID: UUID?) {
+        guard clipboardAvailable, boardID == nil || clipboardBoards.contains(where: { $0.id == boardID }),
+              let index = clipboard.firstIndex(where: { $0.id == entry.id }) else { return }
+        clipboard[index].boardID = boardID
+        if boardID != nil { clipboard[index].pinned = true }
+        prune()
+    }
+    func copyTransformedClipboard(_ id: UUID, transform: ClipboardTransform, revealingSensitive: Bool) -> Bool {
+        guard clipboardAvailable, let entry = clipboard.first(where: { $0.id == id }),
+              entry.expiresAt.map({ $0 > Date() }) ?? true,
+              entry.sensitive != true || revealingSensitive, let text = entry.text,
+              let result = transform.apply(to: text) else { return false }
+        let board = NSPasteboard.general; board.clearContents(); let written = board.setString(result, forType: .string)
+        if entry.sensitive == true { board.setString("", forType: .init("org.nspasteboard.ConcealedType")) }
+        board.setString("", forType: .init("org.nspasteboard.AutoGeneratedType")); changeCount = board.changeCount
+        return written
+    }
+    private func scheduleClipboardExpiry() {
+        expiryTask?.cancel(); expiryTask = nil
+        guard let deadline = clipboard.compactMap(\.expiresAt).min() else { return }
+        expiryTask = Task { @MainActor [weak self] in
+            do { try await Task.sleep(for: .seconds(max(0.05, deadline.timeIntervalSinceNow))) } catch { return }
+            guard !Task.isCancelled else { return }; self?.expireSensitiveClipboard()
+        }
+    }
+    private func expireSensitiveClipboard() {
+        guard loaded else { return }
+        let count = clipboard.count, now = Date()
+        // Clock changes must not run general retention/future-date validation on
+        // legacy pins. Only explicit short-lived captures are removed here.
+        clipboard = ClipboardPolicy.removingExpiredSensitive(clipboard, now: now)
+        if clipboard.count != count { persist() }
+        scheduleClipboardExpiry()
+    }
     private func prune() {
         guard loaded else { return }
-        clipboard = ClipboardPolicy.retained(clipboard, now: Date(), days: Defaults[.clipboardRetentionDays]); persist()
+        clipboard = ClipboardPolicy.retained(clipboard, now: Date(), days: Defaults[.clipboardRetentionDays]); persist(); scheduleClipboardExpiry()
     }
     func addNote() {
         guard loaded, notes.count < 100 else { return }
@@ -276,7 +349,7 @@ final class LocalToolsManager: ObservableObject {
             do { try await Task.sleep(for: .milliseconds(500)) } catch { return }
             guard let self, !Task.isCancelled else { return }
             do {
-                try await vault.save(clipboard: clipboard, notes: notes, appleNotes: appleNotesState, workspace: workspace)
+                try await vault.save(clipboard: clipboard, notes: notes, appleNotes: appleNotesState, workspace: workspace, clipboardBoards: clipboardBoards)
                 if revision == savingRevision { needsSave = false; error = nil }
             }
             catch { self.error = "Changes couldn’t be saved. Keep this window open and try again." }
@@ -287,7 +360,7 @@ final class LocalToolsManager: ObservableObject {
         guard loaded, needsSave else { return }
         let savingRevision = revision
         do {
-            try await vault.save(clipboard: clipboard, notes: notes, appleNotes: appleNotesState, workspace: workspace)
+            try await vault.save(clipboard: clipboard, notes: notes, appleNotes: appleNotesState, workspace: workspace, clipboardBoards: clipboardBoards)
             if revision == savingRevision { needsSave = false }
         }
         catch { self.error = "Changes couldn’t be saved." }

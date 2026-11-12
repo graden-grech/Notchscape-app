@@ -1,0 +1,169 @@
+{
+  "collection": "Landmarks",
+  "date": "2026-10-28",
+  "tool": "Built-in OpenAI imagegen",
+  "intent": "Original photorealistic architectural artwork for Home themes.",
+  "source": "The accepted White House exterior supplies the navy blue-hour sky, clouds and warm amber lighting. Each landmark is generated separately and reframed for the shared Home crop.",
+  "referenceAsset": "Notchscape/Assets.xcassets/WhiteHouseExteriorBackdrop.imageset/WhiteHouseExteriorBackdrop.png",
+  "referenceSHA256": "3db52fdb09d0d2df9a96537e49611bd5eb6d46e70135acf148c11a9e97bce89f",
+  "style": "Navy blue-hour sky and warm amber architectural light",
+  "records": [
+    {
+      "landmark": "U.S. Capitol",
+      "location": "Washington, D.C.",
+      "asset": "Notchscape/Assets.xcassets/LandmarkCapitolBackdrop.imageset/LandmarkCapitolBackdrop.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 2141511,
+      "sha256": "38737c7ffe428558a4c7922a74d84245b7ed7159ac55cc36e6ea49065a2ebe2f",
+      "prompt": "Use case: style-transfer.\nAsset type: one 16:9 photorealistic Notchscape architectural background, full photographic scene.\nInput image 1 is the Capitol scene to correct. Input image 2 is the White House lighting/style reference.\nMake ONLY this targeted composition correction: pull the camera FARTHER BACK so the entire real U.S. Capitol building is about 40 percent SMALLER in height and width. The present Capitol is too large: the top statue will be cut off in the app and the right wing is clipped at the right edge. Recompose naturally so BOTH complete outer wings, central dome including its lantern and tiny Statue of Freedom, and the lowest MAIN terrace steps all fit with clear margins. Architecture should be center-right around x=68%, and the entire top-to-bottom structure should occupy approximately y=35% to y=64%, with its highest statue at y35% and main terrace base at y64%. The whole building must end before x=92%, with real open space to its right. A very shallow horizontal center crop retaining only y=34%-66% must preserve the complete main structure. Keep real Capitol proportions; do not squash, flatten, trim or distort the dome, wings or steps to make them fit.\nPreserve the same convincing rich navy softly layered cloudy blue-hour sky, realistic warm amber architectural uplighting on white stone, restrained contrast, natural photographic detail, quiet dark lawn and tree foreground left. Add natural sky and dark lawn as necessary for the more distant view. No White House, no invented extra architecture, no collage, panels, text, logos, captions, watermarks, flags, crowds, event staging, scaffolding, oversaturated colors or CGI. Single wide 16:9 real photographic scene.",
+      "review": "Full photo and shallow Home framing reviewed. The shared crop can trim lower approaches in wider layouts; complete photos appear in the picker."
+    },
+    {
+      "landmark": "Lincoln Memorial",
+      "location": "Washington, D.C.",
+      "asset": "Notchscape/Assets.xcassets/LandmarkLincolnMemorialBackdrop.imageset/LandmarkLincolnMemorialBackdrop.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 2144265,
+      "sha256": "092f571e186f04934e3ecb42f88edebb146995d4bdc27d77e8bd1600ec5383f2",
+      "prompt": "Use case: photorealistic-natural.\nAsset type: one individual high-quality photographic background for Notchscape, wide landscape 16:9. It will also appear as a full photograph in a photo picker.\nInput image 1 is ONLY a reference for photographic style, sky, lighting, texture, and quiet composition. Create a different real Washington, D.C. landmark scene. Do not copy the White House building into this scene.\nStyle and light: match the reference closely: rich deep navy/slate blue-hour sky, soft layered clouds with the same natural tonal depth, warm amber real architectural uplights, realistic white-stone texture and warm windows where appropriate, restrained natural contrast and saturation. Real architectural photography, not a painting, illustration, render, fantasy, magical lighting, or CGI.\nComposition: a SINGLE wide 16:9 landscape photo with the complete landmark modestly scaled toward center-right, around x=69%, and its entire recognizable structure safely inside the central vertical band y=32%-68%. Pull the camera back far enough to preserve the complete top, base, and lateral ends with clear breathing room. This precise framing is essential: a shallow centered 4:1 Home crop retaining only y=28%-72% must still show the whole recognizable landmark. Ample dark navy clouded sky above, dark quiet foreground below. The left third should be a quiet, natural dark lawn/water/trees area suitable behind a calendar. The full uncropped photo should feel like a believable thoughtfully framed architectural photograph.\nKeep real landmark shapes and proportions, straight verticals and believable perspective, intact rooflines, detailed but natural stone, soft atmospheric depth. No exaggerated telephoto compression.\nAvoid: collage, grids, split panels, captions, labels, legible signage or inscriptions, watermarks, logos, campaign or party decorations, crowds, close people, dramatic sun rays, oversaturated sunset horizon, purple/magenta/teal sky, neon, floating elements, invented extra towers, architecture chopped by the frame or crop.\nSubject/view: the REAL Lincoln Memorial in Washington, D.C., viewed from a slightly oblique position near the eastern Reflecting Pool approach. Accurate broad low rectangular Greek-Doric marble temple, fluted Doric colonnade, HIGH FLAT RECTANGULAR attic/frieze and horizontal cornice above it, no triangular front pediment and no dome. The broad stepped terraces and the complete flat roofline must both remain intact, scaled modestly toward center-right inside y=35%-68%. The dark entrance recess may naturally suggest the distant seated Lincoln statue but the image focuses on the exterior architecture. Quiet shadowed lawn and trees on the left, a small calm section of the Reflecting Pool foreground with restrained amber reflections. Warm amber real uplighting on columns and pale Colorado marble, deep clouded navy blue hour matching the style reference. No close people or event equipment.",
+      "review": "Full photo and shallow Home framing reviewed. The shared crop can trim lower approaches in wider layouts; complete photos appear in the picker."
+    },
+    {
+      "landmark": "Washington Monument",
+      "location": "Washington, D.C.",
+      "asset": "Notchscape/Assets.xcassets/LandmarkWashingtonMonumentBackdrop.imageset/LandmarkWashingtonMonumentBackdrop.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 1993108,
+      "sha256": "47d9ef8736ccf13b73cc4770b5b6acb6aae2e82087fb2ba51267c3e66c293c26",
+      "prompt": "Use case: style-transfer.\nAsset type: one 16:9 photorealistic Notchscape architectural background, full photographic scene.\nInput image 1 is the Washington Monument scene to correct. Input image 2 is the White House lighting/style reference.\nMake ONLY this targeted composition correction: pull the camera BACK so the complete real Washington Monument is about 30 percent SMALLER. Its tip is currently too high for the app's shallow centered crop. Recompose naturally so its intact pyramidal tip sits around y=36% of image height and its complete base at y=64%; the whole accurate obelisk should occupy just the middle 28 percent of image height, safely inside y=34%-66%. Position it center-right around x=69%, seen at a believable greater distance. Preserve the real slender approximately ten-to-one height-to-base-width proportions; do not shorten, squash, crop or thicken the obelisk to make it fit. Keep the stone-tone change about one third of the way up, correct subtle top windows and pyramidal point, no statue, cross, crown or decorative capital.\nPreserve exactly the rich deep navy softly layered cloudy blue-hour sky, warm subtle real floodlights on marble, natural photographic texture, restrained contrast, distant dark park treeline, quiet shadowed grass and tree left foreground and calm dark Tidal Basin water with soft reflections. Adjust the distance/horizon naturally to the more distant view. No added architecture, no extra obelisk, no White House, no readable text, captions, logos, watermarks, flags, political decorations, crowds, boats, event staging, magical lights, CGI, collage or panels. Single wide 16:9 real photographic scene.",
+      "review": "Full photo and shallow Home framing reviewed. The shared crop can trim lower approaches in wider layouts; complete photos appear in the picker."
+    },
+    {
+      "landmark": "Jefferson Memorial",
+      "location": "Washington, D.C.",
+      "asset": "Notchscape/Assets.xcassets/LandmarkJeffersonMemorialBackdrop.imageset/LandmarkJeffersonMemorialBackdrop.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 2161827,
+      "sha256": "fe919755e30e6773c168fc25f66a3eefb6b47f8513298578b73c09890c19ae6b",
+      "prompt": "Use case: photorealistic-natural.\nAsset type: one individual high-quality photographic background for Notchscape, wide landscape 16:9. It will also appear as a full photograph in a photo picker.\nInput image 1 is ONLY a reference for photographic style, sky, lighting, texture, and quiet composition. Create a different real Washington, D.C. landmark scene. Do not copy the White House building into this scene.\nStyle and light: match the reference closely: rich deep navy/slate blue-hour sky, soft layered clouds with the same natural tonal depth, warm amber real architectural uplights, realistic white-stone texture and warm windows where appropriate, restrained natural contrast and saturation. Real architectural photography, not a painting, illustration, render, fantasy, magical lighting, or CGI.\nComposition: a SINGLE wide 16:9 landscape photo with the complete landmark modestly scaled toward center-right, around x=69%, and its entire recognizable structure safely inside the central vertical band y=32%-68%. Pull the camera back far enough to preserve the complete top, base, and lateral ends with clear breathing room. This precise framing is essential: a shallow centered 4:1 Home crop retaining only y=28%-72% must still show the whole recognizable landmark. Ample dark navy clouded sky above, dark quiet foreground below. The left third should be a quiet, natural dark lawn/water/trees area suitable behind a calendar. The full uncropped photo should feel like a believable thoughtfully framed architectural photograph.\nKeep real landmark shapes and proportions, straight verticals and believable perspective, intact rooflines, detailed but natural stone, soft atmospheric depth. No exaggerated telephoto compression.\nAvoid: collage, grids, split panels, captions, labels, legible signage or inscriptions, watermarks, logos, campaign or party decorations, crowds, close people, dramatic sun rays, oversaturated sunset horizon, purple/magenta/teal sky, neon, floating elements, invented extra towers, architecture chopped by the frame or crop.\nSubject/view: the REAL Thomas Jefferson Memorial from a slightly oblique distant viewpoint across the Tidal Basin, looking toward the north entrance. Correct circular open-air white-marble rotunda, SHALLOW smooth dome, circular Ionic colonnade, projecting north portico with its triangular pediment, and broad pale marble/granite stepped terraces descending toward the water. Maintain realistic overall proportions and distinguish this shallow circular-domed memorial from the tall U.S. Capitol dome. Entire dome, portico, side colonnade, and lower terrace steps should fit inside y=34%-68%, modestly scaled on the center-right with ample sky above and calm water below. Natural dark leafy trees frame the far left; quiet dark basin foreground with gentle warm reflected architectural lights, no boats or cherry-blossom decoration. Warm amber uplights graze the Ionic columns and pale marble, matching the White House reference's blue-hour cloudy navy sky exactly in mood. No scaffolding or event staging.",
+      "review": "Full photo and shallow Home framing reviewed. The shared crop can trim lower approaches in wider layouts; complete photos appear in the picker."
+    },
+    {
+      "landmark": "Smithsonian Castle",
+      "location": "Washington, D.C.",
+      "asset": "Notchscape/Assets.xcassets/LandmarkSmithsonianCastleBackdrop.imageset/LandmarkSmithsonianCastleBackdrop.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 2174385,
+      "sha256": "2c1ebbd79fa145af2e944437a24f088e23ec38cdd82e1b66a6e4624a30bcbaf7",
+      "prompt": "Use case: precise-object-edit. Input image 1 is the EDIT TARGET. One precise camera/framing placement correction only, NOT a new design. The current small, distant landmark and its beautiful navy blue-hour clouds / warm amber architectural illumination are correct. Preserve the SAME identifiable landmark, exact architectural identity, perspective, pale or red stone textures, foliage style and photorealistic exposure; do NOT revert to a large close-up. Make the Castle about 90% of its CURRENT size and lift its complete silhouette and ground-contact line upward by approximately 4% of the canvas height. The complete important architecture from the highest tower/dome/finial down to its lowest architectural base/steps must now be wholly INSIDE y35%\u201364% of the final 16:9 canvas, centered around y49\u201350%; NOT sitting low at y70\u201375%. Fill the newly visible lower part naturally with MORE quiet dark lawn or plaza, so at least the entire bottom36% is calm foreground. Keep the top35% quiet real navy/cloudy sky, not a huge empty sky occupying half the frame. Keep the landmark at right-center around x68% with comfortable side margins and calm left half for calendar/music. This is a seamless single believable wider architectural photo: no pasted miniature, no collage, no border, letterboxing or visible edits. No new buildings, redesigned towers, readable text, logos, guides, people, cars, flags, holiday/party/political decoration, neon, fantastical lighting or watermark. True full-bleed16:9 output. The exact crop-safe HEIGHT placement is the only requested improvement; preserve everything else that already works.",
+      "review": "Full photo and shallow Home framing reviewed. The shared crop can trim lower approaches in wider layouts; complete photos appear in the picker."
+    },
+    {
+      "landmark": "Library of Congress",
+      "location": "Washington, D.C.",
+      "asset": "Notchscape/Assets.xcassets/LandmarkLibraryOfCongressBackdrop.imageset/LandmarkLibraryOfCongressBackdrop.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 2226599,
+      "sha256": "2ed13038bc82743f43691d9f45b5ff78675a840d5c421028e2652e091f3d5405",
+      "prompt": "Use case: precise-object-edit. Input image 1 is the EDIT TARGET. One precise camera/framing placement correction only, NOT a new design. The current small, distant landmark and its beautiful navy blue-hour clouds / warm amber architectural illumination are correct. Preserve the SAME identifiable landmark, exact architectural identity, perspective, pale or red stone textures, foliage style and photorealistic exposure; do NOT revert to a large close-up. Make the Jefferson Building about 85% of its CURRENT size and lift its complete silhouette and ground-contact/stair line upward by approximately 6% of the canvas height. The complete important architecture from the highest tower/dome/finial down to its lowest architectural base/steps must now be wholly INSIDE y35%\u201364% of the final 16:9 canvas, centered around y49\u201350%; NOT sitting low at y70\u201375%. Fill the newly visible lower part naturally with MORE quiet dark lawn or plaza, so at least the entire bottom36% is calm foreground. Keep the top35% quiet real navy/cloudy sky, not a huge empty sky occupying half the frame. Keep the landmark at right-center around x68% with comfortable side margins and calm left half for calendar/music. This is a seamless single believable wider architectural photo: no pasted miniature, no collage, no border, letterboxing or visible edits. No new buildings, redesigned towers, readable text, logos, guides, people, cars, flags, holiday/party/political decoration, neon, fantastical lighting or watermark. True full-bleed16:9 output. The exact crop-safe HEIGHT placement is the only requested improvement; preserve everything else that already works.",
+      "review": "Full photo and shallow Home framing reviewed. The shared crop can trim lower approaches in wider layouts; complete photos appear in the picker."
+    },
+    {
+      "landmark": "U.S. Supreme Court",
+      "location": "Washington, D.C.",
+      "asset": "Notchscape/Assets.xcassets/LandmarkSupremeCourtBackdrop.imageset/LandmarkSupremeCourtBackdrop.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 2161043,
+      "sha256": "460399a6800388806ada9f6f378fc637cb35e24fe2ea9a6b9bcac8b3753ec4a5",
+      "prompt": "Use case: precise-object-edit. Input image 1 is the EDIT TARGET. One precise camera/framing placement correction only, NOT a new design. The current small, distant landmark and its beautiful navy blue-hour clouds / warm amber architectural illumination are correct. Preserve the SAME identifiable landmark, exact architectural identity, perspective, pale or red stone textures, foliage style and photorealistic exposure; do NOT revert to a large close-up. Keep the Supreme Court at its CURRENT small size and lift its complete silhouette and lowest main stair upward by approximately 8% of the canvas height (about 75px on a 941px canvas). The complete important architecture from the highest tower/dome/finial down to its lowest architectural base/steps must now be wholly INSIDE y35%\u201364% of the final 16:9 canvas, centered around y49\u201350%; NOT sitting low at y70\u201375%. Fill the newly visible lower part naturally with MORE quiet dark lawn or plaza, so at least the entire bottom36% is calm foreground. Keep the top35% quiet real navy/cloudy sky, not a huge empty sky occupying half the frame. Keep the landmark at right-center around x68% with comfortable side margins and calm left half for calendar/music. This is a seamless single believable wider architectural photo: no pasted miniature, no collage, no border, letterboxing or visible edits. No new buildings, redesigned towers, readable text, logos, guides, people, cars, flags, holiday/party/political decoration, neon, fantastical lighting or watermark. True full-bleed16:9 output. The exact crop-safe HEIGHT placement is the only requested improvement; preserve everything else that already works.",
+      "review": "Full photo and shallow Home framing reviewed. The shared crop can trim lower approaches in wider layouts; complete photos appear in the picker."
+    },
+    {
+      "landmark": "Washington National Cathedral",
+      "location": "Washington, D.C.",
+      "asset": "Notchscape/Assets.xcassets/LandmarkNationalCathedralBackdrop.imageset/LandmarkNationalCathedralBackdrop.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 2184326,
+      "sha256": "dd3031c197575e73434cec20b84a18bd4f0e789f700d62737f5badc797d37e04",
+      "prompt": "Use case: precise-object-edit. Input image 1 is the EDIT TARGET. One precise camera/framing placement correction only, NOT a new design. The current small, distant landmark and its beautiful navy blue-hour clouds / warm amber architectural illumination are correct. Preserve the SAME identifiable landmark, exact architectural identity, perspective, pale or red stone textures, foliage style and photorealistic exposure; do NOT revert to a large close-up. Make the cathedral about 85% of its CURRENT size and lift its complete silhouette and entrance/base line upward by approximately 8.5% of the canvas height. The complete important architecture from the highest tower/dome/finial down to its lowest architectural base/steps must now be wholly INSIDE y35%\u201364% of the final 16:9 canvas, centered around y49\u201350%; NOT sitting low at y70\u201375%. Fill the newly visible lower part naturally with MORE quiet dark lawn or plaza, so at least the entire bottom36% is calm foreground. Keep the top35% quiet real navy/cloudy sky, not a huge empty sky occupying half the frame. Keep the landmark at right-center around x68% with comfortable side margins and calm left half for calendar/music. This is a seamless single believable wider architectural photo: no pasted miniature, no collage, no border, letterboxing or visible edits. No new buildings, redesigned towers, readable text, logos, guides, people, cars, flags, holiday/party/political decoration, neon, fantastical lighting or watermark. True full-bleed16:9 output. The exact crop-safe HEIGHT placement is the only requested improvement; preserve everything else that already works.",
+      "review": "Full photo and shallow Home framing reviewed. The shared crop can trim lower approaches in wider layouts; complete photos appear in the picker."
+    },
+    {
+      "landmark": "Statue of Liberty",
+      "location": "New York",
+      "asset": "Notchscape/Assets.xcassets/LandmarkStatueOfLibertyBackdrop.imageset/LandmarkStatueOfLibertyBackdrop-v2.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 1934702,
+      "sha256": "29c99b4caf7268ee949ff0228597b5011c0057e079574b8a71e1373f843fa7c8",
+      "prompt": "Use case: precise-object-edit / photographic reframing. Input image1 is the edit target. Preserve its landmark identity, architecture, exact deep-navy blue-hour cloud treatment, warm amber practical lighting, material realism and photographic mood. Change ONLY the camera distance, framing and surrounding negative space: pull the camera much farther back so Statue of Liberty including the entire torch, statue and pedestal is COMPLETELY contained between 35% and 64% of total image HEIGHT, not touching either boundary. This is critical: the image will be used in a shallow 784 by190 panorama crop cut from the exact middle of this wide16:9 photograph. The WHOLE identifiable landmark silhouette must survive that center strip. Make the whole structure much SMALLER in the full photo (around one quarter of total image height) and center it vertically at50%, placed slightly right around65% across. Extend natural navy sky ABOVE and plausible quiet plaza/water/grass BELOW to create generous negative space. Do not keep the old too-close framing. Retain realistic surroundings appropriate to the site. No text, no watermark, no UI, no new landmark, no cartoon glow, no extra towers. Landscape16:9. Output one seamless realistic photo; the final app crop will enlarge the subject to a comfortable size.",
+      "review": "Full photo and shallow Home framing reviewed. The shared crop can trim lower approaches in wider layouts; complete photos appear in the picker."
+    },
+    {
+      "landmark": "Independence Hall",
+      "location": "Philadelphia",
+      "asset": "Notchscape/Assets.xcassets/LandmarkIndependenceHallBackdrop.imageset/LandmarkIndependenceHallBackdrop-v2.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 2404259,
+      "sha256": "120e3bcc77ea2165119746d564b584c5846f1d15101bc9b32e23091ef5a995dd",
+      "prompt": "Use case: precise-object-edit / photographic reframing. Input image1 is the edit target. Preserve its landmark identity, architecture, exact deep-navy blue-hour cloud treatment, warm amber practical lighting, material realism and photographic mood. Change ONLY the camera distance, framing and surrounding negative space: pull the camera much farther back so Independence Hall including its entire steeple and main building is COMPLETELY contained between 35% and 64% of total image HEIGHT, not touching either boundary. This is critical: the image will be used in a shallow 784 by190 panorama crop cut from the exact middle of this wide16:9 photograph. The WHOLE identifiable landmark silhouette must survive that center strip. Make the whole structure much SMALLER in the full photo (around one quarter of total image height) and center it vertically at50%, placed slightly right around65% across. Extend natural navy sky ABOVE and plausible quiet plaza/water/grass BELOW to create generous negative space. Do not keep the old too-close framing. Retain realistic surroundings appropriate to the site. No text, no watermark, no UI, no new landmark, no cartoon glow, no extra towers. Landscape16:9. Output one seamless realistic photo; the final app crop will enlarge the subject to a comfortable size.",
+      "review": "Full photo and shallow Home framing reviewed. The shared crop can trim lower approaches in wider layouts; complete photos appear in the picker."
+    },
+    {
+      "landmark": "Old State House",
+      "location": "Boston",
+      "asset": "Notchscape/Assets.xcassets/LandmarkOldStateHouseBackdrop.imageset/LandmarkOldStateHouseBackdrop-v3.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 2423788,
+      "sha256": "28fa3bbc68d78bdb2833d88c2fc8954c09a7c6a27cdf95c18cb85eeadff672cc",
+      "prompt": "Use case: photographic reframing. Image1 is the current generated Boston Old State House scene. Preserve this EXACT recognizable historic building's form and its realistic amber-lit brick, white clock/cupola tower, lion/unicorn ornaments and rich navy blue-hour palette, sky clouds and natural photographic style. Make ONE composition correction: the ENTIRE historic building is currently much too tall for the app's shallow panorama. Pull the camera back far enough that the building from its highest golden weather-vane to its street-level foundation is ONLY about220 pixels high in a1672\u00d7941 image (around23% of the whole image height). Put that WHOLE building silhouette between y380 and y600, centered slightly right at x1100. Its TOP must be well BELOW the top third of the image; keep a broad generous navy sky above, and a large natural dark paved plaza below. The unchanged surrounding modern city blocks can remain at frame edges, but the historic cupola must be small, completely inside that central band, well away from crop boundaries. Make the historic building about HALF ITS CURRENT HEIGHT in the full photo, not just a slight zoom out. This intentionally distant view will be shown enlarged within a1056\u00d7190 center crop; no part of the cupola can be clipped. Landscape16:9, seamless real-looking photograph, no text, no watermark, no visible guides or UI, no new monument, no architectural redesign, no orange sunset or neon.",
+      "review": "Full photo and shallow Home framing reviewed. The shared crop can trim lower approaches in wider layouts; complete photos appear in the picker."
+    },
+    {
+      "landmark": "The Alamo",
+      "location": "San Antonio",
+      "asset": "Notchscape/Assets.xcassets/LandmarkAlamoBackdrop.imageset/LandmarkAlamoBackdrop-v2.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "bytes": 2558753,
+      "sha256": "0afdf94cde37b0b53553bb17b72e8747f9cd580e5e0581087b4e0c2ba823025a",
+      "prompt": "Use case: precise-object-edit / photographic reframing. Input image1 is the edit target. Preserve its landmark identity, architecture, exact deep-navy blue-hour cloud treatment, warm amber practical lighting, material realism and photographic mood. Change ONLY the camera distance, framing and surrounding negative space: pull the camera much farther back so Alamo Church including its entire scalloped parapet and complete facade is COMPLETELY contained between 35% and 64% of total image HEIGHT, not touching either boundary. This is critical: the image will be used in a shallow 784 by190 panorama crop cut from the exact middle of this wide16:9 photograph. The WHOLE identifiable landmark silhouette must survive that center strip. Make the whole structure much SMALLER in the full photo (around one quarter of total image height) and center it vertically at50%, placed slightly right around65% across. Extend natural navy sky ABOVE and plausible quiet plaza/water/grass BELOW to create generous negative space. Do not keep the old too-close framing. Retain realistic surroundings appropriate to the site. No text, no watermark, no UI, no new landmark, no cartoon glow, no extra towers. Landscape16:9. Output one seamless realistic photo; the final app crop will enlarge the subject to a comfortable size.",
+      "review": "Full photo and shallow Home framing reviewed. The shared crop can trim lower approaches in wider layouts; complete photos appear in the picker."
+    }
+  ],
+  "limits": "Home uses a shallow centered crop; the gallery shows each complete image. These scenes are artistic depictions for app themes."
+}

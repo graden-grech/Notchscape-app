@@ -1,0 +1,44 @@
+{
+  "status": "original source art, unpublished, not an installable or signed resource pack",
+  "collection": "Civic Collection",
+  "assets": [
+    {
+      "id": "treasury",
+      "title": "U.S. Treasury Building",
+      "path": "AddOnPacks/CivicCollection/source-assets/treasury-blue-hour-v1.png",
+      "sha256": "cae4790091e9e81cb4af2d89564435b5d1fea764978d6d3efe47dcdb8e7b01a2",
+      "bytes": 2306824,
+      "width": 1671,
+      "height": 941,
+      "type": "generated-artwork",
+      "source": "built-in image_gen",
+      "styleReference": "Notchscape/Assets.xcassets/WhiteHouseExteriorBackdrop.imageset/WhiteHouseExteriorBackdrop.png"
+    },
+    {
+      "id": "pentagon",
+      "title": "The Pentagon",
+      "path": "AddOnPacks/CivicCollection/source-assets/pentagon-blue-hour-v1.png",
+      "sha256": "45a799753519ca3743193c17d69572b38998c6b7df813825bdd00c29ac270851",
+      "bytes": 2235493,
+      "width": 1671,
+      "height": 941,
+      "type": "generated-artwork",
+      "source": "built-in image_gen",
+      "styleReference": "Notchscape/Assets.xcassets/WhiteHouseExteriorBackdrop.imageset/WhiteHouseExteriorBackdrop.png"
+    },
+    {
+      "id": "eisenhower",
+      "title": "Eisenhower Executive Office Building",
+      "path": "AddOnPacks/CivicCollection/source-assets/eisenhower-blue-hour-v1.png",
+      "sha256": "924a87a2d15e7d8e4af4ba53db857f33a58bb1a1895293ec83ba202eaae4be57",
+      "bytes": 2504352,
+      "width": 1671,
+      "height": 941,
+      "type": "generated-artwork",
+      "source": "built-in image_gen",
+      "styleReference": "Notchscape/Assets.xcassets/WhiteHouseExteriorBackdrop.imageset/WhiteHouseExteriorBackdrop.png"
+    }
+  ],
+  "promptSet": "PROMPTS.md",
+  "packaging": "Kept outside Assets.xcassets so these bytes are not automatically added to the core app."
+}

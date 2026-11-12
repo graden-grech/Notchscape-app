@@ -225,8 +225,15 @@ private struct AppearanceRecipeEditor: View {
                         }
                     }
                     if base.isCityscape {
-                        Picker("City", selection: cityscapeScene) {
-                            ForEach(CityscapeScene.allCases) { Text($0.title).tag($0) }
+                        Picker("City or landmark", selection: cityscapeScene) {
+                            Section(CityscapeCollection.cities.title) {
+                                ForEach(CityscapeCollection.cities.scenes) { Text($0.title).tag($0) }
+                            }
+                            ForEach(CityscapeRegion.allCases) { region in
+                                Section(region.title) {
+                                    ForEach(region.landmarks) { Text($0.title).tag($0) }
+                                }
+                            }
                         }
                     }
                     if base.isWhiteHouse {

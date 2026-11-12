@@ -8,34 +8,20 @@
 import SwiftUI
 
 struct HoverButton: View {
-    @ObservedObject private var performance = AppPerformanceManager.shared
     var icon: String
     var iconColor: Color = .primary
     var scale: Image.Scale = .medium
+    var accessibilityStatus: String = ""
     var action: () -> Void
-    
-    @State private var isHovering = false
 
     var body: some View {
         let size = CGFloat(scale == .large ? 40 : 30)
 
-        Group {
-            if #available(macOS 26.0, *), !performance.lowImpact, !performance.reduceTransparency {
-                button(size: size)
-                    .buttonStyle(.plain)
-                    .glassEffect(.regular, in: Circle())
-            } else {
-                button(size: size)
-                    .buttonStyle(.plain)
-            }
-        }
-        .onHover { hovering in
-            withAnimation(.smooth(duration: 0.3)) {
-                isHovering = hovering
-            }
-        }
-        .help(controlLabel)
-        .accessibilityLabel(controlLabel)
+        button(size: size)
+            .notchGlassButton(circular: true, diameter: size)
+            .help(controlLabel)
+            .accessibilityLabel(controlLabel)
+            .accessibilityValue(accessibilityStatus)
     }
 
     private var controlLabel: String {
@@ -49,6 +35,8 @@ struct HoverButton: View {
         case "repeat.1": "Repeat one track"
         case "gobackward.15": "Back 15 seconds"
         case "goforward.15": "Forward 15 seconds"
+        case "heart": "Add to favorites"
+        case "heart.fill": "Remove from favorites"
         default: icon
         }
     }
@@ -57,9 +45,8 @@ struct HoverButton: View {
         Button(action: action) {
             Image(systemName: icon)
                 .foregroundColor(iconColor)
-                .font(scale == .large ? .largeTitle : .body)
-                .frame(width: size, height: size)
-                .background(isHovering ? Color.white.opacity(0.08) : .clear, in: Circle())
+                .font(scale == .large ? .title2 : .body)
+                .frame(width: size == 40 ? 22 : 16, height: size == 40 ? 22 : 16)
                 .contentShape(Circle())
         }
     }

@@ -1,6 +1,7 @@
 import Foundation
 
 @main
+@MainActor
 struct SettingsTourPolicyTests {
     static var checks = 0
     static func check(_ value: @autoclosure () -> Bool, _ message: String) {
@@ -10,17 +11,21 @@ struct SettingsTourPolicyTests {
         check(SettingsTourChapter.allCases.count == 6, "Related settings fit six short chapters")
         let publicTopics = SettingsTourChapter.allCases.flatMap { $0.topics() }
         let allTopics = SettingsTourChapter.allCases.flatMap { $0.topics(accountsEnabled: true) }
-        check(publicTopics.count == 18 && allTopics.count == 19, "Hidden account page is excluded unless explicitly enabled")
-        check(Set(publicTopics.map(\.sectionID)).count == 18, "Each visible settings page is explained once")
+        check(publicTopics.count == 21 && allTopics.count == 22, "Add-ons and Dock are explained while the account page stays conditional")
+        check(Set(publicTopics.map(\.sectionID)).count == publicTopics.count, "Each settings destination is explained once")
+        check(publicTopics.contains(where: { $0.sectionID == "FaceUnlock" }), "Optional face setup has its own privacy explanation")
         check(!publicTopics.contains(where: { $0.sectionID == "Account" }), "Disabled accounts are not advertised")
         for chapter in SettingsTourChapter.allCases {
             check(!chapter.title.isEmpty && !chapter.subtitle.isEmpty && !chapter.symbol.isEmpty, "Chapter has accessible copy and an SF symbol")
-            check((2...4).contains(chapter.topics().count), "Each chapter contains a small group of pages")
+            check((2...5).contains(chapter.topics().count), "Each chapter contains a small group of pages")
         }
         for topic in allTopics {
             check(!topic.summary.isEmpty && !topic.suggestion.isEmpty, "Each settings page has an explanation and starting suggestion")
             check(topic.summary.count < 160 && topic.suggestion.count < 160, "Descriptions stay concise")
         }
+        let covered = allTopics.flatMap { [$0.sectionID] + $0.subpageIDs }
+        check(Set(covered).count == covered.count, "Focused subpages are covered once without adding tour cards")
+        check(Set(allTopics.flatMap(\.subpageIDs)) == Set(["Themes", "HomeLayout", "AppIcon", "Effects", "MediaAppearance"]), "New appearance pages remain discoverable from their parent tour topic")
         var progress = SettingsTourProgress()
         progress.back()
         check(progress.index == 0 && progress.isFirst && !progress.isFinished, "Back cannot run before the first page")

@@ -12,7 +12,7 @@ struct SportsTeam: Equatable, Identifiable {
     let colorHex: String?
 }
 
-struct SportsDirectoryTeam: Equatable, Identifiable {
+struct SportsDirectoryTeam: Equatable, Identifiable, Codable {
     let id: String
     let league: SportsLeague
     let name: String
@@ -21,6 +21,32 @@ struct SportsDirectoryTeam: Equatable, Identifiable {
     let colorHex: String?
 
     var favoriteKey: String { "\(league.rawValue):\(id)" }
+
+    private enum CodingKeys: String, CodingKey { case id, league, name, abbreviation, logoURL, colorHex }
+    init(id: String, league: SportsLeague, name: String, abbreviation: String, logoURL: URL?, colorHex: String?) {
+        self.id = id; self.league = league; self.name = name; self.abbreviation = abbreviation
+        self.logoURL = logoURL; self.colorHex = colorHex
+    }
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        guard let league = SportsLeague(rawValue: try c.decode(String.self, forKey: .league)) else {
+            throw DecodingError.dataCorruptedError(forKey: .league, in: c, debugDescription: "Unknown league")
+        }
+        let id = try c.decode(String.self, forKey: .id)
+        let name = try c.decode(String.self, forKey: .name)
+        let abbreviation = try c.decode(String.self, forKey: .abbreviation)
+        guard !id.isEmpty, id.count <= 64, !name.isEmpty, name.count <= 200, abbreviation.count <= 40 else {
+            throw DecodingError.dataCorruptedError(forKey: .name, in: c, debugDescription: "Invalid team metadata")
+        }
+        self.init(id: id, league: league, name: name, abbreviation: abbreviation,
+            logoURL: try c.decodeIfPresent(URL.self, forKey: .logoURL), colorHex: try c.decodeIfPresent(String.self, forKey: .colorHex))
+    }
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(id, forKey: .id); try c.encode(league.rawValue, forKey: .league)
+        try c.encode(name, forKey: .name); try c.encode(abbreviation, forKey: .abbreviation)
+        try c.encodeIfPresent(logoURL, forKey: .logoURL); try c.encodeIfPresent(colorHex, forKey: .colorHex)
+    }
 }
 
 struct SportsGame: Equatable, Identifiable {
@@ -70,12 +96,21 @@ final class SportsActivityManager: ObservableObject {
     @Published private(set) var availableTeams: [SportsDirectoryTeam] = []
     @Published private(set) var isLoadingTeams = false
     @Published private(set) var teamsErrorMessage: String?
+    @Published private(set) var knownTeams: [String: SportsDirectoryTeam] = [:]
 
     private var pollingTask: Task<Void, Never>?
     private var bannerDismissalTask: Task<Void, Never>?
     private var previousGame: SportsGame?
+    private var teamDirectories: [SportsLeague: [SportsDirectoryTeam]] = [:]
+    private var teamRequestID: UUID?
+    private static let favoriteMetadataKey = "sportsFavoriteTeamMetadata"
 
-    private init() {}
+    private init() {
+        if let data = UserDefaults.standard.data(forKey: Self.favoriteMetadataKey), data.count <= 1_000_000,
+           let saved = try? JSONDecoder().decode([SportsDirectoryTeam].self, from: data), saved.count <= 256 {
+            knownTeams = Dictionary(saved.map { ($0.favoriteKey, $0) }, uniquingKeysWith: { first, _ in first })
+        }
+    }
 
     func start() {
         guard Defaults[.sportsActivitiesEnabled] else {
@@ -112,6 +147,7 @@ final class SportsActivityManager: ObservableObject {
     }
 
     func configurationChanged() {
+        persistFavoriteMetadata()
         stop()
         previousGame = nil
         currentGame = nil
@@ -158,14 +194,46 @@ final class SportsActivityManager: ObservableObject {
     }
 
     func loadTeams(for league: SportsLeague) async {
-        guard !isLoadingTeams,
-              let url = URL(string: "https://site.api.espn.com/apis/site/v2/sports/\(league.endpointPath)/teams?limit=1000") else { return }
-
+        let requestID = UUID()
+        teamRequestID = requestID
         isLoadingTeams = true
         teamsErrorMessage = nil
-        defer { isLoadingTeams = false }
-
+        availableTeams = []
+        defer { if teamRequestID == requestID { isLoadingTeams = false } }
         do {
+            let teams = try await teamDirectory(for: league)
+            guard !Task.isCancelled, teamRequestID == requestID else { return }
+            availableTeams = teams
+        } catch is CancellationError { return }
+        catch {
+            guard teamRequestID == requestID else { return }
+            teamsErrorMessage = "Teams are temporarily unavailable. Try again when connected."
+        }
+    }
+
+    func loadFavoriteTeamDetails() async {
+        let keys = Defaults[.sportsFavoriteTeams]
+        for league in SportsLeague.allCases where keys.contains(where: { $0.hasPrefix(league.rawValue + ":") }) {
+            guard !Task.isCancelled else { return }
+            _ = try? await teamDirectory(for: league)
+        }
+    }
+
+    private func persistFavoriteMetadata() {
+        let selected = Defaults[.sportsFavoriteTeams]
+        let teams = knownTeams.values.filter { selected.contains($0.favoriteKey) }
+            .sorted { $0.favoriteKey < $1.favoriteKey }
+        let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys]
+        guard teams.count <= 256, let data = try? encoder.encode(teams), data.count <= 1_000_000 else { return }
+        if UserDefaults.standard.data(forKey: Self.favoriteMetadataKey) != data {
+            UserDefaults.standard.set(data, forKey: Self.favoriteMetadataKey)
+        }
+    }
+
+    private func teamDirectory(for league: SportsLeague) async throws -> [SportsDirectoryTeam] {
+        if let cached = teamDirectories[league] { return cached }
+        guard let url = URL(string: "https://site.api.espn.com/apis/site/v2/sports/\(league.endpointPath)/teams?limit=1000") else { throw SportsFeedError.unavailable }
+
             let data = try await requestData(from: url)
             let directory = try JSONDecoder().decode(ESPNTeamDirectory.self, from: data)
             let teams = directory.sports
@@ -189,14 +257,13 @@ final class SportsActivityManager: ObservableObject {
                     )
                 }
                 .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-            availableTeams = teams
-        } catch is CancellationError {
-            return
-        } catch {
-            availableTeams = []
-            teamsErrorMessage = "Teams are temporarily unavailable."
-            Self.logger.error("Team directory failed: \(String(describing: error), privacy: .public)")
-        }
+            guard !Task.isCancelled else { throw CancellationError() }
+            teamDirectories[league] = teams
+            var combined = knownTeams
+            for team in teams { combined[team.favoriteKey] = team }
+            if combined != knownTeams { knownTeams = combined }
+            persistFavoriteMetadata()
+            return teams
     }
 
     func showScorePreview() {

@@ -28,16 +28,16 @@ Published by **Notchscape**. Maintained by [Graden Grech](https://github.com/gra
 - An optional six-chapter Settings tour, with Skip and replay from General or Help.
 
 See the [latest release](https://github.com/graden-grech/Notchscape-app/releases/latest)
-for the current public download and verification status. **2.9.4 (297)** source
-adds twelve Cityscapes scenes and fixes physical-notch and battery-alert layout,
-retaining the guided setup, White House scenes/icons and other app features. See
-the [release notes](docs/releases/2.9.4.md). Accounts remain disabled;
-no app account is required.
+for the current public download and verification status. **2.9.6 (330)** source
+adds native Settings refinements, the restored music card, larger glass header
+controls, optional Dock and snow previews, landmark scenes and local tools.
+See the [release notes](docs/releases/2.9.6.md). Accounts remain disabled and
+Face Unlock is excluded from the public download; no app account is required.
 
 ## Download and updates
 
 [Public releases](https://github.com/graden-grech/Notchscape-app/releases)
-include version-specific notes and known testing limits. Version 2.9.4 requires
+include version-specific notes and known testing limits. Version 2.9.6 requires
 Apple silicon and macOS 15 or later, matching its linked media framework. Native Liquid Glass is
 available on macOS 26 or later; earlier systems use lighter standard materials.
 
@@ -48,8 +48,9 @@ recommend disabling Gatekeeper or globally changing system security settings.
 
 Automatic updates continue through this repository's signed Sparkle feed. The
 active repository is **graden-grech/Notchscape-app**, created with fresh history.
-The earlier **graden-grech/Notchscape** repository remains available for legacy
-downloads and migration updates. Its older rename redirects are preserved.
+The earlier repositories were deleted. Installations whose update feeds point
+to those legacy addresses need a fresh download from **Notchscape-app**; the
+deleted addresses and redirects are not restored.
 The app's internal identity and
 signing trust remain stable to preserve settings and permissions. New downloads
 use **Notchscape.app**; older installations need a tested rename migration.

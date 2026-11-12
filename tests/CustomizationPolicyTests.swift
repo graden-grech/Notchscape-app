@@ -25,23 +25,76 @@ struct CustomizationPolicyTests {
     }
 
     static func main() throws {
-        check(CityscapeScene.allCases == [.newYork, .chicago, .detroit, .boston, .philadelphia, .washingtonDC,
-                                        .losAngeles, .sanFrancisco, .seattle, .lasVegas, .miami, .newOrleans],
+        let cities = CityscapeCollection.cities.scenes
+        check(cities == [.newYork, .chicago, .detroit, .boston, .philadelphia, .washingtonDC,
+                         .losAngeles, .sanFrancisco, .seattle, .lasVegas, .miami, .newOrleans],
               "Cityscapes presents the twelve requested cities in a stable order")
-        check(Set(CityscapeScene.allCases.map(\.rawValue)).count == 12, "Every city has an independent persisted theme value")
-        check(Set(CityscapeScene.allCases.map(\.backdropName)).count == 12, "Every city resolves to separate bundled photography")
-        check(Set(CityscapeScene.allCases.map(\.title)).count == 12, "Every city has an unambiguous native picker label")
+        let originalCityIDs = ["cityNewYork", "cityChicago", "cityDetroit", "cityBoston", "cityPhiladelphia", "cityWashingtonDC",
+                              "cityLosAngeles", "citySanFrancisco", "citySeattle", "cityLasVegas", "cityMiami", "cityNewOrleans"]
+        check(cities.map(\.rawValue) == originalCityIDs, "Existing city preferences keep their exact raw values and order")
+        for raw in originalCityIDs {
+            let restored = try JSONDecoder().decode(CityscapeScene.self, from: Data("\"\(raw)\"".utf8))
+            check(restored.collection == .cities && restored.rawValue == raw, "Every previously saved city remains valid")
+        }
+        let landmarks: [(CityscapeScene, String, String)] = [
+            (.capitol, "landmarkCapitol", "LandmarkCapitolBackdrop"),
+            (.lincolnMemorial, "landmarkLincolnMemorial", "LandmarkLincolnMemorialBackdrop"),
+            (.washingtonMonument, "landmarkWashingtonMonument", "LandmarkWashingtonMonumentBackdrop"),
+            (.jeffersonMemorial, "landmarkJeffersonMemorial", "LandmarkJeffersonMemorialBackdrop"),
+            (.smithsonianCastle, "landmarkSmithsonianCastle", "LandmarkSmithsonianCastleBackdrop"),
+            (.libraryOfCongress, "landmarkLibraryOfCongress", "LandmarkLibraryOfCongressBackdrop"),
+            (.supremeCourt, "landmarkSupremeCourt", "LandmarkSupremeCourtBackdrop"),
+            (.nationalCathedral, "landmarkNationalCathedral", "LandmarkNationalCathedralBackdrop"),
+            (.statueOfLiberty, "landmarkStatueOfLiberty", "LandmarkStatueOfLibertyBackdrop"),
+            (.independenceHall, "landmarkIndependenceHall", "LandmarkIndependenceHallBackdrop"),
+            (.oldStateHouse, "landmarkOldStateHouse", "LandmarkOldStateHouseBackdrop"),
+            (.alamo, "landmarkAlamo", "LandmarkAlamoBackdrop")
+        ]
+        check(CityscapeCollection.landmarks.scenes == landmarks.map(\.0), "All twelve landmarks share the existing atomic scene catalog")
+        check(CityscapeRegion.washingtonDC.landmarks == Array(landmarks.prefix(8)).map(\.0), "D.C. groups the eight requested landmarks")
+        check(CityscapeRegion.unitedStates.landmarks == Array(landmarks.suffix(4)).map(\.0), "The four other landmarks have their own gallery group")
+        for (scene, raw, backdrop) in landmarks {
+            check(scene.rawValue == raw && scene.backdropName == backdrop, "Landmark selection matches the bundled artwork contract")
+        }
+        check(CityscapeScene.allCases.count == 24, "The shared gallery contains twelve cities and twelve landmarks")
+        check(Set(CityscapeScene.allCases.map(\.rawValue)).count == 24, "Every view has an independent persisted theme value")
+        check(Set(CityscapeScene.allCases.map(\.backdropName)).count == 24, "Every view resolves to separate bundled photography")
+        check(Set(CityscapeScene.allCases.map(\.title)).count == 24, "Every view has an unambiguous native picker label")
         for scene in CityscapeScene.allCases {
             let restored = try JSONDecoder().decode(CityscapeScene.self, from: JSONEncoder().encode(scene))
-            check(restored == scene && restored.backdropName == scene.backdropName, "City selection and photo restore together")
-            check(scene.rawValue.hasPrefix("city") && scene.rawValue.utf8.count < 64, "City IDs stay bounded and separate from existing theme families")
-            check(scene.backdropName.hasPrefix("City") && scene.backdropName.hasSuffix("Backdrop"), "City photos are deterministic bundled assets")
+            check(restored == scene && restored.backdropName == scene.backdropName && restored.collection == scene.collection,
+                  "Scene selection, photo and browsing collection restore together")
+            let rawPrefix = scene.collection == .cities ? "city" : "landmark"
+            let assetPrefix = scene.collection == .cities ? "City" : "Landmark"
+            check(scene.rawValue.hasPrefix(rawPrefix) && scene.rawValue.utf8.count < 64, "Scene IDs stay bounded and separate from other theme families")
+            check(scene.backdropName.hasPrefix(assetPrefix) && scene.backdropName.hasSuffix("Backdrop"), "Scene photos are deterministic bundled assets")
+            let initialGallery = CityscapeGalleryFilter(selectedScene: restored)
+            check(initialGallery.collection == restored.collection && initialGallery.sections.flatMap(\.scenes).contains(restored),
+                  "Opening the gallery shows the collection containing the saved selected scene")
             for hex in [scene.lightAccent, scene.darkAccent] {
                 check(hex.hasPrefix("#") && hex.count == 7 && UInt32(hex.dropFirst(), radix: 16) != nil, "City accent is finite sRGB")
             }
             check(1.05 / (luminance(scene.lightAccent) + 0.05) >= 4.5, "City accent is readable on light controls")
             check((luminance(scene.darkAccent) + 0.05) / (luminance("#111111") + 0.05) >= 4.5, "City accent is readable on the dark notch plane")
         }
+        var gallery = CityscapeGalleryFilter(selectedScene: .newYork)
+        check(gallery.sections.flatMap(\.scenes) == cities, "City browsing initially contains exactly the original twelve views")
+        gallery.collection = .landmarks
+        check(gallery.sections.map(\.scenes.count) == [8, 4], "Switching collections only exposes the two ordered landmark groups")
+        gallery.query = "  bOsToN \n"
+        check(gallery.sections.flatMap(\.scenes) == [.oldStateHouse], "Native search finds a landmark by its city, ignoring case and surrounding whitespace")
+        gallery.query = "Lincoln"
+        check(gallery.sections.flatMap(\.scenes) == [.lincolnMemorial], "Search finds a landmark by its name")
+        gallery.query = "Washington"
+        check(gallery.sections.count == 1 && gallery.sections[0].scenes == CityscapeRegion.washingtonDC.landmarks,
+              "A region search retains all eight D.C. landmarks and omits empty groups")
+        gallery.query = "no matching place"
+        check(gallery.sections.isEmpty, "Unmatched searches produce an empty gallery instead of selecting another theme")
+        gallery.collection = .cities
+        gallery.query = "Boston"
+        check(gallery.sections.flatMap(\.scenes) == [.boston], "Collection filtering scopes search without turning a city into its landmark")
+        gallery.query = ""
+        check(gallery.sections.flatMap(\.scenes) == cities, "Clearing filters restores the complete original city collection")
         check(WhiteHouseStyle.allCases == [.neutral, .republican, .democrat], "Neutral plus both decorative party-color options are explicit choices")
         check(WhiteHouseScene.allCases == [.exterior, .ovalOffice, .eastRoom, .blueRoom], "Four architectural rooms and views are available")
         check(WhiteHouseThemeVariant.allCases.count == 24, "Every style works with every room and Christmas setting")
@@ -303,6 +356,17 @@ struct CustomizationPolicyTests {
         check(snapshot.isAvailable, "Read real system power source successfully")
         check(!snapshot.hasBattery || (0...100).contains(snapshot.currentCapacity), "Live percentage is valid")
         #endif
+        check(HomeTileStyle.allCases.contains(.original), "Original Home surfaces remain available")
+        for input in [-Double.infinity, Double.nan, Double.infinity, -1, 0, 0.25, 0.5, 1, 2] {
+            let bounded = HomeTileSurfacePolicy.boundedTransparency(input)
+            check(bounded.isFinite && (0...1).contains(bounded), "Persisted transparency stays finite and bounded")
+            check(HomeTileSurfacePolicy.opacity(style: .original, transparency: input, reduceTransparency: false, increasedContrast: false) == 0, "Original never draws the new surface")
+            check(HomeTileSurfacePolicy.opacity(style: .native, transparency: input, reduceTransparency: true, increasedContrast: false) == 1, "Reduce Transparency overrides the cosmetic slider")
+            check(HomeTileSurfacePolicy.opacity(style: .native, transparency: input, reduceTransparency: false, increasedContrast: true) == 1, "Increase Contrast overrides the cosmetic slider")
+        }
+        check(HomeTileSurfacePolicy.opacity(style: .native, transparency: 0.4, reduceTransparency: false, increasedContrast: false) == 0.6, "Transparency fades only the surface")
+        check(HomeTileSurfacePolicy.opacity(style: .native, transparency: 1, reduceTransparency: false, increasedContrast: false) == 0, "Full transparency reveals the scene")
+        check(HomeTileSurfacePolicy.opacity(style: .native, transparency: 0, reduceTransparency: false, increasedContrast: false) == 1, "Zero transparency retains the refined material")
         print("Passed \(count) customization policy checks")
     }
 }

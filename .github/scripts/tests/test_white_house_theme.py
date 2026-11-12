@@ -134,7 +134,7 @@ class WhiteHouseThemeTests(unittest.TestCase):
                         "The complete outer background, not the photo, must fill the row height")
         self.assertIn("LazyVGrid(columns: [GridItem(.flexible(), alignment: .top), GridItem(.flexible(), alignment: .top)], spacing: 14)", source)
         picker = source.split("ForEach(AppTheme.pickerThemes)", 1)[1].split('Text("Menu theme")', 1)[0]
-        self.assertIn(".buttonStyle(.plain)\n                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)", picker)
+        self.assertRegex(picker, r"\.buttonStyle\(\.plain\)\s+\.frame\(maxWidth: \.infinity, maxHeight: \.infinity, alignment: \.top\)")
         self.assertIn("preserveEntirePhoto: true", card)
         self.assertIn(".aspectRatio(theme.usesArchitecturalPhotoLayout ? 16.0 / 9.0 : 3.0, contentMode: .fit)", card)
         self.assertNotIn("scaledToFill", card, "Equalizing cards must not crop or stretch photos")

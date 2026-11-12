@@ -17,6 +17,7 @@ if [[ -n "$signer" && "$signer" != 'Developer ID Installer: '* ]]; then
     echo 'FAIL: installer signing requires a Developer ID Installer identity, not an app development identity.' >&2
     exit 1
 fi
+python3 "$task_repo_root/.github/scripts/face_vault_signing.py" --public-release-app "$candidate"
 bash "$task_repo_root/.github/scripts/verify_custom_app_branding.sh" "$candidate" "$task_repo_root/Notchscape/Info.plist"
 bash "$task_repo_root/.github/scripts/verify_custom_app_identity.sh" "$candidate" "$previous"
 python3 "$task_repo_root/.github/scripts/verify_public_feature_flags.py" "$candidate/Contents/Info.plist"

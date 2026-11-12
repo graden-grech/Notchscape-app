@@ -20,6 +20,8 @@ class SettingsTourIntegrationTests(unittest.TestCase):
         expected = re.findall(r'\.init\(id: "([^"]+)"', destinations)
         guide = (ROOT / "Notchscape/models/SettingsTourPolicy.swift").read_text()
         actual = re.findall(r'\.init\(sectionID: "([^"]+)"', guide)
+        for group in re.findall(r'subpageIDs: \[(.*?)\]\)', guide):
+            actual.extend(re.findall(r'"([^"\n]+)"', group))
         self.assertCountEqual(actual, expected)
         self.assertEqual(len(actual), len(set(actual)))
 

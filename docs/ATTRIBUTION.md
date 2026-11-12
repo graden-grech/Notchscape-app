@@ -20,6 +20,18 @@ Credits preserved from the original README include:
 - [maxtron95](https://github.com/maxtron95), original-project icon credit.
 - [himanshhhhuv](https://github.com/himanshhhhuv), original-project website credit.
 
+The optional Face Unlock preview uses the official OpenCV Zoo SFace model under
+Apache 2.0, contributed by Yaoyao Zhong with the original ONNX conversion credited
+to Chengrui Wang. Notchscape independently converted it to Core ML; it does not
+include InsightFace code, history or weights. Camera-preview hosting now adapts
+small MIT-licensed components from [Glance](https://github.com/DesusLove/Glance)
+and [FaceUnlock](https://github.com/HasBrain/FaceUnlock); their model weights and
+password-injection code are not included. Full notices are bundled in
+`Notchscape/Resources/FacePreviewNotices.txt`. The pinned provenance,
+unchanged source license and conversion notice are bundled in
+`Notchscape/Resources/FaceModels`. See [the model notice](../Notchscape/Resources/FaceModels/MODEL_NOTICE.md)
+and [the full license](../Notchscape/Resources/FaceModels/LICENSE).
+
 The current seasonal and Star Wars scene assets have their own provenance and
 limitations in the adjacent asset documentation. In particular, no generated
 Vader character scene is supplied: the rejected online substitute was removed.

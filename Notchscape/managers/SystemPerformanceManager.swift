@@ -20,17 +20,53 @@ final class SystemPerformanceManager: ObservableObject {
     @Published private(set) var diskReadRate: Double?
     @Published private(set) var diskWriteRate: Double?
     @Published private(set) var memoryPressure = "No recent signal"
+    @Published private(set) var cpuDataAvailable = false
+    @Published private(set) var memoryDataAvailable = false
+    @Published private(set) var diskDataAvailable = false
+    @Published private(set) var networkDataAvailable = false
     private var pressureSource: DispatchSourceMemoryPressure?
     private var previousIO: (Date, UInt64, UInt64, UInt64?, UInt64?)?
 
     private var samplingTask: Task<Void, Never>?
     private var previousCPUTicks: (user: UInt64, system: UInt64, idle: UInt64, nice: UInt64)?
+    private var previousNetworkCountersValid = false
+    private var lastDiskSample: Date?
+    private var demand = SystemSamplingDemand()
 
     private init() {}
 
     func startSampling() {
+        demand.dashboardAppeared()
+        reconcileSampling()
+    }
+
+    func stopSampling() {
+        demand.dashboardDisappeared()
+        reconcileSampling()
+    }
+
+    func setMenuBarSampling(_ requested: Bool) {
+        guard demand.menuBarRequested != requested else { return }
+        demand.setMenuBarRequested(requested)
+        reconcileSampling()
+    }
+
+    /// The menu-bar lifecycle coordinator forwards lock/sleep/console/mode
+    /// state even with no optional items selected. Demand survives suspension.
+    func setSamplingSuspended(_ suspended: Bool) {
+        guard demand.suspended != suspended else { return }
+        demand.setSuspended(suspended)
+        reconcileSampling()
+    }
+
+    private func reconcileSampling() {
+        if demand.shouldSample { beginSampling() } else { endSampling() }
+    }
+
+    private func beginSampling() {
         guard samplingTask == nil else { return }
-        previousIO = nil
+        previousIO = nil; previousCPUTicks = nil; previousNetworkCountersValid = false; lastDiskSample = nil
+        memoryPressure = "No recent signal"
         let pressure = DispatchSource.makeMemoryPressureSource(eventMask: [.normal, .warning, .critical], queue: .main)
         pressure.setEventHandler { [weak self] in
             guard let self, let flags = pressureSource?.data else { return }
@@ -47,16 +83,24 @@ final class SystemPerformanceManager: ObservableObject {
         }
     }
 
-    func stopSampling() {
+    private func endSampling() {
+        guard samplingTask != nil else { return }
         samplingTask?.cancel()
         samplingTask = nil
         pressureSource?.cancel(); pressureSource = nil; previousIO = nil
+        previousCPUTicks = nil; previousNetworkCountersValid = false; lastDiskSample = nil
+        cpuDataAvailable = false; memoryDataAvailable = false
+        diskDataAvailable = false; networkDataAvailable = false
     }
 
     func refresh() {
+        guard demand.shouldSample else { return }
         updateCPU()
         updateMemory()
-        updateDisk()
+        // Filesystem capacity does not need a refresh on each CPU sample.
+        if lastDiskSample.map({ Date().timeIntervalSince($0) >= 30 }) ?? true {
+            lastDiskSample = Date(); updateDisk()
+        }
         updateIO()
         thermalState = Self.thermalLabel(ProcessInfo.processInfo.thermalState)
     }
@@ -101,7 +145,7 @@ final class SystemPerformanceManager: ObservableObject {
                 host_statistics(mach_host_self(), HOST_CPU_LOAD_INFO, $0, &count)
             }
         }
-        guard result == KERN_SUCCESS else { return }
+        guard result == KERN_SUCCESS else { cpuDataAvailable = false; previousCPUTicks = nil; return }
 
         let ticks = (
             user: UInt64(info.cpu_ticks.0),
@@ -110,15 +154,20 @@ final class SystemPerformanceManager: ObservableObject {
             nice: UInt64(info.cpu_ticks.3)
         )
         defer { previousCPUTicks = ticks }
-        guard let previousCPUTicks else { return }
+        guard let previousCPUTicks,
+              ticks.user >= previousCPUTicks.user, ticks.system >= previousCPUTicks.system,
+              ticks.idle >= previousCPUTicks.idle, ticks.nice >= previousCPUTicks.nice else {
+            cpuDataAvailable = false; return
+        }
 
         let user = ticks.user &- previousCPUTicks.user
         let system = ticks.system &- previousCPUTicks.system
         let idle = ticks.idle &- previousCPUTicks.idle
         let nice = ticks.nice &- previousCPUTicks.nice
         let total = user + system + idle + nice
-        guard total > 0 else { return }
+        guard total > 0 else { cpuDataAvailable = false; return }
         cpuUsage = Double(user + system + nice) / Double(total)
+        cpuDataAvailable = true
     }
 
     private func updateMemory() {
@@ -129,28 +178,33 @@ final class SystemPerformanceManager: ObservableObject {
                 host_statistics64(mach_host_self(), HOST_VM_INFO64, $0, &count)
             }
         }
-        guard result == KERN_SUCCESS else { return }
+        guard result == KERN_SUCCESS else { memoryDataAvailable = false; return }
 
         let pageSize = UInt64(vm_kernel_page_size)
         let pages = UInt64(info.active_count) + UInt64(info.wire_count) + UInt64(info.compressor_page_count)
         usedMemory = min(totalMemory, pages * pageSize)
         memoryUsage = totalMemory > 0 ? Double(usedMemory) / Double(totalMemory) : 0
+        memoryDataAvailable = totalMemory > 0
     }
 
     private func updateDisk() {
         guard let values = try? URL(fileURLWithPath: "/").resourceValues(forKeys: [
             .volumeTotalCapacityKey,
             .volumeAvailableCapacityForImportantUsageKey
-        ]) else { return }
-        totalDisk = Int64(values.volumeTotalCapacity ?? 0)
-        let available = values.volumeAvailableCapacityForImportantUsage ?? 0
+        ]) else { diskDataAvailable = false; return }
+        guard let total = values.volumeTotalCapacity, total > 0,
+              let available = values.volumeAvailableCapacityForImportantUsage,
+              available >= 0, available <= Int64(total) else { diskDataAvailable = false; return }
+        totalDisk = Int64(total)
         usedDisk = max(0, totalDisk - available)
         diskUsage = totalDisk > 0 ? Double(usedDisk) / Double(totalDisk) : 0
+        diskDataAvailable = totalDisk > 0
     }
 
     private func updateIO() {
         var interfaces: UnsafeMutablePointer<ifaddrs>?
         var received: UInt64 = 0, sent: UInt64 = 0
+        var networkCountersValid = false
         if getifaddrs(&interfaces) == 0 {
             defer { freeifaddrs(interfaces) }
             var pointer = interfaces
@@ -163,6 +217,7 @@ final class SystemPerformanceManager: ObservableObject {
                 guard String(cString: name).hasPrefix("en") else { continue }
                 let counters = data.assumingMemoryBound(to: if_data.self).pointee
                 received += UInt64(counters.ifi_ibytes); sent += UInt64(counters.ifi_obytes)
+                networkCountersValid = true
             }
         }
         var read: UInt64?, written: UInt64?
@@ -178,11 +233,16 @@ final class SystemPerformanceManager: ObservableObject {
                 }
             }
         }
-        let now = Date(); defer { previousIO = (now, received, sent, read, written) }
-        guard let prior = previousIO else { networkReceived = 0; networkSent = 0; diskReadRate = nil; diskWriteRate = nil; return }
-        let seconds = now.timeIntervalSince(prior.0); guard seconds > 0 else { return }
-        networkReceived = received >= prior.1 ? Double(received-prior.1)/seconds : 0
-        networkSent = sent >= prior.2 ? Double(sent-prior.2)/seconds : 0
+        let now = Date()
+        defer { previousIO = (now, received, sent, read, written); previousNetworkCountersValid = networkCountersValid }
+        guard let prior = previousIO else { networkDataAvailable = false; diskReadRate = nil; diskWriteRate = nil; return }
+        let seconds = now.timeIntervalSince(prior.0)
+        guard seconds.isFinite, seconds > 0 else { networkDataAvailable = false; diskReadRate = nil; diskWriteRate = nil; return }
+        networkDataAvailable = previousNetworkCountersValid && networkCountersValid && received >= prior.1 && sent >= prior.2
+        if networkDataAvailable {
+            networkReceived = Double(received-prior.1)/seconds
+            networkSent = Double(sent-prior.2)/seconds
+        }
         diskReadRate = read.flatMap { value in prior.3.flatMap { value >= $0 ? Double(value-$0)/seconds : nil } }
         diskWriteRate = written.flatMap { value in prior.4.flatMap { value >= $0 ? Double(value-$0)/seconds : nil } }
     }

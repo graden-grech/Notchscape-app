@@ -10,7 +10,10 @@ struct AppearanceRecipePolicyTests {
         "whiteHouseRepublicanChristmas", "whiteHouseRepublicanChristmasOvalOffice", "whiteHouseRepublicanChristmasEastRoom", "whiteHouseRepublicanChristmasBlueRoom",
         "whiteHouseDemocratChristmas", "whiteHouseDemocratChristmasOvalOffice", "whiteHouseDemocratChristmasEastRoom", "whiteHouseDemocratChristmasBlueRoom"]
     static let cityscapeThemes = ["cityNewYork", "cityChicago", "cityDetroit", "cityBoston", "cityPhiladelphia", "cityWashingtonDC",
-        "cityLosAngeles", "citySanFrancisco", "citySeattle", "cityLasVegas", "cityMiami", "cityNewOrleans"]
+        "cityLosAngeles", "citySanFrancisco", "citySeattle", "cityLasVegas", "cityMiami", "cityNewOrleans",
+        "landmarkCapitol", "landmarkLincolnMemorial", "landmarkWashingtonMonument", "landmarkJeffersonMemorial",
+        "landmarkSmithsonianCastle", "landmarkLibraryOfCongress", "landmarkSupremeCourt", "landmarkNationalCathedral",
+        "landmarkStatueOfLiberty", "landmarkIndependenceHall", "landmarkOldStateHouse", "landmarkAlamo"]
     static let themes = Set(["system", "autumn", "halloween", "christmas", "winter", "easter", "starWars", "starWarsVader"] + NativeAppearanceStyle.allCases.map(\.rawValue) + whiteHouseThemes + cityscapeThemes)
     static let icons: Set<String> = ["standard", "autumn", "halloween", "christmas", "winter", "easter", "whiteHouse",
         "whiteHouseRepublican", "whiteHouseDemocrat", "whiteHouseRepublicanChristmas", "whiteHouseDemocratChristmas"]
@@ -53,9 +56,9 @@ struct AppearanceRecipePolicyTests {
                 var value = recipe
                 value.theme = theme; value.icon = followsTheme ? "standard" : "winter"; value.followsThemeIcon = followsTheme
                 let restored = try AppearanceRecipe.decode(JSONEncoder().encode(value), themes: themes, icons: icons)
-                check(restored == value, "Every city restores with its custom accent and manual or matching icon preference")
+                check(restored == value, "Every city and landmark restores with its custom accent and manual or matching icon preference")
                 check(restored.homeOrder == recipe.homeOrder && restored.hiddenWidgets == recipe.hiddenWidgets,
-                      "City changes preserve the saved Home layout")
+                      "City and landmark changes preserve the saved Home layout")
             }
         }
         var object = try JSONSerialization.jsonObject(with: data) as! [String: Any]

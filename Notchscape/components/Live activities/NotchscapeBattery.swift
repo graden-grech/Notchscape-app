@@ -78,10 +78,11 @@ struct BatteryView: View {
 }
 
 struct ScaleButtonStyle: ButtonStyle {
+    @ObservedObject private var performance = AppPerformanceManager.shared
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
-            .animation(.easeInOut(duration: 0.2), value: configuration.isPressed)
+            .scaleEffect(performance.suppressAnimations ? 1 : configuration.isPressed ? 0.95 : 1)
+            .animation(performance.suppressAnimations ? nil : .easeInOut(duration: 0.16), value: configuration.isPressed)
     }
 }
 

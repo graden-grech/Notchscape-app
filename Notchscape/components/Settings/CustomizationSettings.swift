@@ -2,6 +2,133 @@ import Defaults
 import SwiftUI
 import UniformTypeIdentifiers
 
+extension Defaults.Keys {
+    // Local chrome preference, deliberately independent of theme/recipe choices.
+    static let settingsSidebarAlwaysMulticolor = Key<Bool>("settingsSidebarAlwaysMulticolor", default: false)
+}
+
+/// A restrained accent wash on the native Settings background. Increased
+/// contrast removes the wash; controls retain their native material fallback.
+struct ThemeSettingsBackground: View {
+    let accent: Color
+    let isThemed: Bool
+    @ObservedObject private var performance = AppPerformanceManager.shared
+    @Environment(\.colorSchemeContrast) private var contrast
+
+    var body: some View {
+        ZStack {
+            LiquidGlassSettingsBackground()
+            if isThemed && !performance.reduceTransparency && contrast != .increased && !performance.lowImpact {
+                LinearGradient(colors: [accent.opacity(0.075), .clear],
+                               startPoint: .topTrailing, endPoint: .bottomLeading)
+            }
+        }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+}
+
+/// The same static evergreen strand and warm lights in Settings and the White
+/// House sheet. No particles, repeated animation, blur, timers or asset loads.
+struct ChristmasSettingsTrim: View {
+    let themeID: String
+    let accent: Color
+    @Environment(\.colorScheme) private var colorScheme
+    @ObservedObject private var performance = AppPerformanceManager.shared
+
+    var body: some View {
+        if ThemeChromePolicy.showsChristmasTrim(themeID: themeID) {
+            Canvas { context, size in
+                let width = size.width
+                guard width > 48 else { return }
+                let dark = colorScheme == .dark
+                let green = Color(red: dark ? 0.28 : 0.13, green: dark ? 0.52 : 0.37, blue: dark ? 0.38 : 0.25)
+                let gold = Color(red: 0.94, green: dark ? 0.76 : 0.59, blue: dark ? 0.42 : 0.19)
+                func point(_ fraction: CGFloat) -> CGPoint {
+                    CGPoint(x: 12 + fraction * (width - 24), y: 7 + sin(fraction * .pi) * 8)
+                }
+                var strand = Path()
+                strand.move(to: point(0))
+                strand.addQuadCurve(to: point(1), control: CGPoint(x: width / 2, y: 23))
+                context.stroke(strand, with: .color(green), style: StrokeStyle(lineWidth: 1.8, lineCap: .round))
+                let count = performance.lowImpact ? 4 : min(12, max(5, Int(width / 55)))
+                for index in 0...count {
+                    let fraction = CGFloat(index) / CGFloat(count)
+                    let position = point(fraction)
+                    if !performance.lowImpact {
+                        for offset in [-4.0, 0, 4] {
+                            var needles = Path()
+                            needles.move(to: CGPoint(x: position.x - 8 + offset, y: position.y - 5))
+                            needles.addLine(to: CGPoint(x: position.x + offset, y: position.y + 1))
+                            needles.addLine(to: CGPoint(x: position.x + 8 + offset, y: position.y - 5))
+                            context.stroke(needles, with: .color(green.opacity(0.85)),
+                                           style: StrokeStyle(lineWidth: 1.1, lineCap: .round))
+                        }
+                    }
+                    var stem = Path()
+                    stem.move(to: position)
+                    stem.addLine(to: CGPoint(x: position.x, y: position.y + 5))
+                    context.stroke(stem, with: .color(green), lineWidth: 1)
+                    let bulb = CGRect(x: position.x - 2.5, y: position.y + 4, width: 5, height: 7)
+                    context.fill(Path(ellipseIn: bulb), with: .color(index.isMultiple(of: 4) ? accent : gold))
+                    context.fill(Path(ellipseIn: CGRect(x: bulb.minX + 1.2, y: bulb.minY + 1, width: 1.4, height: 2)),
+                                 with: .color(.white.opacity(0.75)))
+                }
+                // One small ribbon anchors the garland without covering labels.
+                var bow = Path()
+                bow.move(to: CGPoint(x: width / 2, y: 13))
+                bow.addQuadCurve(to: CGPoint(x: width / 2 - 10, y: 7), control: CGPoint(x: width / 2 - 15, y: 3))
+                bow.addQuadCurve(to: CGPoint(x: width / 2, y: 17), control: CGPoint(x: width / 2 - 14, y: 19))
+                bow.addQuadCurve(to: CGPoint(x: width / 2 + 10, y: 7), control: CGPoint(x: width / 2 + 15, y: 3))
+                bow.addQuadCurve(to: CGPoint(x: width / 2, y: 13), control: CGPoint(x: width / 2 + 13, y: 2))
+                context.fill(bow, with: .color(accent))
+            }
+            .frame(height: 30)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+            .transaction { $0.animation = nil; $0.disablesAnimations = true }
+        }
+    }
+}
+
+/// Keeps one expanded-size scene alive while the outer notch mask closes. All
+/// expanded tabs share the same artwork/crop; only their readability layer varies.
+struct ExpandedMenuThemeBackground: View {
+    let theme: AppTheme
+    let vaderArtwork: StarWarsCharacterArtwork
+    let size: CGSize
+    let isExpanded: Bool
+    let isHome: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @ObservedObject private var performance = AppPerformanceManager.shared
+
+    private var scrim: ThemeChromePolicy.SceneScrim {
+        ThemeChromePolicy.sceneScrim(isHome: isHome, reduceTransparency: performance.reduceTransparency)
+    }
+    private var transitionAnimation: Animation? {
+        performance.suppressAnimations || reduceMotion ? nil : .easeOut(duration: 0.24)
+    }
+
+    var body: some View {
+        HomeThemeScene(theme: theme, vaderArtwork: vaderArtwork, imageAlignment: .top)
+            .frame(width: size.width, height: size.height, alignment: .top)
+            .clipped()
+            .overlay {
+                LinearGradient(stops: [
+                    .init(color: .black.opacity(scrim.leading), location: 0),
+                    .init(color: .black.opacity(scrim.middle), location: 0.78),
+                    .init(color: .black.opacity(scrim.trailing), location: 0.86)
+                ], startPoint: .leading, endPoint: .trailing)
+            }
+            .opacity(isExpanded ? 1 : 0)
+            .animation(transitionAnimation, value: isExpanded)
+            .animation(transitionAnimation, value: isHome)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+            .transaction { if performance.suppressAnimations || reduceMotion { $0.animation = nil; $0.disablesAnimations = true } }
+    }
+}
+
 enum PresetAccentColor: String, CaseIterable, Identifiable {
     case blue = "Blue"
     case purple = "Purple"
@@ -25,6 +152,45 @@ enum PresetAccentColor: String, CaseIterable, Identifiable {
         case .green: return Color(red: 0.4, green: 0.824, blue: 0.176)
         case .graphite: return Color(red: 0.557, green: 0.557, blue: 0.576)
         }
+    }
+}
+
+struct HomeTileAppearanceSettings: View {
+    @Default(.homeTileStyle) private var style
+    @Default(.homeTileTransparency) private var transparency
+    @ObservedObject private var performance = AppPerformanceManager.shared
+    @Environment(\.colorSchemeContrast) private var contrast
+
+    private var transparencyUnavailable: Bool {
+        style == .original || performance.reduceTransparency || contrast == .increased
+    }
+
+    private var displayedTransparency: Double { HomeTileSurfacePolicy.boundedTransparency(transparency) }
+    private var transparencySelection: Binding<Double> {
+        Binding(get: { displayedTransparency }, set: { transparency = HomeTileSurfacePolicy.boundedTransparency($0) })
+    }
+
+    var body: some View {
+        Picker("Tile style", selection: $style) {
+            ForEach(HomeTileStyle.allCases) { Text($0.title).tag($0) }
+        }
+        .pickerStyle(.segmented)
+
+        HStack(spacing: 12) {
+            Slider(value: transparencySelection, in: 0...1, step: 0.05) { Text("Tile transparency") }
+                .accessibilityValue("\(Int(displayedTransparency * 100)) percent")
+            Text(displayedTransparency.formatted(.percent.precision(.fractionLength(0))))
+                .monospacedDigit().foregroundStyle(.secondary)
+                .frame(width: 40, alignment: .trailing)
+        }
+        .disabled(transparencyUnavailable)
+
+        Text(style == .original
+             ? "Original removes the new Music, Calendar and Quick Actions backgrounds. Your layout and calendar fixes stay in place."
+             : performance.reduceTransparency || contrast == .increased
+                ? "Your Mac’s accessibility settings keep tile backgrounds opaque. Your transparency choice is saved."
+                : "Adjust the Music, Calendar and Quick Actions backgrounds without fading text or buttons. Weather keeps its sky.")
+            .font(.caption).foregroundStyle(.secondary)
     }
 }
 
@@ -118,7 +284,7 @@ struct SeasonalThemeSettings: View {
     }
 }
 
-/// Architectural artwork stays on Home's content plane. Native segmented
+/// Architectural artwork stays on the content plane. Native segmented
 /// controls and buttons are the only interactive layer; no video or pulse loop.
 struct WhiteHouseThemeSettingsView: View {
     @Environment(\.dismiss) private var dismiss
@@ -128,6 +294,7 @@ struct WhiteHouseThemeSettingsView: View {
     @ObservedObject private var performance = AppPerformanceManager.shared
 
     private var variant: WhiteHouseThemeVariant { theme.whiteHouseVariant ?? preferredVariant }
+    private var previewTheme: AppTheme { AppTheme(rawValue: variant.rawValue) ?? .whiteHouse }
     private var style: Binding<WhiteHouseStyle> {
         Binding(get: { variant.style }, set: { apply(variant.selecting(style: $0)) })
     }
@@ -146,10 +313,12 @@ struct WhiteHouseThemeSettingsView: View {
                 Button("Done") { dismiss() }.keyboardShortcut(.defaultAction)
             }
             .padding(20)
+            ChristmasSettingsTrim(themeID: variant.rawValue, accent: .effectiveAccent)
+                .padding(.horizontal, 24)
             Form {
                 Section {
                     ZStack(alignment: .bottomLeading) {
-                        HomeThemeScene(theme: theme, vaderArtwork: .lightsaber, preserveEntirePhoto: true)
+                        HomeThemeScene(theme: previewTheme, vaderArtwork: .lightsaber, preserveEntirePhoto: true)
                         LinearGradient(colors: [.black.opacity(0.76), .clear], startPoint: .leading, endPoint: .trailing)
                         VStack(alignment: .leading, spacing: 5) {
                             Text(variant.scene.title).font(.title3.weight(.semibold))
@@ -191,7 +360,7 @@ struct WhiteHouseThemeSettingsView: View {
             .formStyle(.grouped).scrollContentBackground(.hidden)
         }
         .frame(width: 610, height: 680)
-        .background(Color(nsColor: .windowBackgroundColor))
+        .background(ThemeSettingsBackground(accent: .effectiveAccent, isThemed: true))
         .preferredColorScheme(.dark)
         .tint(.effectiveAccent)
         .transaction { if performance.suppressAnimations { $0.animation = nil; $0.disablesAnimations = true } }
@@ -220,7 +389,7 @@ struct WhiteHouseThemeSettingsView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(scene.title)
-        .accessibilityHint("Changes the Home background. Keeps the selected accent style and Christmas setting.")
+        .accessibilityHint("Changes the expanded menu background. Keeps the selected accent style and Christmas setting.")
         .accessibilityAddTraits(selected ? [.isSelected] : [])
     }
 
@@ -397,14 +566,20 @@ struct StarWarsThemeSettingsView: View {
     }
 }
 
-/// City photos share White House's complete-photo previews and Home scene.
-/// All choices stay in one native settings sheet instead of twelve theme cards.
+/// Cities and landmarks share White House's complete-photo previews and Home
+/// scene. Browsing controls only filter the gallery; photo buttons apply themes.
 struct CityscapeThemeSettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Default(.appTheme) private var theme
     @Default(.cityscapePreferredScene) private var preferredScene
     @Default(.useCustomAccentColor) private var customAccentEnabled
     @ObservedObject private var performance = AppPerformanceManager.shared
+    @State private var gallery: CityscapeGalleryFilter
+
+    init() {
+        let selected = Defaults[.appTheme].cityscapeScene ?? Defaults[.cityscapePreferredScene]
+        _gallery = State(initialValue: .init(selectedScene: selected))
+    }
 
     private var scene: CityscapeScene { theme.cityscapeScene ?? preferredScene }
     private var previewTheme: AppTheme { AppTheme(rawValue: scene.rawValue) ?? .cityNewYork }
@@ -413,8 +588,8 @@ struct CityscapeThemeSettingsView: View {
         VStack(spacing: 0) {
             HStack {
                 VStack(alignment: .leading, spacing: 3) {
-                    Text("Cityscapes").font(.title2.weight(.semibold))
-                    Text("Twelve views in blue-hour light.").font(.callout).foregroundStyle(.secondary)
+                    Text("Cities & Landmarks").font(.title2.weight(.semibold))
+                    Text("American architecture in blue-hour light.").font(.callout).foregroundStyle(.secondary)
                 }
                 Spacer()
                 Button("Done") { dismiss() }.keyboardShortcut(.defaultAction)
@@ -422,30 +597,51 @@ struct CityscapeThemeSettingsView: View {
             .padding(20)
             Form {
                 Section {
-                    ZStack(alignment: .bottomLeading) {
+                    HStack(alignment: .center, spacing: 14) {
                         HomeThemeScene(theme: previewTheme, vaderArtwork: .lightsaber, preserveEntirePhoto: true)
-                        LinearGradient(colors: [.black.opacity(0.76), .clear], startPoint: .leading, endPoint: .trailing)
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(scene.title).font(.title3.weight(.semibold))
-                            Text("Navy sky · Warm city lights").font(.caption).foregroundStyle(.white.opacity(0.85))
+                            .aspectRatio(16.0 / 9.0, contentMode: .fit)
+                            .frame(width: 220)
+                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(scene.title).font(.headline)
+                            if scene.collection == .landmarks {
+                                Text(scene.location).font(.callout).foregroundStyle(.secondary)
+                            }
+                            Text("Navy sky · Warm architectural light")
+                                .font(.caption).foregroundStyle(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
-                        .foregroundStyle(.white).padding(16)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    .aspectRatio(16.0 / 9.0, contentMode: .fit)
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                     .accessibilityElement(children: .combine)
                     if customAccentEnabled {
                         Label("Your custom accent is still in use. Turn on Match theme in Appearance → Accent color to use this palette.", systemImage: "paintpalette")
                             .font(.caption).foregroundStyle(.secondary)
                     }
                 } header: { Text("Selected view") } footer: {
-                    Text("Each city brings warm architectural lighting and a deep navy sky to Home.")
+                    Text("Each view brings warm architectural lighting and a deep navy sky to every expanded menu.")
                 }
 
-                Section("Cities") {
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                        ForEach(CityscapeScene.allCases) { scene in
-                            cityButton(scene)
+                Section {
+                    Picker("Collection", selection: $gallery.collection) {
+                        ForEach(CityscapeCollection.allCases) { Text($0.title).tag($0) }
+                    }
+                    .pickerStyle(.segmented)
+                    TextField(gallery.collection == .cities ? "Search cities" : "Search landmarks", text: $gallery.query)
+                        .textFieldStyle(.roundedBorder)
+                        .accessibilityLabel("Search cities and landmarks")
+                }
+
+                if gallery.sections.isEmpty {
+                    Section { Text("No views found").foregroundStyle(.secondary) }
+                } else {
+                    ForEach(gallery.sections) { section in
+                        Section(section.title) {
+                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                                ForEach(section.scenes) { choice in
+                                    sceneButton(choice)
+                                }
+                            }
                         }
                     }
                 }
@@ -457,10 +653,13 @@ struct CityscapeThemeSettingsView: View {
         .preferredColorScheme(.dark)
         .tint(.effectiveAccent)
         .transaction { if performance.suppressAnimations { $0.animation = nil; $0.disablesAnimations = true } }
-        .onAppear { if let current = theme.cityscapeScene { preferredScene = current } }
+        .onAppear {
+            if let current = theme.cityscapeScene { preferredScene = current }
+            gallery = .init(selectedScene: scene)
+        }
     }
 
-    private func cityButton(_ choice: CityscapeScene) -> some View {
+    private func sceneButton(_ choice: CityscapeScene) -> some View {
         let selected = choice == scene
         return Button { apply(choice) } label: {
             VStack(alignment: .leading, spacing: 7) {
@@ -470,9 +669,13 @@ struct CityscapeThemeSettingsView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
                 HStack {
                     Text(choice.title).font(.callout.weight(.medium))
+                        .lineLimit(2).fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 4)
                     Image(systemName: selected ? "checkmark.circle.fill" : "circle")
                         .foregroundStyle(selected ? Color.effectiveAccent : .secondary)
+                }
+                if choice.collection == .landmarks {
+                    Text(choice.location).font(.caption).foregroundStyle(.secondary)
                 }
             }
             .padding(9)
@@ -507,7 +710,7 @@ struct PerformanceSettingsSection: View {
                 ForEach(AppPerformanceMode.allCases) { Text($0.title).tag($0) }
             }
             LabeledContent("Currently", value: performance.lowImpact ? "Low impact" : "Balanced")
-            Text("Low impact simplifies glass, shadows and artwork effects, uses a static music indicator and refreshes media and system stats less often. Automatic enables it on battery or in macOS Low Power Mode. Reduce Motion is respected in every mode.")
+            Text("Low impact uses simpler effects and refreshes less often. Automatic adapts to battery power and Low Power Mode. Your Reduce Motion setting is always respected.")
                 .font(.caption).foregroundStyle(.secondary)
         }
     }
@@ -609,11 +812,12 @@ struct AgentHistoryRows: View {
                     Image(systemName: entry.state.symbol)
                         .foregroundStyle(entry.state == .completed ? Color.green : entry.state == .usageLimited ? .red : .orange)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(entry.title).font(.caption.weight(.semibold)).lineLimit(1)
-                        Text("\(entry.provider) · \(entry.state.label)").font(.caption2).foregroundStyle(.secondary)
+                        Text(entry.title).font(.callout.weight(.medium)).lineLimit(1)
+                        Text("\(entry.provider) · \(AgentActivityTextPresentation.summary(state: entry.state, detail: ""))")
+                            .font(.caption).foregroundStyle(.secondary)
                     }
                     Spacer(minLength: 4)
-                    Text(entry.endedAt, style: .time).font(.caption2).foregroundStyle(.secondary)
+                    Text(entry.endedAt, style: .time).font(.caption).foregroundStyle(.secondary)
                 }
                 .accessibilityElement(children: .combine)
             }

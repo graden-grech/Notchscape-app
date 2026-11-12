@@ -16,6 +16,7 @@ import SwiftUI
 struct NotchscapeApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @Default(.menubarIcon) var showMenuBarIcon
+    @Default(.desktopSnowEnabled) private var desktopSnowEnabled
     @Environment(\.openWindow) var openWindow
 
     let updaterController: SPUStandardUpdaterController
@@ -118,6 +119,12 @@ struct NotchscapeApp: App {
             Button("Windows & Workspaces…") { WindowToolsController.shared.show() }
             RecordingMenuControl()
             Button("Open Tools…") { NotchToolsWindowController.shared.show() }
+            Button("Add-ons Store…") { SettingsWindowController.shared.showWindow(section: "Store") }
+            Button("Dock Bar…") { DockReplacementController.shared.show() }
+            Button("Dock Workspace…") { DockWorkspaceManager.shared.show() }
+            if desktopSnowEnabled {
+                Button("Stop Snow", systemImage: "snowflake.slash") { desktopSnowEnabled = false }
+            }
             WorkspaceModeMenu()
             Divider()
             Button("Restart Notchscape") {
@@ -135,6 +142,7 @@ struct NotchscapeApp: App {
             }
             CommandGroup(after: .help) {
                 Button("Settings Tour…") { SettingsTourWindowController.shared.show() }
+                Button("Display Compatibility Preview…") { DisplayCompatibilityWindowController.shared.show() }
             }
             // App-local menu commands, not a global hotkey that steals Finder's
             // Network shortcut or another app's keystrokes. Available before a
@@ -145,6 +153,12 @@ struct NotchscapeApp: App {
                 Button("Workspace Tools…") { WorkspaceToolsWindowController.shared.show() }
                 Button("Capture Studio…") { CaptureStudioController.shared.show() }
                 Button("Windows & Workspaces…") { WindowToolsController.shared.show() }
+                Button("Add-ons Store…") { SettingsWindowController.shared.showWindow(section: "Store") }
+                Button("Dock Bar…") { DockReplacementController.shared.show() }
+                Button("Dock Workspace…") { DockWorkspaceManager.shared.show() }
+                if desktopSnowEnabled {
+                    Button("Stop Snow", systemImage: "snowflake.slash") { desktopSnowEnabled = false }
+                }
                 RecordingMenuControl()
             }
         }
@@ -237,6 +251,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        DesktopSnowManager.shared.stop()
+        DockReplacementController.shared.stop()
+        DockWidgetManager.shared.stop()
+        DockWorkspaceManager.shared.stop()
+        MenuBarModulesController.shared.stop()
+        FaceUnlockManager.shared.endSession()
         WorkspaceClockManager.shared.stopKeepAwake()
         unlockTransitionTask?.cancel()
         lockPreviewTask?.cancel()
@@ -268,6 +288,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         PinnedScratchpadController.shared.close()
         CaptureStudioController.shared.close()
         WindowToolsController.shared.close()
+        DockWorkspaceManager.shared.hide()
         MediaToolsManager.shared.privacyStop()
         WorkspaceClockManager.shared.stopKeepAwake()
         DeviceControlsManager.shared.stop()
@@ -280,6 +301,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         cleanupDragDetectors()
         // Stop only this app's Mirror camera. No system camera permission changes.
         WebcamManager.shared.stopSession()
+        FaceUnlockManager.shared.systemDidLock()
         for (_, model) in notchWindowModels { model.isCameraExpanded = false }
         if !Defaults[.showOnLockScreen] {
             cleanupWindows()
@@ -302,6 +324,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard let session = CGSessionCopyCurrentDictionary() as? [String: Any],
               session["CGSSessionScreenIsLocked"] as? Bool != true else { return }
         isScreenLocked = false
+        FaceUnlockManager.shared.systemDidUnlock()
         LocalToolsManager.shared.setLocked(false)
         DownloadWatcher.shared.setLocked(false)
         AppleNotesSyncManager.shared.setLocked(false)
@@ -355,7 +378,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             window.contentView = NSHostingView(rootView: Color.clear)
         case .lockedHome:
             let screen = model.screenUUID.flatMap { NSScreen.screen(withUUID: $0) }
-            let physical = (screen?.safeAreaInsets.top ?? 0) > 0
+            let physical = screen.flatMap { NSScreenDisplayGeometryAdapter.snapshot(for: $0) }?.usesLegacyNotchLayout == true
             let island = !physical && Defaults[.nonNotchPresentation] == .dynamicIsland
             var size = getClosedNotchSize(screenUUID: model.screenUUID)
             if island, let screen {
@@ -543,11 +566,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         LocalToolsManager.shared.start()
         LocalToolsManager.shared.setLocked(isScreenLocked)
+        WindowToolsManager.shared.registerShortcuts()
         AppleNotesSyncManager.shared.start()
         AppleNotesSyncManager.shared.setLocked(isScreenLocked)
         DeviceControlsManager.shared.start()
         _ = AudioRoutingManager.shared
+        MenuBarModulesController.shared.start()
+        DockWorkspaceManager.shared.start()
+        DockWidgetManager.shared.start()
+        DockReplacementController.shared.start()
+        DesktopSnowManager.shared.start()
         NotchWallpaperManager.shared.start(locked: isScreenLocked)
+        if isScreenLocked { FaceUnlockManager.shared.systemDidLock() }
+        else { FaceUnlockManager.shared.systemDidUnlock() }
 
         externalDisplayObservation = Defaults.publisher(.showOnExternalDisplays)
             .dropFirst()
@@ -784,7 +815,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func deviceHasNotch() -> Bool {
         if #available(macOS 12.0, *) {
             for screen in NSScreen.screens {
-                if screen.safeAreaInsets.top > 0 {
+                if NSScreenDisplayGeometryAdapter.snapshot(for: screen)?.usesLegacyNotchLayout == true {
                     return true
                 }
             }

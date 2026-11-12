@@ -2,6 +2,7 @@ import importlib.util
 import os
 from pathlib import Path
 import plistlib
+import subprocess
 import tempfile
 import unittest
 import xml.etree.ElementTree as ET
@@ -86,7 +87,8 @@ class SharedInstallTests(unittest.TestCase):
     def test_release_targets_agree_with_framework_minimum(self):
         import re
         project = (ROOT / "Notchscape.xcodeproj/project.pbxproj").read_text()
-        self.assertEqual(re.findall(r"MACOSX_DEPLOYMENT_TARGET = ([^;]+);", project), ["15.0"] * 6)
+        # Debug/Release declarations also include the new independent Dock host.
+        self.assertEqual(re.findall(r"MACOSX_DEPLOYMENT_TARGET = ([^;]+);", project), ["15.0"] * 8)
         workflow = (ROOT / ".github/workflows/release.yml").read_text()
         self.assertIn("depends_on macos: :sequoia", workflow)
         self.assertNotIn("depends_on macos: :sonoma", workflow)
@@ -96,6 +98,25 @@ class SharedInstallTests(unittest.TestCase):
             source = (ROOT / ".github/scripts" / filename).read_text()
             self.assertIn("verify_shared_install.py", source)
             self.assertIn("verify_custom_app_identity.sh", source)
+
+    def test_installer_refuses_private_development_profile_before_staging(self):
+        app = self.fixture()
+        # Satisfy the independent feature gates so this case reaches the
+        # development-service boundary it is meant to exercise.
+        (app / "Contents/Info.plist").write_bytes(plistlib.dumps({
+            "NotchFaceUnlockEnabled": False, "NotchAccountsEnabled": False,
+        }))
+        helper = app / "Contents/XPCServices/RenamedVault.xpc/Contents/Info.plist"
+        helper.parent.mkdir(parents=True)
+        helper.write_bytes(plistlib.dumps({"CFBundleIdentifier": "example.renamed.helper",
+            "FaceVaultLocalDevelopmentOnly": True}))
+        output = app.parent / "installer-output"
+        result = subprocess.run(["/bin/bash", str(ROOT / ".github/scripts/package_shared_installer.sh"),
+            str(app), str(app.parent / "missing-baseline.app"), str(output), "--unsigned-preview"],
+            text=True, capture_output=True)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("local-only", result.stderr)
+        self.assertFalse(output.exists(), "Refuse before staging any private profile")
 
 
 class PresentationIntegrationTests(unittest.TestCase):

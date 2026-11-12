@@ -18,7 +18,8 @@ struct ShelfView: View {
     var body: some View {
         HStack(spacing: 12) {
             FileShareView()
-                .aspectRatio(1, contentMode: .fit)
+                .frame(width: 132)
+                .frame(maxHeight: .infinity)
                 .environmentObject(vm)
             panel
                 .onDrop(of: [.fileURL, .url, .utf8PlainText, .plainText, .data], isTargeted: $vm.dragDetectorTargeting) { providers in
@@ -62,19 +63,14 @@ struct ShelfView: View {
         content
             .padding()
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .standardMaterialPanel(tint: vm.dragDetectorTargeting ? .accentColor : .white, cornerRadius: 18)
+            .standardMaterialPanel(tint: .clear, cornerRadius: 14)
             .overlay {
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(
-                vm.dragDetectorTargeting
-                    ? Color.accentColor.opacity(0.9)
-                    : Color.white.opacity(0.10),
-                style: StrokeStyle(
-                    lineWidth: vm.dragDetectorTargeting ? 2 : 1,
-                    lineCap: .round,
-                    dash: vm.dragDetectorTargeting ? [9] : []
-                )
-                )
+                if vm.dragDetectorTargeting {
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .strokeBorder(Color.accentColor,
+                            style: StrokeStyle(lineWidth: 1.5, lineCap: .round, dash: [6, 4]))
+                        .allowsHitTesting(false)
+                }
             }
             .transaction { transaction in
                 transaction.animation = vm.animation
@@ -86,17 +82,19 @@ struct ShelfView: View {
     var content: some View {
         Group {
             if tvm.isEmpty {
-                VStack(spacing: 10) {
+                VStack(spacing: 8) {
                     Image(systemName: "tray.and.arrow.down")
                         .symbolVariant(.fill)
                         .symbolRenderingMode(.hierarchical)
-                        .foregroundStyle(.white, .gray)
-                        .imageScale(.large)
+                        .foregroundStyle(.secondary)
+                        .font(.title2)
+                        .accessibilityHidden(true)
                     
-                    Text("Drop files here")
-                        .foregroundStyle(.gray)
-                        .font(.system(.title3, design: .rounded))
-                        .fontWeight(.medium)
+                    Text("Drop files, links or text")
+                        .font(.callout.weight(.medium))
+                        .foregroundStyle(.primary)
+                    Text("Keep them close while you work.")
+                        .font(.caption).foregroundStyle(.secondary)
                 }
             } else {
                 ScrollView(.horizontal) {

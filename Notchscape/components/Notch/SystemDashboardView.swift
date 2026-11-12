@@ -2,7 +2,6 @@ import SwiftUI
 
 struct SystemDashboardView: View {
     @ObservedObject private var performance = SystemPerformanceManager.shared
-    @ObservedObject private var rendering = AppPerformanceManager.shared
 
     var body: some View {
         VStack(spacing: 8) {
@@ -34,9 +33,7 @@ struct SystemDashboardView: View {
                 Spacer(minLength: 0)
             }.font(.caption2).foregroundStyle(.secondary)
 
-            if #available(macOS 26.0, *), !rendering.lowImpact, !rendering.reduceTransparency {
-                GlassEffectContainer(spacing: 8) { controls }
-            } else { controls }
+            NotchGlassControlGroup { controls }
         }
         // Participate in the expanded page's height, just like Home and Live.
         // An intrinsic-height dashboard is otherwise centered by the physical
@@ -86,8 +83,7 @@ struct SystemDashboardView: View {
                 .lineLimit(1).minimumScaleFactor(0.85)
                 .padding(.vertical, 5)
         }
-        .buttonStyle(.plain)
-        .liquidGlassCapsule(tint: .accentColor)
+        .notchGlassButton()
     }
 
     private func byteSummary(_ used: UInt64, _ total: UInt64) -> String {

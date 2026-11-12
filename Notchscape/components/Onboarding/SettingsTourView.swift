@@ -66,12 +66,13 @@ struct SettingsTourView: View {
                             Image(systemName: progress.chapter.symbol)
                                 .font(.system(size: 30, weight: .medium)).foregroundStyle(Color.effectiveAccent)
                                 .accessibilityHidden(true)
-                            Text(progress.chapter.title).font(.title2.weight(.semibold))
+                            Text(progress.chapter.title).font(.title2.bold())
                                 .accessibilityAddTraits(.isHeader)
                             Text(progress.chapter.subtitle).font(.callout).foregroundStyle(.secondary)
                         }
 
-                        ForEach(progress.chapter.topics(accountsEnabled: AccountFeaturePolicy.enabled), id: \.sectionID) { topic in
+                        ForEach(progress.chapter.topics(accountsEnabled: AccountFeaturePolicy.enabled)
+                            .filter { $0.sectionID != "FaceUnlock" || FaceUnlockManager.featureEnabled }, id: \.sectionID) { topic in
                             if let destination = NotchSettingsDestination.all.first(where: { $0.id == topic.sectionID }) {
                                 topicCard(topic, destination: destination)
                             }
@@ -112,7 +113,7 @@ struct SettingsTourView: View {
     private func topicCard(_ topic: SettingsTourTopic, destination: NotchSettingsDestination) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Label(destination.title, systemImage: destination.symbol).font(.headline)
-            Text(topic.summary).font(.callout)
+            Text(topic.summary).font(.callout).foregroundStyle(.primary)
             Text(topic.suggestion).font(.caption).foregroundStyle(.secondary)
             Button("Open \(destination.title) Settings", systemImage: "arrow.up.forward") {
                 onOpenSection(destination.id)
@@ -121,7 +122,7 @@ struct SettingsTourView: View {
             .accessibilityHint("Leaves the tour and opens this settings page")
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(14)
-        .background(Color.secondary.opacity(0.07), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .padding(12)
+        .standardMaterialPanel(tint: .clear, cornerRadius: 14)
     }
 }

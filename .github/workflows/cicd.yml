@@ -24,8 +24,6 @@ jobs:
       matrix:
         platform:
           - macOS
-        xcode:
-          - ^26
         scheme:
           - Notchscape
     # Native Liquid Glass requires the macOS 26 SDK. Hosted Intel complements
@@ -47,6 +45,25 @@ jobs:
         "$RUNNER_TEMP/customization-policy-tests"
     - name: Check workflow and release helpers
       run: python3 -m unittest discover -s .github/scripts/tests -v
+    - name: Check native Dock tile and signing policies
+      run: |
+        set -euo pipefail
+        swiftc -swift-version 6 -strict-concurrency=complete -warnings-as-errors \
+          NotchscapeDockWidget/DockWidgetPolicy.swift \
+          NotchscapeDockWidget/Tests/DockWidgetPolicyTests.swift \
+          -o "$RUNNER_TEMP/dock-widget-policy-tests"
+        "$RUNNER_TEMP/dock-widget-policy-tests"
+        swiftc -swift-version 6 -strict-concurrency=complete -warnings-as-errors \
+          Notchscape/models/DockReplacementModels.swift \
+          Notchscape/models/DockReplacementPolicy.swift \
+          tests/DockReplacementPolicyTests.swift \
+          -o "$RUNNER_TEMP/dock-replacement-policy-tests"
+        "$RUNNER_TEMP/dock-replacement-policy-tests"
+        swiftc -swift-version 6 -strict-concurrency=complete -warnings-as-errors \
+          Notchscape/models/DesktopSnowPolicy.swift tests/DesktopSnowPolicyTests.swift \
+          -o "$RUNNER_TEMP/desktop-snow-policy-tests"
+        "$RUNNER_TEMP/desktop-snow-policy-tests"
+        python3 -m unittest discover -s tests -p 'test_*_signing.py' -v
     - name: Check local tools privacy and usage policies
       run: |
         set -euo pipefail
@@ -104,6 +121,40 @@ jobs:
         swiftc Notchscape/models/WindowGeometry.swift \
           tests/WindowGeometryTests.swift -o "$RUNNER_TEMP/window-geometry-tests"
         "$RUNNER_TEMP/window-geometry-tests"
+    - name: Check theme chrome and camera preview lifecycle
+      run: |
+        set -euo pipefail
+        swiftc -D THEME_CHROME_POLICY_TEST Notchscape/models/CustomizationModels.swift \
+          tests/ThemeChromePolicyTests.swift -o "$RUNNER_TEMP/theme-chrome-tests"
+        "$RUNNER_TEMP/theme-chrome-tests"
+        swiftc Notchscape/models/FaceCameraPolicy.swift \
+          tests/FaceScanPreviewPolicyTests.swift -o "$RUNNER_TEMP/face-scan-preview-tests"
+        "$RUNNER_TEMP/face-scan-preview-tests"
+    - name: Check add-on trust and clipboard migration policies
+      run: |
+        set -euo pipefail
+        bash tests/test_addons_clipboard.sh
+    - name: Check native glass accessibility and rendering policy
+      run: |
+        set -euo pipefail
+        swiftc Notchscape/models/GlassPresentationPolicy.swift \
+          tests/GlassPresentationPolicyTests.swift -o "$RUNNER_TEMP/glass-policy-tests"
+        "$RUNNER_TEMP/glass-policy-tests"
+        swiftc Notchscape/models/WeatherPresentationPolicy.swift \
+          tests/WeatherPresentationPolicyTests.swift -o "$RUNNER_TEMP/weather-presentation-tests"
+        "$RUNNER_TEMP/weather-presentation-tests"
+    - name: Check optional Dock layout and privacy lifecycle
+      run: |
+        set -euo pipefail
+        swiftc Notchscape/models/DockWorkspacePolicy.swift \
+          tests/DockWorkspacePolicyTests.swift -o "$RUNNER_TEMP/dock-workspace-tests"
+        "$RUNNER_TEMP/dock-workspace-tests"
+    - name: Check optional menu module lifecycle and sampling demand
+      run: |
+        set -euo pipefail
+        swiftc -D MENU_BAR_MODULE_TEST Notchscape/menu/StatusBarMenu.swift \
+          tests/MenuBarModulePolicyTests.swift -o "$RUNNER_TEMP/menu-module-tests"
+        "$RUNNER_TEMP/menu-module-tests"
     # Initial defaults must not overwrite an existing user's implicit choices.
     # Header safety is independent of the closed island/menu-bar height.
     - name: Check initial defaults and expanded header layout
@@ -118,6 +169,10 @@ jobs:
         swiftc Notchscape/models/SettingsTourPolicy.swift \
           tests/SettingsTourPolicyTests.swift -o "$RUNNER_TEMP/settings-tour-tests"
         "$RUNNER_TEMP/settings-tour-tests"
+    - name: Check display geometry and opt-in click routing
+      run: bash .github/scripts/test_display_compatibility.sh
+    - name: Check synthetic local face unlock policies and model
+      run: bash .github/scripts/test_face_unlock.sh
     - name: Check synthetic media export without screen capture
       run: |
         set -euo pipefail
@@ -139,13 +194,14 @@ jobs:
           Notchscape/managers/AccountSignInAttempt.swift \
           tests/AccountSignInAttemptTests.swift -o "$RUNNER_TEMP/account-sign-in-tests"
         "$RUNNER_TEMP/account-sign-in-tests"
-    - # TODO: pin to immutable SHA
-      uses: mxcl/xcodebuild@d3ee9b419c1be9a988086c58fe0988f32d99cfc5 # v3.6.0
-      with:
-        xcode: ${{ matrix.xcode }}
-        platform: ${{ matrix.platform }}
-        scheme: ${{ matrix.scheme }}
-        action: build
-        verbosity: xcpretty
-        upload-logs: always
-        configuration: release
+    - name: Compile with the native macOS SDK without distribution credentials
+      run: |
+        set -euo pipefail
+        sdk_version="$(xcrun --sdk macosx --show-sdk-version)"
+        [[ "${sdk_version%%.*}" -ge 26 ]] || {
+          echo "::error::The build requires the macOS 26 SDK or later"; exit 1;
+        }
+        xcodebuild -project Notchscape.xcodeproj -scheme Notchscape \
+          -configuration Release -destination "platform=macOS" \
+          -derivedDataPath "$RUNNER_TEMP/notchscape-ci-build" \
+          ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build

@@ -10,6 +10,20 @@ import SwiftUI
 import Defaults
 import Sparkle
 
+/// Retains navigation requests before the first hosting view has mounted.
+/// Sending only a notification can lose the first request at cold launch.
+@MainActor
+final class NotchSettingsNavigation: ObservableObject {
+    static let shared = NotchSettingsNavigation()
+    @Published private(set) var selection = "General"
+    private init() {}
+    func select(_ section: String) {
+        guard NotchSettingsDestination.all.contains(where: { $0.id == section }),
+              section != "Account" || AccountFeaturePolicy.enabled else { return }
+        selection = section
+    }
+}
+
 class SettingsWindowController: NSWindowController {
     static let shared = SettingsWindowController()
     private var updaterController: SPUStandardUpdaterController?
@@ -25,6 +39,12 @@ class SettingsWindowController: NSWindowController {
         super.init(window: window)
         
         setupWindow()
+
+        // AppKit restores the last usable frame and owns subsequent autosaving.
+        // Configure this once; rebuilding the hosting view must not move a window.
+        let frameName = NSWindow.FrameAutosaveName("NotchscapeSettingsWindow")
+        if !window.setFrameUsingName(frameName) { window.center() }
+        window.setFrameAutosaveName(frameName)
     }
     
     required init?(coder: NSCoder) {
@@ -42,7 +62,10 @@ class SettingsWindowController: NSWindowController {
         
         window.title = "Notchscape Settings"
         window.titlebarAppearsTransparent = true
-        window.titleVisibility = .hidden
+        // Keep the native title visible so the active Settings destination can
+        // participate in the unified titlebar instead of leaving the detail
+        // pane without a heading.
+        window.titleVisibility = .visible
         window.toolbarStyle = .unified
         // A real system toolbar gives traffic lights their native inset and
         // height. Do not draw content over the title bar or move button frames.
@@ -78,11 +101,7 @@ class SettingsWindowController: NSWindowController {
     }
     
     func showWindow(section: String? = nil) {
-        if let section {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(name: .notchSettingsSectionRequested, object: section)
-            }
-        }
+        if let section { NotchSettingsNavigation.shared.select(section) }
         // If window is already visible, bring it to front properly
         if window?.isVisible == true {
             NSApp.activate(ignoringOtherApps: true)
@@ -94,7 +113,6 @@ class SettingsWindowController: NSWindowController {
         // Show the window with proper ordering
         window?.orderFrontRegardless()
         window?.makeKeyAndOrderFront(nil)
-        window?.center()
         
         // Activate the app and ensure window gets focus
         NSApp.activate(ignoringOtherApps: true)

@@ -149,6 +149,8 @@ extension Defaults.Keys {
     static let lightsaberMusicBar = Key<Bool>("lightsaberMusicBar", default: true)
     static let lightsaberColorMode = Key<LightsaberColorMode>("lightsaberColorMode", default: .theme)
     static let lightsaberCustomColorData = Key<Data?>("lightsaberCustomColorData", default: nil)
+    static let homeTileStyle = Key<HomeTileStyle>("homeTileStyle", default: .native)
+    static let homeTileTransparency = Key<Double>("homeTileTransparency", default: 0)
     static let homeWidgetOrder = Key<[HomeWidget]>("homeWidgetOrder", default: [])
     static let hiddenHomeWidgets = Key<Set<HomeWidget>>("hiddenHomeWidgets", default: [])
     static let quickActions = Key<[NotchQuickAction]>("quickActions", default: [])

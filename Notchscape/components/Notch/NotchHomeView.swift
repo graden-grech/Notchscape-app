@@ -214,6 +214,7 @@ struct AlbumArtView: View {
 }
 
 struct MusicControlsView: View {
+    var showsTrackInfo = true
     @ObservedObject private var performance = AppPerformanceManager.shared
     @ObservedObject var musicManager = MusicManager.shared
         @EnvironmentObject var vm: NotchscapeViewModel
@@ -226,7 +227,7 @@ struct MusicControlsView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            songInfoAndSlider
+            if showsTrackInfo { songInfoAndSlider }
             slotToolbar
         }
         .buttonStyle(PlainButtonStyle())
@@ -236,7 +237,9 @@ struct MusicControlsView: View {
         GeometryReader { geo in
             VStack(alignment: .leading, spacing: 4) {
                 songInfo(width: geo.size.width)
-                musicSlider
+                if musicManager.songDuration.isFinite && musicManager.songDuration > 0 {
+                    musicSlider
+                }
             }
         }
         .padding(.top, 10)
@@ -346,7 +349,8 @@ struct MusicControlsView: View {
     private func slotView(for slot: MusicControlButton) -> some View {
         switch slot {
         case .shuffle:
-            HoverButton(icon: "shuffle", iconColor: musicManager.isShuffled ? .red : .primary, scale: .medium) {
+            HoverButton(icon: "shuffle", iconColor: musicManager.isShuffled ? .red : .primary, scale: .medium,
+                        accessibilityStatus: musicManager.isShuffled ? "On" : "Off") {
                 MusicManager.shared.toggleShuffle()
             }
         case .previous:
@@ -366,7 +370,8 @@ struct MusicControlsView: View {
                 MusicManager.shared.nextTrack()
             }
         case .repeatMode:
-            HoverButton(icon: repeatIcon, iconColor: repeatIconColor, scale: .medium) {
+            HoverButton(icon: repeatIcon, iconColor: repeatIconColor, scale: .medium,
+                        accessibilityStatus: musicManager.repeatMode == .off ? "Off" : musicManager.repeatMode == .one ? "One track" : "All tracks") {
                 MusicManager.shared.toggleRepeat()
             }
         case .volume:
@@ -608,6 +613,7 @@ struct NotchHomeView: View {
         HStack(alignment: .top, spacing: (shouldShowCamera && Defaults[.showCalendar]) ? 10 : 15) {
             ForEach(visibleWidgets) { widget in
                 homeWidget(widget)
+                    .overlay(alignment: .top) { HomeSnowDecoration(tileID: widget.rawValue) }
                     .overlay {
                         if vm.isEditingHomeLayout {
                             RoundedRectangle(cornerRadius: 16, style: .continuous)
@@ -659,7 +665,7 @@ struct NotchHomeView: View {
             }
 
 
-            if appTheme.hasHomeScene {
+            if appTheme.reservesHomeArtworkSpace {
                 // Seasonal scenery belongs to the single shared background.
                 // Keep content to its left without placing a second photo here.
                 Color.clear
@@ -676,12 +682,20 @@ struct NotchHomeView: View {
 
     @ViewBuilder private func homeWidget(_ widget: HomeWidget) -> some View {
         switch widget {
-        case .music: MusicPlayerView(albumArtNamespace: albumArtNamespace)
+        case .music:
+            MusicPlayerView(albumArtNamespace: albumArtNamespace)
+                .frame(height: 130)
+                .homeTileSurface()
         case .calendar:
-            CalendarView().frame(width: (shouldShowCamera || visibleWidgets.contains(.weather)) ? 190 : 215)
+            CalendarView()
+                .padding(.horizontal, 8)
+                .padding(.vertical, 5)
+                .frame(width: (shouldShowCamera || visibleWidgets.contains(.weather)) ? 190 : 215)
+                .homeTileSurface()
                 .onHover { vm.isHoveringCalendar = $0 }.environmentObject(vm)
         case .weather: HomeWeatherTile()
-        case .quickActions: QuickActionsHomeTile()
+        case .quickActions:
+            QuickActionsHomeTile().homeTileSurface()
         }
     }
 }
@@ -926,6 +940,7 @@ struct LightsaberSlider: View {
 }
 
 struct CustomSlider: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Binding var value: Double
     var range: ClosedRange<Double>
     var color: Color = .white
@@ -958,7 +973,8 @@ struct CustomSlider: View {
             .gesture(
                 DragGesture(minimumDistance: 0)
                     .onChanged { gesture in
-                        withAnimation {
+                        guard width.isFinite, width > 0, rangeSpan.isFinite, rangeSpan > 0 else { return }
+                        withAnimation(reduceMotion ? nil : .default) {
                             dragging = true
                         }
                         let newValue = range.lowerBound + Double(gesture.location.x / width) * rangeSpan
@@ -971,18 +987,33 @@ struct CustomSlider: View {
                         lastDragged = Date()
                     }
             )
-            .animation(.spring(response: 0.35, dampingFraction: 0.7), value: dragging)
+            .animation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.7), value: dragging)
+            .focusable(rangeSpan.isFinite && rangeSpan > 0)
+            .onMoveCommand { direction in
+                switch direction {
+                case .left, .down: adjust(incrementing: false)
+                case .right, .up: adjust(incrementing: true)
+                default: break
+                }
+            }
             .accessibilityElement(children: .ignore)
             .accessibilityAdjustableAction { direction in
-                let step = rangeSpan <= 1 ? 0.05 : 5.0
                 switch direction {
-                case .increment: value = min(range.upperBound, value + step)
-                case .decrement: value = max(range.lowerBound, value - step)
+                case .increment: adjust(incrementing: true)
+                case .decrement: adjust(incrementing: false)
                 @unknown default: return
                 }
-                lastDragged = Date()
-                onValueChange?(value)
             }
         }
+    }
+
+    private func adjust(incrementing: Bool) {
+        let span = range.upperBound - range.lowerBound
+        guard span.isFinite, span > 0 else { return }
+        let step = span <= 1 ? 0.05 : 5.0
+        let current = value.isFinite ? value : range.lowerBound
+        value = min(range.upperBound, max(range.lowerBound, current + (incrementing ? step : -step)))
+        lastDragged = Date()
+        onValueChange?(value)
     }
 }

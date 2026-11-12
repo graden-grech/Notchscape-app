@@ -16,25 +16,49 @@ import SwiftUI
 import SwiftUIIntrospect
 
 struct SettingsView: View {
-    @State private var selectedTab = "General"
+    @ObservedObject private var navigation = NotchSettingsNavigation.shared
+    private var selectedTab: String {
+        get { navigation.selection }
+        nonmutating set { navigation.select(newValue) }
+    }
     @State private var search = ""
+    private var isSearching: Bool { !search.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
     private var destinations: [NotchSettingsDestination] {
-        NotchSettingsDestination.all.filter { ($0.id != "Account" || AccountFeaturePolicy.enabled) && $0.matches(search) }
+        NotchSettingsDestination.destinations(matching: search, accountsEnabled: AccountFeaturePolicy.enabled)
+            .filter { $0.id != "FaceUnlock" || FaceUnlockManager.featureEnabled }
+    }
+    private var sidebarSelection: Binding<String> {
+        Binding(get: {
+            isSearching ? selectedTab : NotchSettingsDestination.parentID(for: selectedTab)
+        }, set: { section in
+            selectedTab = section
+            // Navigate to the leaf before restoring its parent row. Clearing
+            // search must not redirect an activated child to that parent.
+            if isSearching { search = "" }
+        })
+    }
+    private var activeParent: NotchSettingsDestination? {
+        let id = NotchSettingsDestination.parentID(for: selectedTab)
+        return id == selectedTab ? nil : NotchSettingsDestination.all.first { $0.id == id }
     }
     private func sidebarColor(_ name: String) -> Color {
+        if ThemeChromePolicy.sidebarUsesThemeAccent(themeID: appTheme.rawValue, alwaysMulticolor: settingsSidebarAlwaysMulticolor) {
+            return currentAccent
+        }
         switch name {
-        case "blue": .blue
-        case "indigo": .indigo
-        case "pink": .pink
-        case "red": .red
-        case "cyan": .cyan
-        case "purple": .purple
-        case "green": .green
-        case "orange": .orange
-        default: .gray
+        case "blue": return .blue
+        case "indigo": return .indigo
+        case "pink": return .pink
+        case "red": return .red
+        case "cyan": return .cyan
+        case "purple": return .purple
+        case "green": return .green
+        case "orange": return .orange
+        default: return .gray
         }
     }
     @Default(.appTheme) private var appTheme
+    @Default(.settingsSidebarAlwaysMulticolor) private var settingsSidebarAlwaysMulticolor
     @Default(.useCustomAccentColor) private var useCustomAccentColor
     @Default(.customAccentColorData) private var customAccentColorData
     @ObservedObject private var performance = AppPerformanceManager.shared
@@ -52,10 +76,11 @@ struct SettingsView: View {
 
     var body: some View {
         NavigationSplitView {
-            List(selection: $selectedTab) {
+            List(selection: sidebarSelection) {
                 ForEach(destinations) { destination in
                     NavigationLink(value: destination.id) {
-                        SettingsSidebarItem(destination.title, symbol: destination.symbol, color: sidebarColor(destination.color))
+                        SettingsSidebarItem(destination.title, symbol: destination.symbol, color: sidebarColor(destination.color),
+                                            breadcrumb: isSearching ? destination.parentTitle : nil)
                     }
                 }
             }
@@ -66,13 +91,19 @@ struct SettingsView: View {
             }
             .listStyle(SidebarListStyle())
             .tint(currentAccent)
-            .toolbar(removing: .sidebarToggle)
             .navigationSplitViewColumnWidth(min: 210, ideal: 220, max: 250)
         } detail: {
-            Group {
+            VStack(spacing: 0) {
+                ChristmasSettingsTrim(themeID: appTheme.rawValue, accent: currentAccent)
+                    .padding(.horizontal, 24)
+                Group {
                 switch selectedTab {
                 case "General":
                     GeneralSettings()
+                case "Store":
+                    AddOnStoreView()
+                case "Dock":
+                    DockWorkspaceSettings()
                 case "Modes":
                     WorkspaceModesSettings()
                 case "Account":
@@ -82,7 +113,17 @@ struct SettingsView: View {
                         GeneralSettings()
                     }
                 case "Appearance":
-                    Appearance()
+                    AppearanceOverview()
+                case "Themes":
+                    Appearance(page: .themes)
+                case "HomeLayout":
+                    Appearance(page: .home)
+                case "AppIcon":
+                    Appearance(page: .icon)
+                case "Effects":
+                    Appearance(page: .effects)
+                case "MediaAppearance":
+                    Appearance(page: .media)
                 case "Media":
                     Media()
                 case "Calendar":
@@ -113,25 +154,35 @@ struct SettingsView: View {
                     GeneralSettings()
                 case "Advanced":
                     Advanced()
+                case "FaceUnlock":
+                    FaceUnlockSettingsView(embedded: true)
                 case "About":
                     About(updaterController: updaterController)
                 default:
                     GeneralSettings()
                 }
+                }
             }
             .navigationTitle(NotchSettingsDestination.all.first(where: { $0.id == selectedTab })?.title ?? "Settings")
+            .toolbar {
+                if let parent = activeParent {
+                    ToolbarItem(placement: .navigation) {
+                        Button { selectedTab = parent.id } label: { Label(parent.title, systemImage: "chevron.backward") }
+                    }
+                }
+            }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .scrollContentBackground(.hidden)
             .background(Color.clear)
         }
         .navigationSplitViewStyle(.balanced)
-        .searchable(text: $search, prompt: "Search Settings")
-        .toolbar(removing: .sidebarToggle)
+        .searchable(text: $search, placement: .sidebar, prompt: "Search Settings")
         .formStyle(.grouped)
         .toggleStyle(CompactSwitchToggleStyle())
         .controlSize(.regular)
         .frame(minWidth: 760, idealWidth: 840, maxWidth: .infinity, minHeight: 560, maxHeight: .infinity)
-        .background(LiquidGlassSettingsBackground())
+        .background(ThemeSettingsBackground(accent: currentAccent, isThemed: appTheme != .system))
+        .accentColor(currentAccent)
         .tint(currentAccent)
         .onReceive(NotificationCenter.default.publisher(for: .notchSettingsSectionRequested)) { notification in
             if let section = notification.object as? String,
@@ -147,14 +198,70 @@ private struct SettingsSidebarItem: View {
     let title: String
     let symbol: String
     let color: Color
-    init(_ title: String, symbol: String, color: Color) { self.title = title; self.symbol = symbol; self.color = color }
+    let breadcrumb: String?
+    init(_ title: String, symbol: String, color: Color, breadcrumb: String? = nil) {
+        self.title = title; self.symbol = symbol; self.color = color; self.breadcrumb = breadcrumb
+    }
     var body: some View {
         HStack(spacing: 9) {
             Image(systemName: symbol).font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(.white).frame(width: 22, height: 22)
                 .background(color.gradient, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
-            Text(title).font(.body).foregroundStyle(.primary)
-        }.padding(.vertical, 1)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).font(.body).foregroundStyle(.primary)
+                if let breadcrumb { Text(breadcrumb).font(.caption).foregroundStyle(.secondary) }
+            }
+        }
+        .padding(.vertical, 1)
+        .accessibilityElement(children: .combine)
+    }
+}
+
+private struct SettingsSubpageButtonStyle: ButtonStyle {
+    @State private var isHovered = false
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .frame(minHeight: 44)
+            .padding(.horizontal, 8)
+            .background(Color.primary.opacity(configuration.isPressed ? 0.10 : isHovered ? 0.05 : 0),
+                        in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .contentShape(Rectangle())
+            .onHover { isHovered = $0 }
+    }
+}
+
+struct SettingsSubpageLink: View {
+    let destinationID: String
+    var subtitle: String? = nil
+    var body: some View {
+        if let destination = NotchSettingsDestination.all.first(where: { $0.id == destinationID }) {
+            Button {
+                NotificationCenter.default.post(name: .notchSettingsSectionRequested, object: destination.id)
+            } label: {
+                HStack {
+                    Image(systemName: destination.symbol)
+                        .foregroundStyle(Color.effectiveAccent)
+                        .frame(width: 22)
+                        .accessibilityHidden(true)
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(destination.title)
+                        if let subtitle {
+                            Text(subtitle).font(.callout).foregroundStyle(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                    .padding(.vertical, subtitle == nil ? 0 : 3)
+                    Spacer(minLength: 8)
+                    Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(.tertiary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(SettingsSubpageButtonStyle())
+            .accessibilityElement(children: .combine)
+            .accessibilityHint("Open \(destination.title) settings")
+        }
     }
 }
 
@@ -164,9 +271,13 @@ struct SystemSettings: View {
 
     var body: some View {
         Form {
+            Section("System Controls") {
+                SettingsSubpageLink(destinationID: "Battery")
+                SettingsSubpageLink(destinationID: "HUD")
+            }
             Section {
                 Toggle("Show System tab in the notch", isOn: $systemDashboardEnabled)
-                LabeledContent("Sampling", value: "Only while the tab is visible")
+                LabeledContent("Sampling", value: "While this tab or a menu bar module is visible")
                 LabeledContent("Refresh rate", value: performance.lowImpact ? "Every 3 seconds" : "Every 1.5 seconds")
             } header: {
                 Text("System Dashboard")
@@ -183,12 +294,12 @@ struct SystemSettings: View {
 
             Section("Privacy and efficiency") {
                 Label("No performance data leaves your Mac", systemImage: "lock.shield.fill")
-                Text("The sampler stops as soon as you leave the System tab, keeping background CPU use close to zero.")
+                Text("The System tab and optional menu bar metrics share one sampler. It stops when neither needs readings, and pauses while locked, asleep or presenting.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
         }
-        .navigationTitle("System")
+        .navigationTitle("System & Power")
         .accentColor(.effectiveAccent)
     }
 }
@@ -223,10 +334,11 @@ struct GeneralSettings: View {
                 Button("Take the Settings Tour…", systemImage: "map") {
                     SettingsTourWindowController.shared.show()
                 }
-                Text("Six short chapters explain the settings. Skip at any time; taking the tour doesn't change your choices.")
+                Text("A quick guide to making Notchscape yours. Skip any time.")
                     .font(.caption).foregroundStyle(.secondary)
             }
             PerformanceSettingsSection()
+            MenuBarModuleSettingsSection()
             Section {
                 Toggle(isOn: Binding(
                     get: { Defaults[.menubarIcon] },
@@ -238,7 +350,7 @@ struct GeneralSettings: View {
                 Defaults.Toggle(key: .showDockIcon) {
                     Text("Show Dock icon")
                 }
-                Text("Hides the running app from the Dock and Command-Tab. Settings remain available from the notch or menu bar. A pinned or recent Dock shortcut may remain; right-click it and choose Options → Remove from Dock once.")
+                Text("When hidden, open Settings from the notch or menu bar. You can remove any pinned Dock shortcut separately.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 LaunchAtLogin.Toggle("Launch at login")
@@ -365,10 +477,13 @@ struct GeneralSettings: View {
                 }
                 .disabled(!showOnExternalDisplays)
                 .opacity(showOnExternalDisplays ? 1 : 0.42)
+                Button("Display Compatibility Preview…", systemImage: "display") {
+                    DisplayCompatibilityWindowController.shared.show()
+                }
             } header: {
                 Text("Display style and sizing")
             } footer: {
-                Text("Turning external displays off keeps the built-in display available, if connected. Dynamic Island stays inside the menu bar; Notch attaches to the top edge. This display choice stays on this Mac and is not synced to your account.")
+                Text("Choose where Notchscape appears. Dynamic Island fits inside the menu bar; Notch attaches to the top edge. Display choices stay on this Mac.")
             }
 
             NotchBehaviour()
@@ -392,8 +507,6 @@ struct GeneralSettings: View {
             }
                 .disabled(!openNotchOnHover)
             if enableGestures {
-                Toggle("Change media with horizontal gestures", isOn: .constant(false))
-                    .disabled(true)
                 Defaults.Toggle(key: .closeGestureEnabled) {
                     Text("Close gesture")
                 }
@@ -631,7 +744,7 @@ struct HUD: View {
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     Spacer(minLength: 40)
-                    Defaults.Toggle("", key: .hudReplacement)
+                    Defaults.Toggle("Replace system HUD", key: .hudReplacement)
                     .labelsHidden()
                     .toggleStyle(.switch)
                     .controlSize(.small)
@@ -814,6 +927,9 @@ struct Media: View {
 
     var body: some View {
         Form {
+            Section {
+                SettingsSubpageLink(destinationID: "MediaAppearance")
+            }
             Section {
                 Picker("Music Source", selection: $mediaController) {
                     ForEach(availableMediaControllers) { controller in
@@ -1107,6 +1223,10 @@ struct ActivitySettings: View {
 
     var body: some View {
         Form {
+            Section("Customize Activities") {
+                SettingsSubpageLink(destinationID: "Agents")
+                SettingsSubpageLink(destinationID: "Sports")
+            }
             Section {
                 Toggle("Show Live Activities", isOn: $liveActivitiesEnabled)
             } footer: {
@@ -1133,11 +1253,13 @@ struct ActivitySettings: View {
                 Toggle("Timers", isOn: $timerActivitiesEnabled)
                 Toggle("Sports scores", isOn: $sportsActivitiesEnabled)
                 Toggle("Downloads folder progress", isOn: $enableDownloadListener)
-                ForEach(downloads.folders) { folder in
-                    HStack { Label(folder.name, systemImage: "folder"); Spacer(); Button("Remove") { downloads.removeFolder(folder.id) } }
+                DisclosureGroup("Watched Download Folders") {
+                    ForEach(downloads.folders) { folder in
+                        HStack { Label(folder.name, systemImage: "folder"); Spacer(); Button("Remove") { downloads.removeFolder(folder.id) } }
+                    }
+                    Button("Add Watched Folder…") { downloads.chooseFolder() }.disabled(!enableDownloadListener || downloads.folders.count >= 8)
+                    Text("Downloads plus up to eight chosen folders. Paused when locked or presenting.").font(.caption).foregroundStyle(.secondary)
                 }
-                Button("Add Watched Folder…") { downloads.chooseFolder() }.disabled(!enableDownloadListener || downloads.folders.count >= 8)
-                Text("Downloads plus up to eight chosen folders. Top-level entries only; filesystem events while idle and bounded scans while downloading. Paused when locked or presenting.").font(.caption).foregroundStyle(.secondary)
                 if let error = downloads.folderError { Text(error).font(.caption).foregroundStyle(.orange) }
                 if privacy.microphoneInUse || privacy.cameraInUse {
                     Label(
@@ -1271,10 +1393,11 @@ struct SportsSettings: View {
     @State private var teamSearch = ""
 
     private var filteredTeams: [SportsDirectoryTeam] {
-        guard !teamSearch.isEmpty else { return sports.availableTeams }
+        let query = teamSearch.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else { return sports.availableTeams }
         return sports.availableTeams.filter {
-            $0.name.localizedCaseInsensitiveContains(teamSearch)
-                || $0.abbreviation.localizedCaseInsensitiveContains(teamSearch)
+            $0.name.localizedStandardContains(query)
+                || $0.abbreviation.localizedStandardContains(query)
         }
     }
 
@@ -1290,49 +1413,75 @@ struct SportsSettings: View {
                 Text("Your favorite games appear beside the notch. Score changes briefly drop down underneath it, similar to Apple Sports.")
             }
 
-            Section("Leagues") {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(SportsLeague.allCases) { league in
-                            let selected = enabledLeagues.contains(league)
-                            Button {
-                                if selected {
-                                    enabledLeagues.remove(league)
-                                } else {
-                                    enabledLeagues.insert(league)
+            Section {
+                if favoriteTeams.isEmpty {
+                    Label("No favorite teams yet", systemImage: "star")
+                        .foregroundStyle(.secondary)
+                    Text("Choose a league below, then select a team to add it here.")
+                        .font(.caption).foregroundStyle(.secondary)
+                } else {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 210), spacing: 8)], spacing: 8) {
+                        ForEach(favoriteTeams.sorted(), id: \.self) { key in
+                            if let team = sports.knownTeams[key] {
+                                favoriteTeamButton(team)
+                            } else {
+                                HStack {
+                                    Label(savedTeamPlaceholder(key), systemImage: "star.fill")
+                                        .font(.callout).foregroundStyle(.secondary)
+                                    Spacer()
+                                    Button("Remove", systemImage: "minus.circle") {
+                                        favoriteTeams.remove(key); sports.configurationChanged()
+                                    }
+                                    .labelStyle(.iconOnly).buttonStyle(.borderless)
+                                    .accessibilityLabel("Remove saved team")
                                 }
-                                sports.configurationChanged()
-                            } label: {
-                                Label(league.title, systemImage: selected ? "checkmark.circle.fill" : league.symbol)
-                                    .font(.callout.weight(.semibold))
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 8)
-                                    .foregroundStyle(selected ? .white : .primary)
-                                    .background(
-                                        selected ? Color.accentColor : Color.secondary.opacity(0.12),
-                                        in: Capsule()
-                                    )
                             }
-                            .buttonStyle(.plain)
                         }
                     }
-                    .padding(.vertical, 2)
                 }
+            } header: {
+                Text("Your Teams · \(favoriteTeams.count)")
+            } footer: {
+                Text("Favorites from every league stay together here. Select a filled star to remove a team. You can choose teams while Live Activities are off.")
+            }
+
+            Section("Leagues") {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 8)], spacing: 8) {
+                    ForEach(SportsLeague.allCases) { league in
+                        let selected = enabledLeagues.contains(league)
+                        Button {
+                            if selected {
+                                enabledLeagues.remove(league)
+                            } else {
+                                enabledLeagues.insert(league)
+                            }
+                            sports.configurationChanged()
+                        } label: {
+                            Label(league.title, systemImage: selected ? "checkmark.circle.fill" : league.symbol)
+                                .font(.callout)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                        .tint(selected ? .accentColor : .secondary)
+                        .accessibilityValue(selected ? "Followed" : "Not followed")
+                    }
+                }
+                .padding(.vertical, 2)
 
                 Text("Choose every league you want followed. At least one league is recommended.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-            .disabled(!sportsActivitiesEnabled)
 
             Section {
-                Picker("Browse", selection: $browsingLeague) {
+                Picker("League", selection: $browsingLeague) {
                     ForEach(SportsLeague.allCases) { league in
                         Text(league.title).tag(league)
                     }
                 }
 
-                TextField("Search teams", text: $teamSearch)
+                TextField("Search \(browsingLeague.title) teams", text: $teamSearch)
                     .textFieldStyle(.roundedBorder)
 
                 if sports.isLoadingTeams {
@@ -1350,6 +1499,11 @@ struct SportsSettings: View {
                         description: Text(message)
                     )
                     .frame(height: 130)
+                    Button("Try Again") { Task { await sports.loadTeams(for: browsingLeague) } }
+                } else if filteredTeams.isEmpty {
+                    ContentUnavailableView("No Matching Teams", systemImage: "magnifyingglass",
+                        description: Text("Try a city, team name or abbreviation in \(browsingLeague.title)."))
+                        .frame(height: 130)
                 } else {
                     ScrollView {
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 210), spacing: 8)], spacing: 8) {
@@ -1363,7 +1517,7 @@ struct SportsSettings: View {
                 }
             } header: {
                 HStack {
-                    Text("Favorite teams")
+                    Text("Add Teams")
                     Spacer()
                     if !favoriteTeams.isEmpty {
                         Text("\(favoriteTeams.count) selected")
@@ -1372,9 +1526,8 @@ struct SportsSettings: View {
                     }
                 }
             } footer: {
-                Text("Tap the star beside any team. When a favorite is playing, its game takes priority over other scores.")
+                Text("Select any team to favorite it. Its league is followed automatically, and its games take priority over other scores.")
             }
-            .disabled(!sportsActivitiesEnabled)
 
             Section("Current activity") {
                 if let game = sports.currentGame {
@@ -1413,16 +1566,23 @@ struct SportsSettings: View {
         .navigationTitle("Sports")
         .accentColor(.effectiveAccent)
         .onAppear {
-            if let first = enabledLeagues.first { browsingLeague = first }
+            if let first = SportsLeague.allCases.first(where: { enabledLeagues.contains($0) }) { browsingLeague = first }
             sports.start()
-            Task { await sports.loadTeams(for: browsingLeague) }
+        }
+        .task(id: browsingLeague) {
+            await sports.loadTeams(for: browsingLeague)
+            await sports.loadFavoriteTeamDetails()
         }
         .onChange(of: sportsActivitiesEnabled) { _, _ in sports.configurationChanged() }
         .onChange(of: showUpcoming) { _, _ in sports.configurationChanged() }
-        .onChange(of: browsingLeague) { _, league in
+        .onChange(of: browsingLeague) { _, _ in
             teamSearch = ""
-            Task { await sports.loadTeams(for: league) }
         }
+    }
+
+    private func savedTeamPlaceholder(_ key: String) -> String {
+        let rawLeague = String(key.split(separator: ":", maxSplits: 1).first ?? "")
+        return "Saved \(SportsLeague(rawValue: rawLeague)?.title ?? "sports") team"
     }
 
     @ViewBuilder
@@ -1450,13 +1610,15 @@ struct SportsSettings: View {
                             .foregroundStyle(.secondary)
                     }
                 }
-                .frame(width: 30, height: 30)
+                .frame(width: 26, height: 26)
+                .padding(3)
+                .background(.white.opacity(0.9), in: RoundedRectangle(cornerRadius: 7, style: .continuous))
 
                 VStack(alignment: .leading, spacing: 1) {
                     Text(team.name)
                         .font(.callout.weight(.medium))
                         .lineLimit(1)
-                    Text(team.abbreviation)
+                    Text("\(team.league.title) · \(team.abbreviation)")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
@@ -1479,6 +1641,9 @@ struct SportsSettings: View {
             }
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("\(team.name), \(team.league.title)")
+        .accessibilityValue(selected ? "Favorite" : "Not a favorite")
+        .accessibilityHint(selected ? "Remove from your teams" : "Add to your teams")
     }
 }
 
@@ -2015,6 +2180,7 @@ private struct SeasonalIconPicker: View {
                     VStack(spacing: 6) {
                         Image(icon.assetName).resizable().scaledToFit()
                             .frame(width: 64, height: 64)
+                            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                         Text(icon.pickerTitle).font(.caption)
                             .multilineTextAlignment(.center)
                             .lineLimit(2, reservesSpace: true)
@@ -2103,6 +2269,7 @@ private struct ThemeAccentPicker: View {
 }
 
 struct Appearance: View {
+    let page: AppearancePage
     @ObservedObject var coordinator = NotchscapeCoordinator.shared
     @ObservedObject private var performance = AppPerformanceManager.shared
     @Default(.mirrorShape) var mirrorShape
@@ -2145,305 +2312,348 @@ struct Appearance: View {
 
     var body: some View {
         Form {
-            Section {
-                Toggle("Always show tabs", isOn: $coordinator.alwaysShowTabs)
-                Defaults.Toggle(key: .settingsIconInNotch) {
-                    Text("Show settings icon in notch")
-                }
-
-            } header: {
-                Text("General")
+            switch page {
+            case .themes: themeSettings
+            case .home: homeSettings
+            case .icon: iconSettings
+            case .effects: effectsSettings
+            case .media: mediaSettings
             }
+        }
+        .tint(.effectiveAccent)
+        .navigationTitle(page.rawValue)
+    }
 
-            Section {
-                LazyVGrid(columns: [GridItem(.flexible(), alignment: .top), GridItem(.flexible(), alignment: .top)], spacing: 14) {
-                    ForEach(AppTheme.pickerThemes) { theme in
-                        Button {
-                            let selectedTheme = previewTheme(for: theme)
-                            if let current = appTheme.whiteHouseVariant { whiteHousePreferredVariant = current }
-                            if let current = appTheme.cityscapeScene { cityscapePreferredScene = current }
-                            withAnimation(performance.suppressAnimations ? nil : .smooth(duration: 0.22)) {
-                                Defaults[.automaticSeasonalThemes] = false
-                                appTheme = selectedTheme
-                                if appIconFollowsTheme {
-                                    appIconVariant = selectedTheme.matchingIcon
-                                }
-                            }
-                            if appIconFollowsTheme { selectedTheme.matchingIcon.apply() }
-                            if theme.isStarWars { starWarsSettingsPresented = true }
-                            if theme.isWhiteHouse { whiteHouseSettingsPresented = true }
-                            if theme.isCityscape { cityscapeSettingsPresented = true }
-                        } label: {
-                            ThemePreviewCard(theme: previewTheme(for: theme), selected: isSelected(theme))
-                        }
-                        .buttonStyle(.plain)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                        .accessibilityLabel(theme.pickerTitle + " theme")
-                        .accessibilityHint(theme.isWhiteHouse ? "Choose neutral, Republican or Democrat décor, four rooms or views, and optional Christmas decorations." : theme.isCityscape ? "Choose from twelve city views in navy and warm light." : theme.isStarWars ? "Choose Jedi, Dark Side, or a character, and customize your lightsaber music bar." : "Apply this theme")
-                        .accessibilityAddTraits(isSelected(theme) ? [.isSelected] : [])
-                    }
-                }
-            } header: {
-                Text("Menu theme")
-            } footer: {
-                Text("Preview Home’s scenes and six quiet, scalable palette themes. White House opens its own room and accent choices. Cityscapes opens twelve city views. Star Wars opens Jedi, Dark Side, and Characters. Winter has no holiday decorations.")
-            }
-            .sheet(isPresented: $starWarsSettingsPresented) { StarWarsThemeSettingsView() }
-            .sheet(isPresented: $whiteHouseSettingsPresented) { WhiteHouseThemeSettingsView() }
-            .sheet(isPresented: $cityscapeSettingsPresented) { CityscapeThemeSettingsView() }
-
-            Section {
-                Defaults.Toggle("Quiet scene detail", key: .themeDetailsEnabled)
-                Text("Adds a small, static motif to the six palette themes. Off by default; no animation, particles, audio, or background work. Low-impact mode hides the extra detail.")
-                    .font(.caption).foregroundStyle(.secondary)
-            } header: { Text("Scene Detail") }
-
-            AppearanceRecipesView()
-
-            Section("App icon") {
-                SeasonalIconPicker()
-            }
-
-            Section("Seasonal switching") {
-                SeasonalThemeSettings()
-            }
-
-            Section("Accent color") {
-                ThemeAccentPicker()
-            }
-
-            Section("Home layout") {
-                HomeLayoutSettings()
-            }
-
-            Section("Quick Actions") {
-                QuickActionsSettings()
-            }
-
-            Section {
-                Defaults.Toggle(key: .coloredSpectrogram) {
-                    Text("Colored spectrogram")
-                }
-                Defaults
-                    .Toggle("Player tinting", key: .playerColorTinting)
-                Defaults.Toggle(key: .lightingEffect) {
-                    Text("Enable blur effect behind album art")
-                }
-                Picker("Slider color", selection: $sliderColor) {
-                    ForEach(SliderColorEnum.allCases, id: \.self) { option in
-                        Text(option.rawValue)
-                    }
-                }
-            } header: {
-                Text("Media")
-            }
-
-            Section {
-                Toggle(
-                    "Use music visualizer spectrogram",
-                    isOn: $useMusicVisualizer.animation()
-                )
-                .disabled(true)
-                if !useMusicVisualizer {
-                    if customVisualizers.count > 0 {
-                        Picker(
-                            "Selected animation",
-                            selection: $selectedVisualizer
-                        ) {
-                            ForEach(
-                                customVisualizers,
-                                id: \.self
-                            ) { visualizer in
-                                Text(visualizer.name)
-                                    .tag(visualizer)
+    @ViewBuilder private var themeSettings: some View {
+        Section {
+            LazyVGrid(columns: [GridItem(.flexible(), alignment: .top), GridItem(.flexible(), alignment: .top)], spacing: 14) {
+                ForEach(AppTheme.pickerThemes) { theme in
+                    Button {
+                        let selectedTheme = previewTheme(for: theme)
+                        if let current = appTheme.whiteHouseVariant { whiteHousePreferredVariant = current }
+                        if let current = appTheme.cityscapeScene { cityscapePreferredScene = current }
+                        withAnimation(performance.suppressAnimations ? nil : .smooth(duration: 0.22)) {
+                            Defaults[.automaticSeasonalThemes] = false
+                            appTheme = selectedTheme
+                            if appIconFollowsTheme {
+                                appIconVariant = selectedTheme.matchingIcon
                             }
                         }
-                    } else {
-                        HStack {
-                            Text("Selected animation")
-                            Spacer()
-                            Text("No custom animation available")
-                                .foregroundStyle(.secondary)
-                        }
+                        if appIconFollowsTheme { selectedTheme.matchingIcon.apply() }
+                        if theme.isStarWars { starWarsSettingsPresented = true }
+                        if theme.isWhiteHouse { whiteHouseSettingsPresented = true }
+                        if theme.isCityscape { cityscapeSettingsPresented = true }
+                    } label: {
+                        ThemePreviewCard(theme: previewTheme(for: theme), selected: isSelected(theme))
                     }
-                }
-            } header: {
-                HStack {
-                    Text("Custom music live activity animation")
-                    customBadge(text: "Coming soon")
+                    .buttonStyle(.plain)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                    .accessibilityLabel(theme.pickerTitle + " theme")
+                    .accessibilityHint(theme.isWhiteHouse ? "Choose neutral, Republican or Democrat décor, four rooms or views, and optional Christmas decorations." : theme.isCityscape ? "Browse cities and historic landmarks, including Washington, D.C., in navy and warm light." : theme.isStarWars ? "Choose Jedi, Dark Side, or a character, and customize your lightsaber music bar." : "Apply this theme")
+                    .accessibilityAddTraits(isSelected(theme) ? [.isSelected] : [])
                 }
             }
+        } header: {
+            Text("Menu theme")
+        } footer: {
+            Text("Themes carry across every expanded menu. White House opens room and accent choices. Cities & Landmarks opens city views and historic places. Star Wars opens Jedi, Dark Side, and Characters. Winter has no holiday decorations.")
+        }
+        .sheet(isPresented: $starWarsSettingsPresented) { StarWarsThemeSettingsView() }
+        .sheet(isPresented: $whiteHouseSettingsPresented) { WhiteHouseThemeSettingsView() }
+        .sheet(isPresented: $cityscapeSettingsPresented) { CityscapeThemeSettingsView() }
 
-            Section {
-                List {
-                    ForEach(customVisualizers, id: \.self) { visualizer in
-                        HStack {
-                            LottieView(
-                                url: visualizer.url, speed: visualizer.speed,
-                                loopMode: .loop
-                            )
-                            .frame(width: 30, height: 30, alignment: .center)
+        AppearanceRecipesView()
+
+        Section("Seasonal switching") {
+            SeasonalThemeSettings()
+        }
+
+        Section("Accent color") {
+            ThemeAccentPicker()
+        }
+
+        Section {
+            Defaults.Toggle("Always use multicolor sidebar icons", key: .settingsSidebarAlwaysMulticolor)
+            Text("When off, Settings icons match your current theme accent, including a custom color. The System theme always keeps its original multicolor icons.")
+                .font(.caption).foregroundStyle(.secondary)
+        } header: { Text("Settings sidebar") }
+
+    }
+
+    @ViewBuilder private var homeSettings: some View {
+        Section("Tile appearance") {
+            HomeTileAppearanceSettings()
+        }
+        Section("Home layout") {
+            HomeLayoutSettings()
+        }
+
+        Section("Quick Actions") {
+            QuickActionsSettings()
+        }
+
+        Section("Home & Weather") {
+            SettingsSubpageLink(destinationID: "Weather")
+        }
+        Section {
+            Toggle("Always show tabs", isOn: $coordinator.alwaysShowTabs)
+            Defaults.Toggle(key: .settingsIconInNotch) {
+                Text("Show settings icon in notch")
+            }
+
+        } header: {
+            Text("General")
+        }
+
+    }
+
+    @ViewBuilder private var iconSettings: some View {
+        Section("App icon") {
+            SeasonalIconPicker()
+        }
+
+    }
+
+    @ViewBuilder private var effectsSettings: some View {
+        DesktopSnowSettings()
+        Section {
+            Defaults.Toggle("Quiet scene detail", key: .themeDetailsEnabled)
+            Text("Adds a small, static motif to the six palette themes. Off by default; no animation, particles, audio, or background work. Low-impact mode hides the extra detail.")
+                .font(.caption).foregroundStyle(.secondary)
+        } header: { Text("Scene Detail") }
+
+        Section {
+            Defaults.Toggle(key: .showMirror) {
+                Text("Enable mirror")
+            }
+                .disabled(!checkVideoInput())
+            Picker("Mirror shape", selection: $mirrorShape) {
+                ForEach(
+                    [MirrorShapeEnum.circle, .rectangle, .roundedRectangle, .squircle, .capsule],
+                    id: \.rawValue
+                ) { shape in
+                    Text(shape.rawValue).tag(shape)
+                }
+            }
+            Defaults.Toggle(key: .showNotHumanFace) {
+                Text("Show cool face animation while inactive")
+            }
+        } header: {
+            HStack {
+                Text("Additional features")
+            }
+        }
+    }
+
+    @ViewBuilder private var mediaSettings: some View {
+        Section {
+            Defaults.Toggle(key: .coloredSpectrogram) {
+                Text("Colored spectrogram")
+            }
+            Defaults
+                .Toggle("Player tinting", key: .playerColorTinting)
+            Defaults.Toggle(key: .lightingEffect) {
+                Text("Enable blur effect behind album art")
+            }
+            Picker("Slider color", selection: $sliderColor) {
+                ForEach(SliderColorEnum.allCases, id: \.self) { option in
+                    Text(option.rawValue)
+                }
+            }
+        } header: {
+            Text("Media")
+        }
+
+        Section {
+            Toggle(
+                "Use music visualizer spectrogram",
+                isOn: $useMusicVisualizer.animation()
+            )
+            .disabled(true)
+            if !useMusicVisualizer {
+                if customVisualizers.count > 0 {
+                    Picker(
+                        "Selected animation",
+                        selection: $selectedVisualizer
+                    ) {
+                        ForEach(
+                            customVisualizers,
+                            id: \.self
+                        ) { visualizer in
                             Text(visualizer.name)
-                            Spacer(minLength: 0)
-                            if selectedVisualizer == visualizer {
-                                Text("selected")
-                                    .font(.caption)
-                                    .fontWeight(.medium)
-                                    .foregroundStyle(.secondary)
-                                    .padding(.trailing, 8)
-                            }
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .padding(.vertical, 2)
-                        .background(
-                            selectedListVisualizer != nil
-                                ? selectedListVisualizer == visualizer
-                                    ? Color.effectiveAccent : Color.clear : Color.clear,
-                            in: RoundedRectangle(cornerRadius: 5)
-                        )
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            if selectedListVisualizer == visualizer {
-                                selectedListVisualizer = nil
-                                return
-                            }
-                            selectedListVisualizer = visualizer
+                                .tag(visualizer)
                         }
                     }
-                }
-                .safeAreaPadding(
-                    EdgeInsets(top: 5, leading: 0, bottom: 5, trailing: 0)
-                )
-                .frame(minHeight: 120)
-                .actionBar {
-                    HStack(spacing: 5) {
-                        Button {
-                            name = ""
-                            url = ""
-                            speed = 1.0
-                            isPresented.toggle()
-                        } label: {
-                            Image(systemName: "plus")
-                                .foregroundStyle(.secondary)
-                                .contentShape(Rectangle())
-                        }
-                        Divider()
-                        Button {
-                            if selectedListVisualizer != nil {
-                                let visualizer = selectedListVisualizer!
-                                selectedListVisualizer = nil
-                                customVisualizers.remove(
-                                    at: customVisualizers.firstIndex(of: visualizer)!)
-                                if visualizer == selectedVisualizer && customVisualizers.count > 0 {
-                                    selectedVisualizer = customVisualizers[0]
-                                }
-                            }
-                        } label: {
-                            Image(systemName: "minus")
-                                .foregroundStyle(.secondary)
-                                .contentShape(Rectangle())
-                        }
-                    }
-                }
-                .controlSize(.small)
-                .buttonStyle(PlainButtonStyle())
-                .overlay {
-                    if customVisualizers.isEmpty {
-                        Text("No custom visualizer")
-                            .foregroundStyle(Color(.secondaryLabelColor))
-                            .padding(.bottom, 22)
-                    }
-                }
-                .sheet(isPresented: $isPresented) {
-                    VStack(alignment: .leading) {
-                        Text("Add new visualizer")
-                            .font(.largeTitle.bold())
-                            .padding(.vertical)
-                        TextField("Name", text: $name)
-                        TextField("Lottie JSON URL", text: $url)
-                        HStack {
-                            Text("Speed")
-                            Spacer(minLength: 80)
-                            Text("\(speed, specifier: "%.1f")s")
-                                .multilineTextAlignment(.trailing)
-                                .foregroundStyle(.secondary)
-                            Slider(value: $speed, in: 0...2, step: 0.1)
-                        }
-                        .padding(.vertical)
-                        HStack {
-                            Button {
-                                isPresented.toggle()
-                            } label: {
-                                Text("Cancel")
-                                    .frame(maxWidth: .infinity, alignment: .center)
-                            }
-
-                            Button {
-                                let visualizer: CustomVisualizer = .init(
-                                    UUID: UUID(),
-                                    name: name,
-                                    url: URL(string: url)!,
-                                    speed: speed
-                                )
-
-                                if !customVisualizers.contains(visualizer) {
-                                    customVisualizers.append(visualizer)
-                                }
-
-                                isPresented.toggle()
-                            } label: {
-                                Text("Add")
-                                    .frame(maxWidth: .infinity, alignment: .center)
-                            }
-                            .buttonStyle(BorderedProminentButtonStyle())
-                        }
-                    }
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .controlSize(.extraLarge)
-                    .padding()
-                }
-            } header: {
-                HStack(spacing: 0) {
-                    Text("Custom vizualizers (Lottie)")
-                    if !Defaults[.customVisualizers].isEmpty {
-                        Text(" – \(Defaults[.customVisualizers].count)")
+                } else {
+                    HStack {
+                        Text("Selected animation")
+                        Spacer()
+                        Text("No custom animation available")
                             .foregroundStyle(.secondary)
                     }
                 }
             }
+        } header: {
+            HStack {
+                Text("Custom music live activity animation")
+                customBadge(text: "Coming soon")
+            }
+        }
 
-            Section {
-                Defaults.Toggle(key: .showMirror) {
-                    Text("Enable mirror")
-                }
-                    .disabled(!checkVideoInput())
-                Picker("Mirror shape", selection: $mirrorShape) {
-                    ForEach(
-                        [MirrorShapeEnum.circle, .rectangle, .roundedRectangle, .squircle, .capsule],
-                        id: \.rawValue
-                    ) { shape in
-                        Text(shape.rawValue).tag(shape)
+        Section {
+            List {
+                ForEach(customVisualizers, id: \.self) { visualizer in
+                    HStack {
+                        LottieView(
+                            url: visualizer.url, speed: visualizer.speed,
+                            loopMode: .loop
+                        )
+                        .frame(width: 30, height: 30, alignment: .center)
+                        Text(visualizer.name)
+                        Spacer(minLength: 0)
+                        if selectedVisualizer == visualizer {
+                            Text("selected")
+                                .font(.caption)
+                                .fontWeight(.medium)
+                                .foregroundStyle(.secondary)
+                                .padding(.trailing, 8)
+                        }
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .padding(.vertical, 2)
+                    .background(
+                        selectedListVisualizer != nil
+                            ? selectedListVisualizer == visualizer
+                                ? Color.effectiveAccent : Color.clear : Color.clear,
+                        in: RoundedRectangle(cornerRadius: 5)
+                    )
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        if selectedListVisualizer == visualizer {
+                            selectedListVisualizer = nil
+                            return
+                        }
+                        selectedListVisualizer = visualizer
                     }
                 }
-                Defaults.Toggle(key: .showNotHumanFace) {
-                    Text("Show cool face animation while inactive")
+            }
+            .safeAreaPadding(
+                EdgeInsets(top: 5, leading: 0, bottom: 5, trailing: 0)
+            )
+            .frame(minHeight: 120)
+            .actionBar {
+                HStack(spacing: 5) {
+                    Button {
+                        name = ""
+                        url = ""
+                        speed = 1.0
+                        isPresented.toggle()
+                    } label: {
+                        Image(systemName: "plus")
+                            .foregroundStyle(.secondary)
+                            .contentShape(Rectangle())
+                    }
+                    Divider()
+                    Button {
+                        guard let visualizer = selectedListVisualizer,
+                              let index = customVisualizers.firstIndex(of: visualizer) else { return }
+                        selectedListVisualizer = nil
+                        customVisualizers.remove(at: index)
+                        if visualizer == selectedVisualizer, let first = customVisualizers.first {
+                            selectedVisualizer = first
+                        }
+                    } label: {
+                        Image(systemName: "minus")
+                            .foregroundStyle(.secondary)
+                            .contentShape(Rectangle())
+                    }
                 }
-            } header: {
-                HStack {
-                    Text("Additional features")
+            }
+            .controlSize(.small)
+            .buttonStyle(PlainButtonStyle())
+            .overlay {
+                if customVisualizers.isEmpty {
+                    Text("No custom visualizer")
+                        .foregroundStyle(Color(.secondaryLabelColor))
+                        .padding(.bottom, 22)
+                }
+            }
+            .sheet(isPresented: $isPresented) {
+                VStack(alignment: .leading) {
+                    Text("Add Visualizer")
+                        .font(.title2.bold())
+                        .padding(.vertical)
+                    TextField("Name", text: $name)
+                    TextField("Lottie JSON URL", text: $url)
+                    HStack {
+                        Text("Speed")
+                        Spacer(minLength: 80)
+                        Text("\(speed, specifier: "%.1f")s")
+                            .multilineTextAlignment(.trailing)
+                            .foregroundStyle(.secondary)
+                        Slider(value: $speed, in: 0...2, step: 0.1)
+                    }
+                    .padding(.vertical)
+                    HStack {
+                        Button {
+                            isPresented.toggle()
+                        } label: {
+                            Text("Cancel")
+                                .frame(maxWidth: .infinity, alignment: .center)
+                        }
+
+                        Button {
+                            guard let validVisualizerURL else { return }
+                            let visualizer: CustomVisualizer = .init(
+                                UUID: UUID(),
+                                name: name,
+                                url: validVisualizerURL,
+                                speed: speed
+                            )
+
+                            if !customVisualizers.contains(visualizer) {
+                                customVisualizers.append(visualizer)
+                            }
+
+                            isPresented.toggle()
+                        } label: {
+                            Text("Add")
+                                .frame(maxWidth: .infinity, alignment: .center)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || validVisualizerURL == nil)
+                        .keyboardShortcut(.defaultAction)
+                    }
+                }
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .controlSize(.regular)
+                .padding(24)
+                .frame(minWidth: 360, idealWidth: 420)
+            }
+        } header: {
+            HStack(spacing: 0) {
+                Text("Custom visualizers (Lottie)")
+                if !Defaults[.customVisualizers].isEmpty {
+                    Text(" – \(Defaults[.customVisualizers].count)")
+                        .foregroundStyle(.secondary)
                 }
             }
         }
-        .accentColor(.effectiveAccent)
-        .navigationTitle("Appearance")
+
+    }
+
+
+    private var validVisualizerURL: URL? {
+        let input = url.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let candidate = URL(string: input),
+              ["https", "http"].contains(candidate.scheme?.lowercased() ?? ""),
+              let host = candidate.host, !host.isEmpty,
+              candidate.user == nil, candidate.password == nil else { return nil }
+        return candidate
     }
 
     func checkVideoInput() -> Bool {
-        if AVCaptureDevice.default(for: .video) != nil {
-            return true
-        }
-
-        return false
+        AVCaptureDevice.default(for: .video) != nil
     }
 }
 

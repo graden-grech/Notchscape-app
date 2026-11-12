@@ -19,6 +19,7 @@ class DistributionArchiveTests(unittest.TestCase):
         path = Path(directory.name) / "Notchscape.zip"
         info = dict(CFBundleName="Notchscape", CFBundleDisplayName="Notchscape",
                     CFBundleExecutable="Notchscape", NotchAccountsEnabled=False,
+                    NotchFaceUnlockEnabled=False,
                     LSMinimumSystemVersion="15.0",
                     NSCalendarsFullAccessUsageDescription="Show selected calendar events.",
                     NSRemindersFullAccessUsageDescription="Show selected reminders.",
@@ -74,6 +75,15 @@ class DistributionArchiveTests(unittest.TestCase):
     def test_accounts_cannot_slip_back_in(self):
         with self.assertRaises(ValueError):
             MODULE.validate_archive(self.fixture(NotchAccountsEnabled=True))
+
+    def test_public_download_cannot_enable_local_face_unlock(self):
+        with self.assertRaises(ValueError):
+            MODULE.validate_archive(self.fixture(NotchFaceUnlockEnabled=True))
+
+    def test_public_download_rejects_profiles_and_local_face_weights(self):
+        for resource in ("renamed.provisionprofile", "renamed.mobileprovision", "FaceModels/weights.bin"):
+            with self.subTest(resource=resource), self.assertRaises(ValueError):
+                MODULE.validate_archive(self.fixture(extra="Notchscape.app/Contents/Resources/" + resource))
 
     def test_other_update_server_fails(self):
         with self.assertRaises(ValueError):

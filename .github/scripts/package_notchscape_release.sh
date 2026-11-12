@@ -7,6 +7,7 @@ output="${3:?Usage: package_notchscape_release.sh candidate.app trusted.app outp
 task_repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 archive="$output/Notchscape.zip"
 [[ ! -e "$archive" ]] || { echo 'FAIL: never overwrite an existing release archive' >&2; exit 1; }
+python3 "$task_repo_root/.github/scripts/face_vault_signing.py" --public-release-app "$candidate"
 bash "$task_repo_root/.github/scripts/verify_custom_app_branding.sh" "$candidate" "$task_repo_root/Notchscape/Info.plist"
 bash "$task_repo_root/.github/scripts/verify_custom_app_identity.sh" "$candidate" "$previous"
 python3 "$task_repo_root/.github/scripts/verify_public_feature_flags.py" "$candidate/Contents/Info.plist"

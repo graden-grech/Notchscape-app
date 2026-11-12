@@ -48,7 +48,7 @@ struct WorkspaceToolsView: View {
                     if let error = tools.error { Text(error).font(.caption).foregroundStyle(.orange).padding(8) }
                 }
             }
-        }.controlSize(.small).toggleStyle(CompactSwitchToggleStyle()).task { await tools.load() }
+        }.controlSize(.regular).toggleStyle(CompactSwitchToggleStyle()).task { await tools.load() }
             .onDisappear { Task { await tools.flush() } }
     }
 }

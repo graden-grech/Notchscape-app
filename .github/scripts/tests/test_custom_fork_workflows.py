@@ -37,7 +37,9 @@ class CustomForkWorkflowTests(unittest.TestCase):
     def test_native_sdk_build_retains_intel_runner_and_feature_policy_checks(self):
         workflow = (ROOT / ".github/workflows/cicd.yml").read_text()
         self.assertIn("runs-on: macos-26-intel", workflow)
-        self.assertIn("          - ^26", workflow)
+        self.assertIn('"${sdk_version%%.*}" -ge 26', workflow)
+        self.assertIn("CODE_SIGNING_ALLOWED=NO", workflow)
+        self.assertIn("CODE_SIGNING_REQUIRED=NO", workflow)
         self.assertIn("          - Notchscape", workflow)
         self.assertIn("tests/CustomizationPolicyTests.swift", workflow)
         self.assertIn("tests/ProductivityPolicyTests.swift", workflow)

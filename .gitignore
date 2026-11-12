@@ -59,3 +59,9 @@ services/accounts/.wrangler/
 services/accounts/.dev.vars*
 services/accounts/.env*
 
+
+# Local code-index caches and device-bound provisioning data
+.serena/
+__pycache__/
+*.provisionprofile
+*.mobileprovision

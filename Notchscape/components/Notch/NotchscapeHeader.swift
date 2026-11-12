@@ -8,32 +8,55 @@
 import Defaults
 import SwiftUI
 
+@MainActor
 struct NotchscapeHeader: View {
     @EnvironmentObject var vm: NotchscapeViewModel
     @ObservedObject var batteryModel = BatteryStatusViewModel.shared
     @ObservedObject var coordinator = NotchscapeCoordinator.shared
     @ObservedObject private var modes = WorkspaceModeManager.shared
+    @ObservedObject private var performance = AppPerformanceManager.shared
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.colorSchemeContrast) private var contrast
     @StateObject var tvm = ShelfStateViewModel.shared
     @Default(.appTheme) private var appTheme
+    @Default(.useCustomAccentColor) private var useCustomAccentColor
+    @Default(.customAccentColorData) private var customAccentColorData
     @Default(.hideBatteryWhenAbsent) private var hideBatteryWhenAbsent
     @Default(.showBatteryIndicator) private var showBatteryIndicator
+    @Default(.desktopSnowEnabled) private var desktopSnowEnabled
+
+    private var accent: Color {
+        Color(nsColor: NSColor.resolvedAccent(theme: appTheme, customEnabled: useCustomAccentColor, customData: customAccentColorData))
+    }
+    private var rendering: GlassPresentationPolicy {
+        let native: Bool
+        if #available(macOS 26.0, *) { native = true } else { native = false }
+        return .init(supportsNativeGlass: native,
+                     reduceTransparency: performance.reduceTransparency || reduceTransparency,
+                     increasedContrast: contrast == .increased, lowImpact: performance.lowImpact,
+                     reduceMotion: performance.reduceMotion || reduceMotion)
+    }
 
     private var screen: NSScreen? {
         if let uuid = vm.screenUUID { return NSScreen.screen(withUUID: uuid) }
         return NSScreen.main
     }
 
-    private var physicalNotch: PhysicalNotchGeometry? {
+    private var displayGeometry: DisplayGeometrySnapshot? {
         guard let screen else { return nil }
-        return PhysicalNotchGeometry.resolve(
-            screenFrame: screen.frame, safeTop: Double(screen.safeAreaInsets.top),
-            leftArea: screen.auxiliaryTopLeftArea, rightArea: screen.auxiliaryTopRightArea)
+        return NSScreenDisplayGeometryAdapter.snapshot(for: screen)
+    }
+
+    private var physicalNotch: PhysicalNotchGeometry? {
+        guard let gap = displayGeometry?.reportedTopGap else { return nil }
+        return PhysicalNotchGeometry(width: gap.width, height: gap.height, centerOffset: gap.centerOffset)
     }
 
     private var headerRowHeight: CGFloat {
         CGFloat(NotchHeaderLayoutPolicy.rowHeight(
             closedHeight: Double(vm.effectiveClosedNotchHeight),
-            hasPhysicalNotch: (screen?.safeAreaInsets.top ?? 0) > 0))
+            hasPhysicalNotch: displayGeometry?.usesLegacyNotchLayout == true))
     }
 
     var body: some View {
@@ -44,10 +67,20 @@ struct NotchscapeHeader: View {
                 } else if vm.notchState == .open {
                     EmptyView()
                 }
+                if desktopSnowEnabled, vm.notchState == .open,
+                   (vm.notchSize.width - vm.closedNotchSize.width) / 2 - 24 >= 180 {
+                    Button { desktopSnowEnabled = false } label: {
+                        Image(systemName: "snowflake")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(.white).frame(width: 14, height: 14)
+                    }
+                    .controlSize(.small).notchGlassButton(circular: true)
+                    .help("Stop snow").accessibilityLabel("Stop snow")
+                }
                 if coordinator.currentView == .home,
                    !appTheme.hasHomeScene,
                    let decoration = appTheme.homeDecoration,
-                   (vm.screenUUID.flatMap { NSScreen.screen(withUUID: $0) }?.safeAreaInsets.top ?? 0) > 0 {
+                   displayGeometry?.usesLegacyNotchLayout == true {
                     Text(decoration)
                         .font(.system(size: 20))
                         .accessibilityHidden(true)
@@ -56,7 +89,8 @@ struct NotchscapeHeader: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .opacity(vm.notchState == .closed ? 0 : 1)
-            .blur(radius: vm.notchState == .closed ? 20 : 0)
+            // The outer notch mask owns reveal; do not alpha-tween live glass.
+            .animation(nil, value: vm.notchState)
             .zIndex(2)
 
             if vm.notchState == .open {
@@ -76,7 +110,7 @@ struct NotchscapeHeader: View {
                         if coordinator.currentView == .home,
                            !appTheme.hasHomeScene,
                            let decoration = appTheme.homeDecoration,
-                           (vm.screenUUID.flatMap { NSScreen.screen(withUUID: $0) }?.safeAreaInsets.top ?? 0) == 0 {
+                           displayGeometry?.usesLegacyNotchLayout != true {
                             Text(decoration)
                                 .font(.system(size: 23))
                                 .accessibilityHidden(true)
@@ -85,30 +119,35 @@ struct NotchscapeHeader: View {
                     }
             }
 
-            HStack(spacing: 4) {
+            NotchGlassControlGroup(spacing: 4) {
+              HStack(spacing: 4) {
                 if vm.notchState == .open {
                     if vm.isEditingHomeLayout && coordinator.currentView == .home {
-                        Button("Done") {
-                            withAnimation(.smooth(duration: 0.2)) { vm.isEditingHomeLayout = false; vm.draggedHomeWidget = nil }
-                        }
-                        .buttonStyle(.plain).font(.caption.weight(.semibold))
-                        .padding(.horizontal, 14).frame(height: NotchHeaderMetrics.controlHeight)
-                        .liquidGlassCapsule(tint: .accentColor)
+                        Button {
+                            vm.isEditingHomeLayout = false; vm.draggedHomeWidget = nil
+                        } label: { Text("Done").foregroundStyle(Color.white) }
+                        .font(.caption.weight(.semibold))
+                        .controlSize(.small)
+                        .notchGlassButton()
+                        .buttonBorderShape(.capsule)
+                        .frame(height: NotchHeaderMetrics.controlHeight)
                         .accessibilityLabel("Done editing Home")
                     } else if isHUDType(coordinator.sneakPeek.type) && coordinator.sneakPeek.show && Defaults[.showOpenNotchHUD] {
                         OpenNotchHUD(type: $coordinator.sneakPeek.type, value: $coordinator.sneakPeek.value, icon: $coordinator.sneakPeek.icon)
-                            .transition(.scale(scale: 0.8).combined(with: .opacity))
+                            .transition(rendering.allowsDecorativeMotion ? .scale(scale: 0.8).combined(with: .opacity) : .identity)
                     } else {
                         if Defaults[.showMirror] {
                             Button(action: {
                                 vm.toggleCameraPreview()
                             }) {
                                 Image(systemName: "web.camera")
-                                    .foregroundStyle(.white)
+                                    .foregroundStyle(Color.white)
+                                    .font(.system(size: 16, weight: .medium))
                                     .frame(width: NotchHeaderMetrics.controlHeight, height: NotchHeaderMetrics.controlHeight)
+                                    .contentShape(Circle())
                                     .liquidGlassCapsule()
                             }
-                            .buttonStyle(PlainButtonStyle())
+                            .buttonStyle(.plain)
                             .help("Mirror")
                             .accessibilityLabel("Mirror")
                             .disabled(modes.active?.hidesPrivateContent == true)
@@ -121,16 +160,18 @@ struct NotchscapeHeader: View {
                                 
                             }) {
                                 Image(systemName: "gear")
-                                    .foregroundStyle(.white)
+                                    .foregroundStyle(Color.white)
+                                    .font(.system(size: 16, weight: .medium))
                                     .frame(width: NotchHeaderMetrics.controlHeight, height: NotchHeaderMetrics.controlHeight)
+                                    .contentShape(Circle())
                                     .liquidGlassCapsule()
                             }
-                            .buttonStyle(PlainButtonStyle())
+                            .buttonStyle(.plain)
                             .help("Settings")
                             .accessibilityLabel("Settings")
                             .contextMenu { WorkspaceModeMenu() }
                             .overlay(alignment: .topTrailing) {
-                                if modes.active != nil { Circle().fill(Color.accentColor).frame(width: 5, height: 5).allowsHitTesting(false).accessibilityHidden(true) }
+                                if modes.active != nil { Circle().fill(accent).frame(width: 5, height: 5).allowsHitTesting(false).accessibilityHidden(true) }
                             }
                         }
                         if BatteryPolicy.shouldShow(enabled: showBatteryIndicator,
@@ -148,15 +189,21 @@ struct NotchscapeHeader: View {
                         }
                     }
                 }
+              }
             }
             .font(.system(.headline, design: .rounded))
             .frame(maxWidth: .infinity, alignment: .trailing)
             .opacity(vm.notchState == .closed ? 0 : 1)
-            .blur(radius: vm.notchState == .closed ? 20 : 0)
+            .animation(nil, value: vm.notchState)
             .zIndex(2)
         }
         .foregroundColor(.gray)
+        .tint(accent)
+        .accentColor(accent)
         .environmentObject(vm)
+        .transaction {
+            if !rendering.allowsDecorativeMotion { $0.animation = nil; $0.disablesAnimations = true }
+        }
     }
 
     func isHUDType(_ type: SneakContentType) -> Bool {

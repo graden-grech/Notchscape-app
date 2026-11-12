@@ -3,6 +3,9 @@
 set -euo pipefail
 candidate="${1:?Usage: verify_custom_app_identity.sh candidate.app previous.app}"
 previous="${2:?Usage: verify_custom_app_identity.sh candidate.app previous.app}"
+selected_face_profile="${3:-}"
+variant="${4:-${NOTCHSCAPE_BUILD_VARIANT:-local}}"
+[[ "$variant" == local || "$variant" == public ]] || { echo 'FAIL: build variant must be local or public'; exit 1; }
 
 for app in "$candidate" "$previous"; do
     /usr/bin/codesign --verify --deep --strict "$app"
@@ -44,4 +47,21 @@ for component in app helper; do
         exit 1
     }
 done
-echo 'PASS: app/helper signing identity and update key preserved'
+gate_directory="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# macOS ships Bash3.2, where expanding an empty array under set -u fails.
+# Both branches run the complete gate; the third argument only pins the exact
+# profile bytes selected by the local build wrapper. Public builds have an
+# explicit separate verifier and never invoke local profile selection.
+if [[ "$variant" == public ]]; then
+    [[ -z "$selected_face_profile" ]] || { echo 'FAIL: public build received a local Face Vault profile path'; exit 1; }
+    python3 "$gate_directory/face_vault_signing.py" --verify-public-app "$candidate" "$previous" --require-dock-widget
+elif [[ -n "$selected_face_profile" ]]; then
+    python3 "$gate_directory/face_vault_signing.py" --verify-app "$candidate" "$previous" --require-dock-widget --profile "$selected_face_profile"
+else
+    python3 "$gate_directory/face_vault_signing.py" --verify-app "$candidate" "$previous" --require-dock-widget
+fi
+if [[ "$variant" == public ]]; then
+    echo 'PASS: public app identity/update key and original helper preserved; Face Vault/profile excluded; Dock widget signature validated'
+else
+    echo 'PASS: main/all existing helper identities and update key preserved; exact Face Vault and Dock widget signatures validated'
+fi

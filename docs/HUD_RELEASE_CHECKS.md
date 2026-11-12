@@ -38,6 +38,11 @@ swift tests/HUDRuntimeSmoke.swift RUNNING_APP_PID
 
 Run this after a cold launch, the Restart HUD control, closing Settings, and a
 real Sparkle update/relaunch. Check an actual volume/brightness key visually too.
+On a physical-notch Mac, confirm the beginning of the slider is visible beside
+the hardware with Home both closed and open. A normal screenshot records pixels
+under the camera housing and cannot prove this clearance. Hover/gesture motion,
+slider glow and percentage/mute changes must also stay outside that housing;
+enabled-tap checks establish interception, not physical visibility.
 Verify that the original HUD preference, Dock visibility, theme, and layout remain
 unchanged. CI cannot grant macOS permission or perform the live media-key test;
 perform these checks on the signed installed app before claiming release success.

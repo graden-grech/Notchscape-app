@@ -6,6 +6,14 @@ struct SettingsTourTopic: Equatable {
     let sectionID: String
     let summary: String
     let suggestion: String
+    let subpageIDs: [String]
+
+    init(sectionID: String, summary: String, suggestion: String, subpageIDs: [String] = []) {
+        self.sectionID = sectionID
+        self.summary = summary
+        self.suggestion = suggestion
+        self.subpageIDs = subpageIDs
+    }
 }
 
 enum SettingsTourChapter: String, CaseIterable, Identifiable {
@@ -45,11 +53,12 @@ enum SettingsTourChapter: String, CaseIterable, Identifiable {
         let all: [SettingsTourTopic] = switch self {
         case .makeItYours: [
             .init(sectionID: "General", summary: "Choose your displays, Notch or Dynamic Island, hover behavior and Dock visibility.", suggestion: "New users start with all displays enabled. You can hide external displays here."),
-            .init(sectionID: "Appearance", summary: "Choose a theme, accent and icon, then arrange or hide Home tiles.", suggestion: "Match your icon and accent to the theme, or choose them yourself."),
+            .init(sectionID: "Store", summary: "Browse Features, Theme Packs and the capabilities included in this preview.", suggestion: "Separate downloads are not published yet. Browsing Add-ons does not enable features or ask for access."),
+            .init(sectionID: "Appearance", summary: "Choose a theme, accent and icon, then arrange or hide Home tiles.", suggestion: "Open a focused page for themes, Home layout, app icons or effects.", subpageIDs: ["Themes", "HomeLayout", "AppIcon", "Effects"]),
             .init(sectionID: "Modes", summary: "Apply a group of temporary settings for work, study, gaming or travel.", suggestion: "Restore your personal settings when you're finished with a mode.")
         ]
         case .yourDay: [
-            .init(sectionID: "Media", summary: "Choose your music source, player controls and music activity behavior.", suggestion: "Music can stay visible with its override even when other live activities are off."),
+            .init(sectionID: "Media", summary: "Choose your music source, player controls and music activity behavior.", suggestion: "Music can stay visible with its override even when other live activities are off.", subpageIDs: ["MediaAppearance"]),
             .init(sectionID: "Calendar", summary: "Choose calendars and reminders to show beside your music.", suggestion: "Calendar and Reminders access are requested only when you choose to connect them."),
             .init(sectionID: "Weather", summary: "Add a forecast using a city or your current location, on Home or Live.", suggestion: "Weather starts off for new users. A manually chosen city doesn't need location access.")
         ]
@@ -60,6 +69,7 @@ enum SettingsTourChapter: String, CaseIterable, Identifiable {
             .init(sectionID: "HUD", summary: "Show volume and brightness changes inside Notchscape.", suggestion: "Replacing the system HUD needs Accessibility access. You can leave it off.")
         ]
         case .workspace: [
+            .init(sectionID: "Dock", summary: "Keep chosen apps, folders and widget cards in an optional native workspace.", suggestion: "Enable it here and open it when needed. Your Mac's Dock settings stay under your control."),
             .init(sectionID: "Tools", summary: "Explore quick notes, text recognition, clipboard, capture and other utilities.", suggestion: "Private features such as clipboard history and recording require an explicit choice."),
             .init(sectionID: "Wallpapers", summary: "Browse wallpapers, save favorites and optionally rotate your desktop.", suggestion: "Preview first; Apply changes your wallpaper. Automatic rotation is optional."),
             .init(sectionID: "Shelf", summary: "Keep files close by and choose how drag-and-drop and sharing behave.", suggestion: "Use the Shelf when you need it; your Home layout stays separate."),
@@ -70,6 +80,7 @@ enum SettingsTourChapter: String, CaseIterable, Identifiable {
             .init(sectionID: "Battery", summary: "Choose the original or enhanced battery display, percentage and optional alerts.", suggestion: "The original display remains available if you prefer the simpler look.")
         ]
         case .privacyAndHelp: [
+            .init(sectionID: "FaceUnlock", summary: "Optional webcam recognition with an encrypted local vault and an automatic on/off control.", suggestion: "Leave it off unless you want it. A regular webcam does not provide Touch ID security; setup and system authentication are separate choices."),
             .init(sectionID: "Advanced", summary: "Find optional experimental controls and troubleshooting settings.", suggestion: "You can leave these unchanged to get started."),
             .init(sectionID: "About", summary: "Check your version and updates, or find help, source and legal information.", suggestion: "Replay this tour from General settings or the Help menu whenever you like."),
             .init(sectionID: "Account", summary: "Manage an optional account and supported appearance sync.", suggestion: "An account is never required to use Notchscape.")

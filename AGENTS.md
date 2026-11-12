@@ -16,24 +16,30 @@
 - Publish only to `personal` (`graden-grech/Notchscape-app`) with user authority.
   Never replace a published archive with a different build. Use a new version for
   post-release corrections and retain old update-feed items.
+- The Face Unlock broker currently uses a seven-day, device-bound Personal Team
+  development profile. It is for local testing only. Do not upload that profile
+  or package it as a generally usable public app; require suitable distribution
+  signing/provisioning before including Face Unlock in public downloads. Keep
+  local build/installation verification distinct from distribution validation.
 - Report release, updater, HUD, and CI outcomes separately. Clearly state any live
   hardware, permission, or update-path testing that remains unverified.
 - This is a new standalone repository with fresh history. Preserve source and
   dependency licenses/credits. Do not import old Git history, forks or release
   tags as a shortcut when preparing this checkout.
-- Keep `graden-grech/Notchscape` and its prior rename redirects publicly readable
-  for existing downloads and signed migration feeds. A compatibility-feed update
-  there is separate from publishing new app releases here. Do not delete, rename
-  or privatize the legacy repository or replace any published archive.
+- The user deleted both prior repositories and explicitly requested a fresh
+  repository without restoring either one. The active `Notchscape-app` was
+  recreated at the same URL with repository ID `1437626275`. Do not restore or
+  recreate the deleted legacy `Notchscape` repository or its former aliases.
+  Preserve the exact republished 2.9.3/2.9.4 archives and current update address.
+  Older installations whose embedded feeds point to the deleted legacy URLs
+  need a manual download; do not claim those compatibility feeds still work.
 
 ## Collaboration and continuation
 
 - Reuse an idle subagent before starting another agent for a related specialty.
   Delegate independent requests added during active work and keep the main chat
   progressing on its existing task. Coordinate file ownership before edits.
-- Check the actual Codex usage windows at substantial work checkpoints. If the
-  five-hour window is nearly exhausted and work remains, save an exact handoff
-  and schedule this chat to resume after the reported reset using the app's
-  heartbeat tool. Inspect/update a matching follow-up instead of creating
-  duplicates. Do not confuse a worker credit error with a five-hour limit or
-  create reset wake-ups while the allowance is healthy.
+- Do not create automatic follow-ups, heartbeat timers or usage-reset wake-ups.
+  The user explicitly stopped them because they consume usage. Save an exact
+  checkpoint when needed and wait for the user's next message. Only schedule
+  again if the user explicitly asks for a new scheduled action.

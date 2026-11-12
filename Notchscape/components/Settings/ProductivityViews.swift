@@ -44,10 +44,7 @@ struct ProductivityHubView: View {
     @Default(.appTheme) private var theme
     @Default(.useCustomAccentColor) private var customAccent
     @Default(.customAccentColorData) private var accentData
-    @State private var search = ""
-    @State private var confirmClear = false
     @State private var confirmDeleteNote = false
-    @State private var copied: UUID?
 
     private var enabled: Bool {
         switch tools.selectedTool { case .clipboard: clipboardEnabled; case .notes: notesEnabled; case .devices: devicesEnabled; case .capture: captureEnabled; case .utilities: true }
@@ -89,9 +86,6 @@ struct ProductivityHubView: View {
         .onChange(of: notesEnabled) { _, enabled in if enabled { Task { await tools.load() } } }
         .onChange(of: clipboardEnabled) { _, enabled in if enabled { Task { await tools.load() } } }
         .onDisappear { Task { await tools.flush() } }
-        .confirmationDialog("Clear clipboard history?", isPresented: $confirmClear, titleVisibility: .visible) {
-            Button("Clear Unpinned Items", role: .destructive) { tools.clearClipboard() }
-        } message: { Text("Pinned items are kept. This can’t be undone.") }
         .confirmationDialog("Delete this note?", isPresented: $confirmDeleteNote, titleVisibility: .visible) {
             Button("Delete Note", role: .destructive) { if let id = tools.selectedNote { tools.removeNote(id) } }
         } message: { Text("This only removes this local note and can’t be undone. Its Apple Notes copy, if any, is kept and won’t be imported again.") }
@@ -122,37 +116,7 @@ struct ProductivityHubView: View {
         }
     }
     private var clipboardContent: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                if expanded { TextField("Search clipboard", text: $search).textFieldStyle(.roundedBorder) }
-                else { Text("\(tools.clipboard.count) items").font(.caption).foregroundStyle(.secondary) }
-                Button(tools.paused ? "Resume" : "Pause") { tools.pause(!tools.paused) }
-                Button("Clear…") { confirmClear = true }.disabled(tools.clipboard.allSatisfy(\.pinned))
-            }
-            if tools.clipboard.isEmpty {
-                Text("Your next copy will appear here. Protected copies are skipped.").font(.caption).foregroundStyle(.secondary)
-            }
-            ScrollView {
-                LazyVStack(spacing: 4) {
-                    ForEach(tools.clipboard.filter { search.isEmpty || $0.title.localizedCaseInsensitiveContains(search) || $0.source.localizedCaseInsensitiveContains(search) }) { entry in
-                        HStack(spacing: 8) {
-                            Image(systemName: entry.image == nil ? "doc.text" : "photo").foregroundStyle(.secondary)
-                            Button {
-                                tools.copy(entry); copied = entry.id
-                            } label: {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(entry.title).lineLimit(1).frame(maxWidth: .infinity, alignment: .leading)
-                                    if expanded { Text(entry.source).font(.caption2).foregroundStyle(.secondary) }
-                                }
-                            }.buttonStyle(.plain).help("Copy item")
-                            if copied == entry.id { Image(systemName: "checkmark").foregroundStyle(.green).accessibilityLabel("Copied") }
-                            Button { tools.pin(entry) } label: { Image(systemName: entry.pinned ? "pin.fill" : "pin") }
-                                .buttonStyle(.borderless).help(entry.pinned ? "Unpin item" : "Pin item").accessibilityLabel(entry.pinned ? "Unpin item" : "Pin item")
-                        }.padding(7).background(.quaternary.opacity(0.4), in: RoundedRectangle(cornerRadius: 8))
-                    }
-                }
-            }
-        }
+        ClipboardBrowserView(expanded: expanded)
     }
     private var notesContent: some View {
         HStack(alignment: .top, spacing: 12) {
@@ -231,6 +195,194 @@ struct ProductivityHubView: View {
     }
 }
 
+private struct ClipboardBrowserView: View {
+    let expanded: Bool
+    @ObservedObject private var tools = LocalToolsManager.shared
+    @State private var query = ""
+    @State private var kind: ClipboardContentKind?
+    @State private var dateFilter = ClipboardDateFilter.any
+    @State private var boardID: UUID?
+    @State private var pinsOnly = false
+    @State private var revealed = Set<UUID>()
+    @State private var previewID: UUID?
+    @State private var copied: UUID?
+    @State private var newBoardName = ""
+    @State private var addingBoard = false
+    @State private var removingBoard = false
+    @State private var clearing = false
+    @State private var matched = Set<UUID>()
+
+    private var filtered: [ClipboardEntry] {
+        tools.clipboard.filter { entry in
+            (query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || matched.contains(entry.id))
+                && (kind == nil || entry.kind == kind)
+                && (!pinsOnly || entry.pinned)
+                && (boardID == nil || entry.boardID == boardID)
+                && dateFilter.includes(entry.date, now: Date())
+        }
+    }
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                TextField("Search copies or apps", text: $query).textFieldStyle(.roundedBorder)
+                    .help("Searches full text; loose matching also checks the beginning of each copy. Hidden sensitive text is excluded.")
+                Button(tools.paused ? "Resume" : "Pause") { tools.pause(!tools.paused) }
+                Menu {
+                    Button("New Board…") { newBoardName = ""; addingBoard = true }.disabled(tools.clipboardBoards.count >= 20)
+                    if boardID != nil { Button("Remove Board…", role: .destructive) { removingBoard = true } }
+                    Divider()
+                    Button("Clear Unpinned…", role: .destructive) { clearing = true }.disabled(tools.clipboard.allSatisfy(\.pinned))
+                } label: { Image(systemName: "ellipsis.circle") }.menuIndicator(.hidden).help("Clipboard options").accessibilityLabel("Clipboard options")
+            }
+            HStack(spacing: 8) {
+                Picker("Board", selection: $boardID) {
+                    Text("All Copies").tag(UUID?.none)
+                    ForEach(tools.clipboardBoards) { Label($0.name, systemImage: "folder").tag(Optional($0.id)) }
+                }.labelsHidden().frame(maxWidth: 190)
+                Picker("Kind", selection: $kind) {
+                    Text("All Types").tag(ClipboardContentKind?.none)
+                    ForEach(ClipboardContentKind.allCases) { Text($0.rawValue).tag(Optional($0)) }
+                }.labelsHidden().frame(maxWidth: 120)
+                if expanded {
+                    Picker("Copied", selection: $dateFilter) { ForEach(ClipboardDateFilter.allCases) { Text($0.rawValue).tag($0) } }.labelsHidden().frame(maxWidth: 120)
+                    Toggle("Pinned", isOn: $pinsOnly).toggleStyle(.button)
+                }
+            }
+            if filtered.isEmpty {
+                VStack(alignment: .leading, spacing: 4) {
+                    Label(tools.clipboard.isEmpty ? "Your next copy appears here" : "No matching copies", systemImage: "doc.on.clipboard")
+                    Text(tools.clipboard.isEmpty ? "Recording is optional. Protected copies are skipped." : "Try another type, board, or search.").font(.caption).foregroundStyle(.secondary)
+                }.padding(.vertical, 12)
+            }
+            ScrollView {
+                LazyVStack(spacing: 5) {
+                    ForEach(filtered) { entry in row(entry) }
+                }
+            }
+            if expanded {
+                Text("\(filtered.count) copies · New detected codes, cards and tokens expire after 10 minutes, even when pinned. Existing saved copies are preserved. Detection is not complete.")
+                    .font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .task(id: ClipboardQueryRequest(query: query, entries: tools.clipboard)) {
+            do { try await Task.sleep(for: .milliseconds(160)) } catch { return }
+            let entries = tools.clipboard, query = query
+            let worker = Task.detached(priority: .userInitiated) { () -> Set<UUID> in
+                var ids = Set<UUID>()
+                for entry in entries {
+                    guard !Task.isCancelled else { return [] }
+                    if ClipboardSearch.matches(entry, query: query) { ids.insert(entry.id) }
+                }
+                return ids
+            }
+            let ids = await withTaskCancellationHandler { await worker.value } onCancel: { worker.cancel() }
+            guard !Task.isCancelled else { return }; matched = ids
+        }
+        .onChange(of: tools.clipboardPrivacyGeneration) { _, _ in clearPreview() }
+        .onChange(of: tools.clipboard.map(\.id)) { _, ids in
+            revealed.formIntersection(ids)
+            if let previewID, !ids.contains(previewID) { self.previewID = nil }
+        }
+        .onDisappear { clearPreview() }
+        .sheet(isPresented: Binding(get: { previewID != nil }, set: { if !$0 { previewID = nil } })) {
+            if let entry = tools.clipboard.first(where: { $0.id == previewID }) {
+                ClipboardPreviewView(entryID: entry.id, revealingSensitive: revealed.contains(entry.id))
+            }
+        }
+        .alert("New Clipboard Board", isPresented: $addingBoard) {
+            TextField("Board name", text: $newBoardName)
+            Button("Cancel", role: .cancel) {}
+            Button("Create") { if let id = tools.createClipboardBoard(name: newBoardName) { boardID = id } }
+                .disabled(ClipboardBoard.validName(newBoardName) == nil)
+        } message: { Text("Boards are encrypted on this Mac. Adding a copy to a board also pins it.") }
+        .confirmationDialog("Remove this board?", isPresented: $removingBoard, titleVisibility: .visible) {
+            Button("Remove Board", role: .destructive) { if let id = boardID { tools.removeClipboardBoard(id); boardID = nil } }
+        } message: { Text("Its copies and pins are kept in All Copies.") }
+        .confirmationDialog("Clear unpinned history?", isPresented: $clearing, titleVisibility: .visible) {
+            Button("Clear Unpinned", role: .destructive) { tools.clearClipboard() }
+        } message: { Text("Pinned copies and boards are kept. This cannot be undone.") }
+    }
+    private func clearPreview() { revealed = []; previewID = nil; copied = nil; query = ""; matched = [] }
+    private func row(_ entry: ClipboardEntry) -> some View {
+        let hidden = entry.sensitive == true && !revealed.contains(entry.id)
+        return HStack(spacing: 8) {
+            Image(systemName: hidden ? "lock.fill" : entry.kind?.symbol ?? "doc.text").foregroundStyle(.secondary).frame(width: 18)
+            Button {
+                if hidden { revealed.insert(entry.id) }
+                else if tools.copy(entry, revealingSensitive: revealed.contains(entry.id)) { copied = entry.id }
+            } label: {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(hidden ? "Sensitive copy · Click to reveal" : entry.title).lineLimit(1).frame(maxWidth: .infinity, alignment: .leading)
+                    if expanded {
+                        Text(entry.source + (entry.sensitive == true ? (entry.expiresAt == nil ? " · Existing sensitive copy" : " · Short-lived copy") : "")).font(.caption2).foregroundStyle(.secondary)
+                    }
+                }
+            }.buttonStyle(.plain).help(hidden ? "Reveal sensitive copy" : "Copy item")
+            if copied == entry.id { Image(systemName: "checkmark").foregroundStyle(.green).accessibilityLabel("Copied") }
+            Button { tools.pin(entry) } label: { Image(systemName: entry.pinned ? "pin.fill" : "pin") }
+                .buttonStyle(.borderless).help(entry.pinned ? "Unpin item" : "Pin item").accessibilityLabel(entry.pinned ? "Unpin item" : "Pin item")
+            Menu {
+                if !hidden { Button("Preview & Transform…") { previewID = entry.id } }
+                if revealed.contains(entry.id) { Button("Hide Sensitive Copy") { revealed.remove(entry.id) } }
+                Menu("Move to Board") {
+                    Button("No Board") { tools.assignClipboardEntry(entry, boardID: nil) }
+                    ForEach(tools.clipboardBoards) { board in Button(board.name) { tools.assignClipboardEntry(entry, boardID: board.id) } }
+                }.disabled(tools.clipboardBoards.isEmpty && entry.boardID == nil)
+                Divider()
+                Button("Delete Copy", role: .destructive) { tools.remove(entry) }
+            } label: { Image(systemName: "ellipsis") }.menuIndicator(.hidden).help("Copy actions").accessibilityLabel("Copy actions")
+        }.padding(8).background(.quaternary.opacity(0.35), in: RoundedRectangle(cornerRadius: 9))
+    }
+}
+
+private struct ClipboardQueryRequest: Equatable {
+    var query: String
+    var entries: [ClipboardEntry]
+}
+
+private struct ClipboardPreviewView: View {
+    let entryID: UUID
+    let revealingSensitive: Bool
+    @ObservedObject private var tools = LocalToolsManager.shared
+    @Environment(\.dismiss) private var dismiss
+    @State private var transform = ClipboardTransform.trim
+    @State private var transforming = false
+    @State private var copied = false
+    private var entry: ClipboardEntry? { tools.clipboard.first { $0.id == entryID } }
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack { Text("Clipboard Preview").font(.title2.bold()); Spacer(); Button("Done") { dismiss() }.keyboardShortcut(.cancelAction) }
+            if let entry, entry.sensitive != true || revealingSensitive {
+                if let text = entry.text {
+                    Toggle("Transform text", isOn: $transforming).toggleStyle(.switch).controlSize(.small)
+                    if transforming { Picker("Transform", selection: $transform) { ForEach(ClipboardTransform.allCases) { Text($0.rawValue).tag($0) } } }
+                    let result = transforming ? transform.apply(to: text) : text
+                    ScrollView {
+                        Text(result.map { String($0.prefix(50_000)) } ?? "This transform needs valid input under 50 KB.")
+                            .font(entry.kind == .code ? .system(.body, design: .monospaced) : .body)
+                            .textSelection(.enabled).frame(maxWidth: .infinity, alignment: .topLeading)
+                    }.padding(12).background(.background, in: RoundedRectangle(cornerRadius: 10))
+                    HStack {
+                        Text("Preview only. Your saved copy is kept.").font(.caption).foregroundStyle(.secondary)
+                        Spacer()
+                        Button(copied ? "Copied" : "Copy Result") {
+                            if transforming { copied = tools.copyTransformedClipboard(entryID, transform: transform, revealingSensitive: revealingSensitive) }
+                            else { copied = tools.copy(entry, revealingSensitive: revealingSensitive) }
+                        }.disabled(result == nil).buttonStyle(.borderedProminent)
+                    }
+                    if text.count > 50_000 { Text("Preview shows the first 50,000 characters. Copy without a transform keeps the complete text.").font(.caption).foregroundStyle(.secondary) }
+                } else if let data = entry.image, let image = NSImage(data: data) {
+                    Image(nsImage: image).resizable().scaledToFit().frame(maxWidth: .infinity, maxHeight: .infinity)
+                    Button(copied ? "Copied" : "Copy Image") { copied = tools.copy(entry) }
+                }
+            } else { Label("This copy is no longer available.", systemImage: "lock") }
+        }.padding(20).frame(width: 560, height: 390)
+        .onChange(of: tools.clipboardPrivacyGeneration) { _, _ in dismiss() }
+        .onChange(of: transform) { _, _ in copied = false }
+        .onChange(of: transforming) { _, _ in copied = false }
+    }
+}
+
 struct DeviceControlsView: View {
     var expanded = false
     @ObservedObject private var manager = DeviceControlsManager.shared
@@ -293,6 +445,10 @@ struct ProductivitySettings: View {
     @Default(.textCaptureEnabled) private var captureEnabled
     var body: some View {
         Form {
+            Section("Shortcuts & Files") {
+                SettingsSubpageLink(destinationID: "Shortcuts")
+                SettingsSubpageLink(destinationID: "Shelf")
+            }
             Section {
                 Toggle("Show Tools tab in the notch", isOn: $showTools)
                 Button("Open Tools…") { NotchToolsWindowController.shared.show() }
@@ -307,7 +463,7 @@ struct ProductivitySettings: View {
                     KeyboardShortcuts.Recorder("Open clipboard", name: .clipboardHistoryPanel)
                 }.disabled(!clipboardEnabled).opacity(clipboardEnabled ? 1 : 0.4)
             } header: { Text("Clipboard") } footer: {
-                Text("Off by default. Encrypted history holds up to 150 items / 12 MB, including pins. Protected clipboard types and known password managers are excluded; other sensitive copies may still be saved. Recording pauses while locked. Pins ignore age limits, not storage limits. Disabling recording does not delete saved history.")
+                Text("Off by default. Encrypted history holds up to 150 items / 12 MB, including pins and local boards. Protected clipboard types and known password managers are excluded. Detected codes, cards and tokens are hidden. Newly recorded sensitive copies expire after 10 minutes even when pinned; existing saved copies are preserved. Detection cannot identify every secret or image. Recording pauses while locked or presenting. Other pins ignore age limits, not storage limits. Disabling recording preserves saved history.")
             }
             Section {
                 Toggle("Quick Notes", isOn: $notesEnabled)
@@ -335,7 +491,7 @@ struct ProductivitySettings: View {
                 KeyboardShortcuts.Recorder("Capture screen text", name: .captureNotchText)
                     .disabled(!captureEnabled).opacity(captureEnabled ? 1 : 0.4)
             } header: { Text("Text Capture") } footer: { Text("Apple Vision recognizes text without an AI account. Image selection needs no screen permission. Capturing a region uses macOS’s region picker and requires Screen Recording access. Results are cleared when locked.") }
-        }.navigationTitle("Tools")
+        }.navigationTitle("Tools & Shortcuts")
     }
 }
 
@@ -405,11 +561,13 @@ struct AgentInsightsView: View {
                     HStack(spacing: 8) {
                         AgentProviderMark(provider: activity.provider, state: activity.state, size: 24)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(activity.title).font(.caption.weight(.semibold)).lineLimit(1)
-                            Text("\(activity.provider) · \(activity.state.label) · \(activity.detail)").font(.caption2).foregroundStyle(.secondary).lineLimit(1)
+                            Text(activity.title).font(.callout.weight(.medium)).lineLimit(1)
+                            Text("\(activity.provider) · \(AgentActivityTextPresentation.summary(state: activity.state, detail: activity.detail))")
+                                .font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                                .help(activity.detail)
                             TimelineView(.periodic(from: .now, by: 30)) { context in
                                 Text("Active for \(max(0, Int(context.date.timeIntervalSince(activity.startedAt) / 60))) min")
-                                    .font(.caption2).foregroundStyle(.secondary)
+                                    .font(.caption).foregroundStyle(.secondary)
                             }
                         }
                         Spacer(minLength: 0)

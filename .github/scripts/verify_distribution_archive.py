@@ -23,6 +23,18 @@ def validate_archive(path):
             if item.filename in paths:
                 raise ValueError("Duplicate archive entry")
             paths.add(item.filename)
+            if any(part.endswith((".provisionprofile", ".mobileprovision")) for part in parts):
+                raise ValueError("Public downloads must not contain provisioning profiles")
+            if "FaceModels" in parts:
+                raise ValueError("Local Face Unlock weights must not enter the public download")
+            if "NotchscapeFaceVault.xpc" in parts:
+                raise ValueError("The Face Vault development helper/profile is local-only, not a public customer download")
+            if item.filename.endswith(".xpc/Contents/Info.plist"):
+                if item.file_size > 1024 * 1024:
+                    raise ValueError("Unexpectedly large helper metadata")
+                helper = plistlib.loads(archive.read(item))
+                if helper.get("CFBundleIdentifier") == "com.graden-grech.Notchscape.FaceVault" or helper.get("FaceVaultLocalDevelopmentOnly") is True:
+                    raise ValueError("A local Face Vault development profile cannot be distributed publicly")
             if parts[0] != "__MACOSX":
                 roots.add(parts[0])
             if "BoringNotchXPCHelper.xpc" in parts:
@@ -40,6 +52,8 @@ def validate_archive(path):
             raise ValueError("Branded executable is missing")
         if info.get("NotchAccountsEnabled") is not False:
             raise ValueError("Unfinished account features must remain disabled")
+        if info.get("NotchFaceUnlockEnabled") is not False:
+            raise ValueError("The public download must explicitly disable local-only Face Unlock")
         if info.get("SUFeedURL") != "https://raw.githubusercontent.com/graden-grech/Notchscape-app/main/appcast.xml":
             raise ValueError("Download does not use the Notchscape update feed")
         minimum = info.get("LSMinimumSystemVersion")

@@ -9,6 +9,8 @@ import Foundation
 import Defaults
 import AppKit
 
+extension HomeTileStyle: Defaults.Serializable {}
+
 public enum Style {
     case notch
     case floating
@@ -189,6 +191,9 @@ enum AppTheme: String, CaseIterable, Defaults.Serializable, Identifiable {
     case whiteHouseDemocratChristmas, whiteHouseDemocratChristmasOvalOffice, whiteHouseDemocratChristmasEastRoom, whiteHouseDemocratChristmasBlueRoom
     case cityNewYork, cityChicago, cityDetroit, cityBoston, cityPhiladelphia, cityWashingtonDC
     case cityLosAngeles, citySanFrancisco, citySeattle, cityLasVegas, cityMiami, cityNewOrleans
+    case landmarkCapitol, landmarkLincolnMemorial, landmarkWashingtonMonument, landmarkJeffersonMemorial
+    case landmarkSmithsonianCastle, landmarkLibraryOfCongress, landmarkSupremeCourt, landmarkNationalCathedral
+    case landmarkStatueOfLiberty, landmarkIndependenceHall, landmarkOldStateHouse, landmarkAlamo
 
     var id: Self { self }
     var starWarsVariant: StarWarsThemeVariant? { StarWarsThemeVariant(rawValue: rawValue) }
@@ -206,11 +211,11 @@ enum AppTheme: String, CaseIterable, Defaults.Serializable, Identifiable {
         }
     }
 
-    var pickerTitle: String { isWhiteHouse ? "White House" : isCityscape ? "Cityscapes" : isStarWars ? "Star Wars" : title }
+    var pickerTitle: String { isWhiteHouse ? "White House" : isCityscape ? "Cities & Landmarks" : isStarWars ? "Star Wars" : title }
 
     var title: String {
         if let variant = whiteHouseVariant { return "White House · \(variant.scene.title) · \(variant.style.title)\(variant.isChristmas ? " · Christmas" : "")" }
-        if let scene = cityscapeScene { return "Cityscapes · \(scene.title)" }
+        if let scene = cityscapeScene { return "\(scene.collection.title) · \(scene.title)" }
         return switch self {
         case .system: "System"
         case .autumn: "Fall"
@@ -304,13 +309,16 @@ enum AppTheme: String, CaseIterable, Defaults.Serializable, Identifiable {
     }
 
     var hasHomeScene: Bool { homeBackdrop != nil || nativeSceneStyle != nil }
+    // Panoramic city scenes use the standard Home width. Seasonal decorations,
+    // White House rooms and individual landmarks retain their showcase lane.
+    var reservesHomeArtworkSpace: Bool { hasHomeScene && cityscapeScene?.collection != .cities }
 
     func homeBackdrop(characterArtwork: StarWarsCharacterArtwork, characterArtworkAvailable: Bool = true) -> String? {
         starWarsVariant?.backdropName(artwork: characterArtwork, characterArtworkAvailable: characterArtworkAvailable) ?? homeBackdrop
     }
 
     var subtitle: String {
-        if isCityscape { return "Twelve cities in navy and warm light" }
+        if isCityscape { return "Cities and historic landmarks in evening light" }
         return switch self {
         case .system: "Classic Mac appearance"
         case .autumn: "Golden leaves and a warm cabin"

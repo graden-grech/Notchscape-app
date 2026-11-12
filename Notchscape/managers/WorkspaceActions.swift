@@ -28,6 +28,8 @@ enum WorkspaceActions {
             .init(id: "scratchpad", title: "Open Pinned Scratchpad", symbol: "pin", keywords: "notes floating window") { PinnedScratchpadController.shared.show() },
             .init(id: "capture", title: "Open Capture Studio", symbol: "viewfinder", keywords: "markup redact crop library record trim video audio gif") { CaptureStudioController.shared.show() },
             .init(id: "windows", title: "Open Windows & Workspaces", symbol: "macwindow.on.rectangle", keywords: "switcher positioning layouts snap") { WindowToolsController.shared.show() },
+            .init(id: "dock-bar", title: "Open Dock Bar", symbol: "dock.rectangle", keywords: "launcher glass apps widgets replacement") { DockReplacementController.shared.show() },
+            .init(id: "dock", title: "Open Dock Workspace", symbol: "dock.rectangle", keywords: "launcher apps folders widgets pinned") { DockWorkspaceManager.shared.show() },
             .init(id: "end-mode", title: "End Workspace Mode", symbol: "stop.circle", keywords: "restore defaults") { WorkspaceModeManager.shared.end() }
         ]
         actions += WorkspaceMode.allCases.map { mode in

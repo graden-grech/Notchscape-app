@@ -29,6 +29,7 @@ final class WorkspaceModeManager: ObservableObject {
             PinnedScratchpadController.shared.close()
             CaptureStudioController.shared.close()
             WindowToolsController.shared.close()
+            DockWorkspaceManager.shared.hide()
             MediaToolsManager.shared.privacyStop()
             NotchscapeCoordinator.shared.currentView = .home
             NotchscapeCoordinator.shared.sneakPeek.show = false

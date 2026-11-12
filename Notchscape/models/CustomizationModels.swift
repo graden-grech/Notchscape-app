@@ -9,6 +9,32 @@ enum MusicPresentationPolicy {
     }
 }
 
+/// Visual chrome only. Theme/icon raw values, custom accents and saved recipes
+/// keep their existing owners; these choices never apply a different theme.
+enum ThemeChromePolicy {
+    static func sidebarUsesThemeAccent(themeID: String, alwaysMulticolor: Bool) -> Bool {
+        themeID != "system" && !alwaysMulticolor
+    }
+
+    static func showsChristmasTrim(themeID: String) -> Bool {
+        themeID == "christmas" || WhiteHouseThemeVariant(rawValue: themeID)?.isChristmas == true
+    }
+
+    struct SceneScrim: Equatable {
+        let leading: Double
+        let middle: Double
+        let trailing: Double
+    }
+
+    /// Home retains its showcase lane. Other tabs place information across the
+    /// entire surface, so every part of the same photo needs text contrast.
+    static func sceneScrim(isHome: Bool, reduceTransparency: Bool) -> SceneScrim {
+        if reduceTransparency { return .init(leading: 0.94, middle: 0.94, trailing: 0.94) }
+        if isHome { return .init(leading: 0.76, middle: 0.54, trailing: 0.03) }
+        return .init(leading: 0.86, middle: 0.82, trailing: 0.80)
+    }
+}
+
 /// Decorative color choices only. No affiliation is inferred from a user's
 /// account, location, or other settings, and Neutral is always the default.
 enum WhiteHouseStyle: String, Codable, CaseIterable, Identifiable {
@@ -138,9 +164,25 @@ enum WhiteHouseThemeVariant: String, Codable, CaseIterable, Identifiable {
     func selecting(christmas: Bool) -> Self { .init(style: style, scene: scene, christmas: christmas) }
 }
 
-/// One bundled architectural photo per city. These are atomic theme values,
-/// grouped under Cityscapes in Appearance, so selection and restoration use the
-/// same Home, accent, icon, and transition observers as every existing theme.
+enum CityscapeCollection: String, CaseIterable, Identifiable {
+    case cities, landmarks
+    var id: Self { self }
+    var title: String { self == .cities ? "Cities" : "Landmarks" }
+    var scenes: [CityscapeScene] { CityscapeScene.allCases.filter { $0.collection == self } }
+}
+
+enum CityscapeRegion: String, CaseIterable, Identifiable {
+    case washingtonDC, unitedStates
+    var id: Self { self }
+    var title: String { self == .washingtonDC ? "Washington, D.C." : "Around the U.S." }
+    var landmarks: [CityscapeScene] {
+        CityscapeCollection.landmarks.scenes.filter { $0.region == self }
+    }
+}
+
+/// Cities and landmarks share one atomic theme catalog and the existing Home,
+/// accent, icon and restoration path. Collection/region metadata is only for
+/// browsing; existing persisted city values keep their original meaning.
 enum CityscapeScene: String, Codable, CaseIterable, Identifiable {
     case newYork = "cityNewYork"
     case chicago = "cityChicago"
@@ -154,8 +196,34 @@ enum CityscapeScene: String, Codable, CaseIterable, Identifiable {
     case lasVegas = "cityLasVegas"
     case miami = "cityMiami"
     case newOrleans = "cityNewOrleans"
+    case capitol = "landmarkCapitol"
+    case lincolnMemorial = "landmarkLincolnMemorial"
+    case washingtonMonument = "landmarkWashingtonMonument"
+    case jeffersonMemorial = "landmarkJeffersonMemorial"
+    case smithsonianCastle = "landmarkSmithsonianCastle"
+    case libraryOfCongress = "landmarkLibraryOfCongress"
+    case supremeCourt = "landmarkSupremeCourt"
+    case nationalCathedral = "landmarkNationalCathedral"
+    case statueOfLiberty = "landmarkStatueOfLiberty"
+    case independenceHall = "landmarkIndependenceHall"
+    case oldStateHouse = "landmarkOldStateHouse"
+    case alamo = "landmarkAlamo"
 
     var id: Self { self }
+    var collection: CityscapeCollection {
+        switch self {
+        case .newYork, .chicago, .detroit, .boston, .philadelphia, .washingtonDC,
+             .losAngeles, .sanFrancisco, .seattle, .lasVegas, .miami, .newOrleans: .cities
+        default: .landmarks
+        }
+    }
+    var region: CityscapeRegion {
+        switch self {
+        case .washingtonDC, .capitol, .lincolnMemorial, .washingtonMonument, .jeffersonMemorial,
+             .smithsonianCastle, .libraryOfCongress, .supremeCourt, .nationalCathedral: .washingtonDC
+        default: .unitedStates
+        }
+    }
     var title: String {
         switch self {
         case .newYork: "New York"
@@ -170,6 +238,28 @@ enum CityscapeScene: String, Codable, CaseIterable, Identifiable {
         case .lasVegas: "Las Vegas"
         case .miami: "Miami"
         case .newOrleans: "New Orleans"
+        case .capitol: "U.S. Capitol"
+        case .lincolnMemorial: "Lincoln Memorial"
+        case .washingtonMonument: "Washington Monument"
+        case .jeffersonMemorial: "Jefferson Memorial"
+        case .smithsonianCastle: "Smithsonian Castle"
+        case .libraryOfCongress: "Library of Congress"
+        case .supremeCourt: "Supreme Court"
+        case .nationalCathedral: "Washington National Cathedral"
+        case .statueOfLiberty: "Statue of Liberty"
+        case .independenceHall: "Independence Hall"
+        case .oldStateHouse: "Old State House"
+        case .alamo: "The Alamo"
+        }
+    }
+    var location: String {
+        if collection == .cities { return title }
+        return switch self {
+        case .statueOfLiberty: "New York"
+        case .independenceHall: "Philadelphia"
+        case .oldStateHouse: "Boston"
+        case .alamo: "San Antonio"
+        default: region.title
         }
     }
     var backdropName: String {
@@ -186,28 +276,71 @@ enum CityscapeScene: String, Codable, CaseIterable, Identifiable {
         case .lasVegas: "CityLasVegasBackdrop"
         case .miami: "CityMiamiBackdrop"
         case .newOrleans: "CityNewOrleansBackdrop"
+        case .capitol: "LandmarkCapitolBackdrop"
+        case .lincolnMemorial: "LandmarkLincolnMemorialBackdrop"
+        case .washingtonMonument: "LandmarkWashingtonMonumentBackdrop"
+        case .jeffersonMemorial: "LandmarkJeffersonMemorialBackdrop"
+        case .smithsonianCastle: "LandmarkSmithsonianCastleBackdrop"
+        case .libraryOfCongress: "LandmarkLibraryOfCongressBackdrop"
+        case .supremeCourt: "LandmarkSupremeCourtBackdrop"
+        case .nationalCathedral: "LandmarkNationalCathedralBackdrop"
+        case .statueOfLiberty: "LandmarkStatueOfLibertyBackdrop"
+        case .independenceHall: "LandmarkIndependenceHallBackdrop"
+        case .oldStateHouse: "LandmarkOldStateHouseBackdrop"
+        case .alamo: "LandmarkAlamoBackdrop"
         }
     }
     /// Warm architecture colors retain readable contrast on both control planes.
     /// A manual accent still takes precedence through the shared color resolver.
     var lightAccent: String {
         switch self {
-        case .newYork, .washingtonDC: "#645221"
+        case .newYork, .washingtonDC, .capitol, .lincolnMemorial, .washingtonMonument, .jeffersonMemorial,
+             .smithsonianCastle, .libraryOfCongress, .supremeCourt, .nationalCathedral: "#645221"
         case .chicago, .philadelphia: "#5C5532"
-        case .detroit, .boston: "#664D2F"
-        case .losAngeles, .lasVegas: "#6A4C2B"
+        case .detroit, .boston, .independenceHall, .oldStateHouse: "#664D2F"
+        case .losAngeles, .lasVegas, .alamo: "#6A4C2B"
         case .sanFrancisco, .newOrleans: "#68503A"
-        case .seattle, .miami: "#5E5737"
+        case .seattle, .miami, .statueOfLiberty: "#5E5737"
         }
     }
     var darkAccent: String {
         switch self {
-        case .newYork, .washingtonDC: "#DFC891"
+        case .newYork, .washingtonDC, .capitol, .lincolnMemorial, .washingtonMonument, .jeffersonMemorial,
+             .smithsonianCastle, .libraryOfCongress, .supremeCourt, .nationalCathedral: "#DFC891"
         case .chicago, .philadelphia: "#D9CC9B"
-        case .detroit, .boston: "#E2BF95"
-        case .losAngeles, .lasVegas: "#E7C28C"
+        case .detroit, .boston, .independenceHall, .oldStateHouse: "#E2BF95"
+        case .losAngeles, .lasVegas, .alamo: "#E7C28C"
         case .sanFrancisco, .newOrleans: "#DFC2A0"
-        case .seattle, .miami: "#D8CEAA"
+        case .seattle, .miami, .statueOfLiberty: "#D8CEAA"
+        }
+    }
+}
+
+struct CityscapeGallerySection: Equatable, Identifiable {
+    let id: String
+    let title: String
+    let scenes: [CityscapeScene]
+}
+
+/// Transient browsing state contains no selected theme or persisted preference.
+/// Changing a collection or search only changes the choices shown in the sheet.
+struct CityscapeGalleryFilter: Equatable {
+    var collection: CityscapeCollection
+    var query = ""
+
+    init(selectedScene: CityscapeScene) { collection = selectedScene.collection }
+
+    var sections: [CityscapeGallerySection] {
+        let search = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        let visible = collection.scenes.filter {
+            search.isEmpty || $0.title.localizedStandardContains(search) || $0.location.localizedStandardContains(search)
+        }
+        if collection == .cities {
+            return visible.isEmpty ? [] : [.init(id: collection.rawValue, title: collection.title, scenes: visible)]
+        }
+        return CityscapeRegion.allCases.compactMap { region in
+            let scenes = visible.filter { $0.region == region }
+            return scenes.isEmpty ? nil : .init(id: region.rawValue, title: region.title, scenes: scenes)
         }
     }
 }
@@ -342,6 +475,26 @@ enum NotchDisplayPolicy {
         if !showExternal { return available.first(where: \.isBuiltIn)?.id }
         if automaticallySwitch, let main, available.contains(where: { $0.id == main }) { return main }
         return nil
+    }
+}
+
+enum HomeTileStyle: String, Codable, CaseIterable, Identifiable, Sendable {
+    case original, native
+    var id: Self { self }
+    var title: String { self == .original ? "Original" : "Refined" }
+}
+
+enum HomeTileSurfacePolicy {
+    static func boundedTransparency(_ value: Double) -> Double {
+        value.isFinite ? min(1, max(0, value)) : 0
+    }
+
+    /// Transparency affects the background only. Accessibility takes priority.
+    static func opacity(style: HomeTileStyle, transparency: Double,
+                        reduceTransparency: Bool, increasedContrast: Bool) -> Double {
+        guard style != .original else { return 0 }
+        if reduceTransparency || increasedContrast { return 1 }
+        return 1 - boundedTransparency(transparency)
     }
 }
 

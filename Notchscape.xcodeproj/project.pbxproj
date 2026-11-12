@@ -7,6 +7,59 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D0C2A0010000000000000001 /* DockVisibilityPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C2F0010000000000000001; };
+		D0C2A0020000000000000002 /* DockVisibilityController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C2F0020000000000000002; };
+		D0C2A0030000000000000003 /* DockVisibilityPolicy.swift in Guardian Sources */ = {isa = PBXBuildFile; fileRef = D0C2F0010000000000000001; };
+		D0C2A0040000000000000004 /* DockVisibilityGuardian.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C2F0030000000000000003; };
+		D35A00010000000000000001 /* AppearanceOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = D35F00010000000000000001 /* AppearanceOverview.swift */; };
+		9CEF2768545E488D9B06EB39 /* HomeSnowDecoration.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA700E92A19D4A858B9401C2; };
+		28109EFF90154082A493CEF2 /* DesktopSnowSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D4627E184649F88F9A5FBC; };
+		B96C1EE9022148DB84BC99B8 /* DesktopSnowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 819712B4AF674F9D9E1E1A8C; };
+		311D81A262F341E0A1E3837C /* DesktopSnowPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DA3BEB6275348D5BE2384C2; };
+		C0D3A0520000000000000052 /* DockReplacementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F0520000000000000052; };
+		C0D3A0510000000000000051 /* DockReplacementController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F0510000000000000051; };
+		C0D3A0500000000000000050 /* DockReplacementPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F0500000000000000050; };
+		C0D3A04F000000000000004F /* DockReplacementModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F04F000000000000004F; };
+		C0D3A04E000000000000004E /* DockWidgetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F04E000000000000004E; };
+		D0C00000000000000000000D /* NotchscapeDockWidget.app in Embed Helpers */ = {isa = PBXBuildFile; fileRef = D0C000000000000000000009; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D0C000000000000000000021 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C000000000000000000011; };
+		D0C000000000000000000022 /* DockWidgetPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C000000000000000000012; };
+		D0C000000000000000000023 /* DockWidgetTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C000000000000000000013; };
+		D0C000000000000000000024 /* DockWidgetController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C000000000000000000014; };
+		C0D3A04D000000000000004D /* WeatherPresentationPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F04D000000000000004D; };
+		C0D3A04C000000000000004C /* GlassPresentationPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F04C000000000000004C; };
+		C0D3A04B000000000000004B /* DockWorkspaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F04B000000000000004B; };
+		C0D3A04A000000000000004A /* DockWorkspaceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F04A000000000000004A; };
+		C0D3A0490000000000000049 /* DockWorkspacePolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F0490000000000000049; };
+		C0D3A0480000000000000048 /* AddOnStoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F0480000000000000048; };
+		C0D3A0470000000000000047 /* AddOnCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F0470000000000000047; };
+		C0D3A0460000000000000046 /* StatusBarMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F0460000000000000046; };
+		FACE000000000000000000C8 = { "isa" = "PBXBuildFile"; "fileRef" = "FACE00000000000000000064"; };
+		FACE000000000000000000C9 = { "isa" = "PBXBuildFile"; "fileRef" = "FACE00000000000000000065"; };
+		FACE000000000000000000CA = { "isa" = "PBXBuildFile"; "fileRef" = "FACE00000000000000000066"; };
+		FACE000000000000000000CB = { "isa" = "PBXBuildFile"; "fileRef" = "FACE00000000000000000067"; };
+		FACE000000000000000000CC = { "isa" = "PBXBuildFile"; "fileRef" = "FACE00000000000000000068"; };
+		FACE000000000000000000D2 = { "isa" = "PBXBuildFile"; "fileRef" = "FACE00000000000000000064"; };
+		FACE000000000000000000D3 = { "isa" = "PBXBuildFile"; "fileRef" = "FACE0000000000000000006F"; };
+		FACE000000000000000000D4 = { "isa" = "PBXBuildFile"; "fileRef" = "FACE00000000000000000078"; "settings" = { "ATTRIBUTES" = ("CodeSignOnCopy", "RemoveHeadersOnCopy", ); }; };
+		C0D3A0590000000000000059 /* FacePreviewNotices.txt in Resources */ = {isa = PBXBuildFile; fileRef = C0D3F0590000000000000059; };
+		C0D3A0450000000000000045 /* FaceModels in Resources */ = {isa = PBXBuildFile; fileRef = C0D3F0450000000000000045; };
+		C0D3A0580000000000000058 /* FaceCameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F0580000000000000058; };
+		C0D3A0440000000000000044 /* FaceUnlockSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F0440000000000000044; };
+		C0D3A0430000000000000043 /* FaceUnlockManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F0430000000000000043; };
+		C0D3A0420000000000000042 /* FaceRecognitionSessionPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F0420000000000000042; };
+		C0D3A0410000000000000041 /* ScreenUnlockAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F0410000000000000041; };
+		C0D3A0400000000000000040 /* ScreenUnlockPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F0400000000000000040; };
+		C0D3A03F000000000000003F /* FaceCameraPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F03F000000000000003F; };
+		C0D3A03E000000000000003E /* CoreMLFaceEmbeddingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F03E000000000000003E; };
+		C0D3A03D000000000000003D /* FaceCameraPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F03D000000000000003D; };
+		C0D3A03C000000000000003C /* FaceUnlockVault.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F03C000000000000003C; };
+		C0D3A03B000000000000003B /* FaceUnlockPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F03B000000000000003B; };
+		C0D3A03A000000000000003A /* DisplayCompatibilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F03A000000000000003A; };
+		C0D3A0390000000000000039 /* IslandClickInterceptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F0390000000000000039; };
+		C0D3A0380000000000000038 /* IslandClickPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F0380000000000000038; };
+		C0D3A0370000000000000037 /* NSScreen+DisplayGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F0370000000000000037; };
+		C0D3A0360000000000000036 /* DisplayGeometryPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F0360000000000000036; };
 		C0D3A0340000000000000034 /* SettingsTourPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F0340000000000000034; };
 		C0D3A0350000000000000035 /* SettingsTourView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F0350000000000000035; };
 		C0D3A0330000000000000033 /* AppPresentationPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F0330000000000000033; };
@@ -199,6 +252,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		D0C00000000000000000000A /* Dock widget proxy */ = {isa = PBXContainerItemProxy; containerPortal = 14CEF40A2C5CAED200855D72; proxyType = 1; remoteGlobalIDString = D0C000000000000000000002; remoteInfo = NotchscapeDockWidget; };
+		FACE00000000000000000002 = { "isa" = "PBXContainerItemProxy"; "containerPortal" = "14CEF40A2C5CAED200855D72"; "proxyType" = 1; "remoteGlobalIDString" = "FACE00000000000000000003"; "remoteInfo" = "NotchscapeFaceVault"; };
 		11F748592EC9AABA00F841DB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 14CEF40A2C5CAED200855D72 /* Project object */;
@@ -209,12 +264,22 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		D0C00000000000000000000C /* Embed Helpers */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Helpers";
+			dstSubfolderSpec = 16;
+			files = (D0C00000000000000000000D /* NotchscapeDockWidget.app in Embed Helpers */, );
+			name = "Embed Helpers";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		11F748412EC8051E00F841DB /* Embed XPC Services */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "$(CONTENTS_FOLDER_PATH)/XPCServices";
 			dstSubfolderSpec = 16;
 			files = (
+				FACE000000000000000000D4,
 				11F7485B2EC9AABA00F841DB /* NotchscapeHelper.xpc in Embed XPC Services */,
 			);
 			name = "Embed XPC Services";
@@ -234,6 +299,60 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D0C2F0010000000000000001 /* DockVisibilityPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/models/DockVisibilityPolicy.swift"; sourceTree = SOURCE_ROOT; };
+		D0C2F0020000000000000002 /* DockVisibilityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/managers/DockVisibilityController.swift"; sourceTree = SOURCE_ROOT; };
+		D0C2F0030000000000000003 /* DockVisibilityGuardian.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotchscapeDockWidget/DockVisibilityGuardian.swift"; sourceTree = SOURCE_ROOT; };
+		D35F00010000000000000001 /* AppearanceOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceOverview.swift; sourceTree = "<group>"; };
+		FA700E92A19D4A858B9401C2 /* HomeSnowDecoration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/components/Notch/HomeSnowDecoration.swift"; sourceTree = SOURCE_ROOT; };
+		E7D4627E184649F88F9A5FBC /* DesktopSnowSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/components/Settings/DesktopSnowSettings.swift"; sourceTree = SOURCE_ROOT; };
+		819712B4AF674F9D9E1E1A8C /* DesktopSnowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/managers/DesktopSnowManager.swift"; sourceTree = SOURCE_ROOT; };
+		7DA3BEB6275348D5BE2384C2 /* DesktopSnowPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/models/DesktopSnowPolicy.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F0520000000000000052 /* DockReplacementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/components/Dock/DockReplacementView.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F0510000000000000051 /* DockReplacementController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/managers/DockReplacementController.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F0500000000000000050 /* DockReplacementPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/models/DockReplacementPolicy.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F04F000000000000004F /* DockReplacementModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/models/DockReplacementModels.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F04E000000000000004E /* DockWidgetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/managers/DockWidgetManager.swift"; sourceTree = SOURCE_ROOT; };
+		D0C000000000000000000009 /* NotchscapeDockWidget.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NotchscapeDockWidget.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D0C000000000000000000011 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		D0C000000000000000000012 /* DockWidgetPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockWidgetPolicy.swift; sourceTree = "<group>"; };
+		D0C000000000000000000013 /* DockWidgetTileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockWidgetTileView.swift; sourceTree = "<group>"; };
+		D0C000000000000000000014 /* DockWidgetController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockWidgetController.swift; sourceTree = "<group>"; };
+		D0C000000000000000000015 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C0D3F04D000000000000004D /* WeatherPresentationPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/models/WeatherPresentationPolicy.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F04C000000000000004C /* GlassPresentationPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/models/GlassPresentationPolicy.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F04B000000000000004B /* DockWorkspaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/components/Settings/DockWorkspaceView.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F04A000000000000004A /* DockWorkspaceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/managers/DockWorkspaceManager.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F0490000000000000049 /* DockWorkspacePolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/models/DockWorkspacePolicy.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F0480000000000000048 /* AddOnStoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/components/Settings/AddOnStoreView.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F0470000000000000047 /* AddOnCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/models/AddOnCatalog.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F0460000000000000046 /* StatusBarMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/menu/StatusBarMenu.swift"; sourceTree = SOURCE_ROOT; };
+		FACE00000000000000000064 = { "isa" = "PBXFileReference"; "lastKnownFileType" = "sourcecode.swift"; "path" = "FaceVaultXPCProtocol.swift"; "sourceTree" = "<group>"; };
+		FACE00000000000000000065 = { "isa" = "PBXFileReference"; "lastKnownFileType" = "sourcecode.swift"; "path" = "FaceVaultBrokerPolicy.swift"; "sourceTree" = "<group>"; };
+		FACE00000000000000000066 = { "isa" = "PBXFileReference"; "lastKnownFileType" = "sourcecode.swift"; "path" = "FaceVaultBrokerPeerVerifier.swift"; "sourceTree" = "<group>"; };
+		FACE00000000000000000067 = { "isa" = "PBXFileReference"; "lastKnownFileType" = "sourcecode.swift"; "path" = "FaceVaultBrokerService.swift"; "sourceTree" = "<group>"; };
+		FACE00000000000000000068 = { "isa" = "PBXFileReference"; "lastKnownFileType" = "sourcecode.swift"; "path" = "main.swift"; "sourceTree" = "<group>"; };
+		FACE0000000000000000006E = { "isa" = "PBXFileReference"; "lastKnownFileType" = "text.plist.xml"; "path" = "Info.plist"; "sourceTree" = "<group>"; };
+		FACE0000000000000000006F = { "isa" = "PBXFileReference"; "lastKnownFileType" = "sourcecode.swift"; "path" = "FaceVaultKeyBrokerClient.swift"; "sourceTree" = "<group>"; };
+		FACE00000000000000000070 = { "isa" = "PBXFileReference"; "lastKnownFileType" = "text.plist.entitlements"; "path" = "NotchscapeFaceVault.entitlements"; "sourceTree" = "<group>"; };
+		FACE00000000000000000078 = { "isa" = "PBXFileReference"; "explicitFileType" = "wrapper.xpc-service"; "includeInIndex" = 0; "path" = "NotchscapeFaceVault.xpc"; "sourceTree" = "BUILT_PRODUCTS_DIR"; };
+		C0D3F0590000000000000059 /* FacePreviewNotices.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Notchscape/Resources/FacePreviewNotices.txt"; sourceTree = SOURCE_ROOT; };
+		C0D3F0450000000000000045 /* FaceModels */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Notchscape/Resources/FaceModels; sourceTree = SOURCE_ROOT; };
+		C0D3F0580000000000000058 /* FaceCameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/components/Settings/FaceCameraPreviewView.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F0440000000000000044 /* FaceUnlockSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/components/Settings/FaceUnlockSettingsView.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F0430000000000000043 /* FaceUnlockManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/managers/FaceUnlockManager.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F0420000000000000042 /* FaceRecognitionSessionPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/models/FaceRecognitionSessionPolicy.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F0410000000000000041 /* ScreenUnlockAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/managers/ScreenUnlockAction.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F0400000000000000040 /* ScreenUnlockPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/models/ScreenUnlockPolicy.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F03F000000000000003F /* FaceCameraPipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/managers/FaceCameraPipeline.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F03E000000000000003E /* CoreMLFaceEmbeddingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/models/CoreMLFaceEmbeddingModel.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F03D000000000000003D /* FaceCameraPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/models/FaceCameraPolicy.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F03C000000000000003C /* FaceUnlockVault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/managers/FaceUnlockVault.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F03B000000000000003B /* FaceUnlockPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/models/FaceUnlockPolicy.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F03A000000000000003A /* DisplayCompatibilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/components/Settings/DisplayCompatibilityView.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F0390000000000000039 /* IslandClickInterceptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/managers/IslandClickInterceptor.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F0380000000000000038 /* IslandClickPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/models/IslandClickPolicy.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F0370000000000000037 /* NSScreen+DisplayGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/extensions/NSScreen+DisplayGeometry.swift"; sourceTree = SOURCE_ROOT; };
+		C0D3F0360000000000000036 /* DisplayGeometryPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/models/DisplayGeometryPolicy.swift"; sourceTree = SOURCE_ROOT; };
 		C0D3F0340000000000000034 /* SettingsTourPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notchscape/models/SettingsTourPolicy.swift; sourceTree = SOURCE_ROOT; };
 		C0D3F0350000000000000035 /* SettingsTourView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notchscape/components/Onboarding/SettingsTourView.swift; sourceTree = SOURCE_ROOT; };
 		C0D3F0330000000000000033 /* AppPresentationPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notchscape/models/AppPresentationPolicy.swift; sourceTree = SOURCE_ROOT; };
@@ -431,6 +550,8 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		D0C000000000000000000007 /* Dock widget Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		FACE00000000000000000006 = { "isa" = "PBXFrameworksBuildPhase"; "buildActionMask" = 2147483647; "files" = (); "runOnlyForDeploymentPostprocessing" = 0; };
 		11F7484C2EC9AABA00F841DB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -463,6 +584,8 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D0C000000000000000000001 /* NotchscapeDockWidget */ = {isa = PBXGroup; children = (D0C2F0030000000000000003, D0C000000000000000000011, D0C000000000000000000012, D0C000000000000000000013, D0C000000000000000000014, D0C000000000000000000015, ); path = NotchscapeDockWidget; sourceTree = "<group>"; };
+		FACE00000000000000000001 = { "isa" = "PBXGroup"; "children" = ("FACE00000000000000000064", "FACE00000000000000000065", "FACE00000000000000000066", "FACE00000000000000000067", "FACE00000000000000000068", "FACE0000000000000000006E", "FACE00000000000000000070", ); "path" = "NotchscapeFaceVault"; "sourceTree" = "<group>"; };
 		1113ABB82E80E27000EC13B2 /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -617,6 +740,24 @@
 		147163B52C5D804B0068B555 /* managers */ = {
 			isa = PBXGroup;
 			children = (
+				C0D3F04E000000000000004E /* DockWidgetManager.swift */,
+				7DA3BEB6275348D5BE2384C2 /* DesktopSnowPolicy.swift */,
+				819712B4AF674F9D9E1E1A8C /* DesktopSnowManager.swift */,
+				E7D4627E184649F88F9A5FBC /* DesktopSnowSettings.swift */,
+				FA700E92A19D4A858B9401C2 /* HomeSnowDecoration.swift */,
+				C0D3F0520000000000000052 /* DockReplacementView.swift */,
+				C0D3F0510000000000000051 /* DockReplacementController.swift */,
+				D0C2F0010000000000000001,
+				D0C2F0020000000000000002,
+				C0D3F0500000000000000050 /* DockReplacementPolicy.swift */,
+				C0D3F04F000000000000004F /* DockReplacementModels.swift */,
+				C0D3F04A000000000000004A /* DockWorkspaceManager.swift */,
+				FACE0000000000000000006F,
+				C0D3F0430000000000000043 /* FaceUnlockManager.swift */,
+				C0D3F0410000000000000041 /* ScreenUnlockAction.swift */,
+				C0D3F03F000000000000003F /* FaceCameraPipeline.swift */,
+				C0D3F03C000000000000003C /* FaceUnlockVault.swift */,
+				C0D3F0390000000000000039 /* IslandClickInterceptor.swift */,
 				C0D3F02C000000000000002C /* CaptureStudio.swift */,
 				C0D3F02D000000000000002D /* MediaToolsManager.swift */,
 				C0D3F02F000000000000002F /* WindowTools.swift */,
@@ -670,6 +811,8 @@
 		14CEF4092C5CAED200855D72 = {
 			isa = PBXGroup;
 			children = (
+				FACE00000000000000000001,
+				D0C000000000000000000001 /* NotchscapeDockWidget */,
 				112B0EB62E30DD0F00562D6C /* mediaremote-adapter */,
 				14CEF4142C5CAED300855D72 /* Notchscape */,
 				11F748502EC9AABA00F841DB /* NotchscapeHelper */,
@@ -681,6 +824,8 @@
 		14CEF4132C5CAED300855D72 /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				FACE00000000000000000078,
+				D0C000000000000000000009 /* NotchscapeDockWidget.app */,
 				14CEF4122C5CAED300855D72 /* Notchscape.app */,
 				11F7484F2EC9AABA00F841DB /* NotchscapeHelper.xpc */,
 			);
@@ -690,6 +835,9 @@
 		14CEF4142C5CAED300855D72 /* Notchscape */ = {
 			isa = PBXGroup;
 			children = (
+				C0D3F0460000000000000046 /* StatusBarMenu.swift */,
+				C0D3F0450000000000000045 /* FaceModels */,
+				C0D3F0590000000000000059 /* FacePreviewNotices.txt */,
 				11F748672EC9AC9600F841DB /* XPCHelperClient */,
 				116398942DF5D6B40052E6AF /* Providers */,
 				14288DE22C6E016F00B9F80C /* observers */,
@@ -755,6 +903,17 @@
 		14D570C72C5F38760011E668 /* models */ = {
 			isa = PBXGroup;
 			children = (
+				C0D3F04D000000000000004D /* WeatherPresentationPolicy.swift */,
+				C0D3F04C000000000000004C /* GlassPresentationPolicy.swift */,
+				C0D3F0490000000000000049 /* DockWorkspacePolicy.swift */,
+				C0D3F0470000000000000047 /* AddOnCatalog.swift */,
+				C0D3F0420000000000000042 /* FaceRecognitionSessionPolicy.swift */,
+				C0D3F0400000000000000040 /* ScreenUnlockPolicy.swift */,
+				C0D3F03E000000000000003E /* CoreMLFaceEmbeddingModel.swift */,
+				C0D3F03D000000000000003D /* FaceCameraPolicy.swift */,
+				C0D3F03B000000000000003B /* FaceUnlockPolicy.swift */,
+				C0D3F0380000000000000038 /* IslandClickPolicy.swift */,
+				C0D3F0360000000000000036 /* DisplayGeometryPolicy.swift */,
 				C0D3F0340000000000000034 /* SettingsTourPolicy.swift */,
 				C0D3F0330000000000000033 /* AppPresentationPolicy.swift */,
 				C0D3F0320000000000000032 /* AgentChatTitle.swift */,
@@ -819,6 +978,7 @@
 		B15063502C63D3F600EBB0E3 /* extensions */ = {
 			isa = PBXGroup;
 			children = (
+				C0D3F0370000000000000037 /* NSScreen+DisplayGeometry.swift */,
 				111BEA602ED09B1B0079DD4E /* NSScreen+UUID.swift */,
 				1194E93F2EACC652009C82D6 /* Color+AccentColor.swift */,
 				118EBE302E9717DB00D54B5A /* URL+SecurityScoped.swift */,
@@ -864,6 +1024,11 @@
 		B18654302C6F4590000B926A /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				C0D3F04B000000000000004B /* DockWorkspaceView.swift */,
+				C0D3F0480000000000000048 /* AddOnStoreView.swift */,
+				C0D3F0440000000000000044 /* FaceUnlockSettingsView.swift */,
+				C0D3F0580000000000000058 /* FaceCameraPreviewView.swift */,
+				C0D3F03A000000000000003A /* DisplayCompatibilityView.swift */,
 				C0D3F02A000000000000002A /* AppearanceRecipesView.swift */,
 				C0D3F0300000000000000030 /* FeatureCatalogueView.swift */,
 				C0D3F0250000000000000025 /* WorkspaceToolsView.swift */,
@@ -876,6 +1041,7 @@
 				C0D3F0210000000000000021 /* WorkspaceModesView.swift */,
 				11F748832ECB27DC00F841DB /* MusicSlotConfigurationView.swift */,
 				11C5E3152DFE88510065821E /* SettingsView.swift */,
+				D35F00010000000000000001 /* AppearanceOverview.swift */,
 				11C5E3112DFE85970065821E /* SettingsWindowController.swift */,
 				B1D6FD422C6603730015F173 /* SoftwareUpdater.swift */,
 				B1B112902C6A572100093D8F /* EditPanelView.swift */,
@@ -917,6 +1083,18 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		D0C000000000000000000002 /* NotchscapeDockWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D0C000000000000000000003 /* Build configuration list for PBXNativeTarget "NotchscapeDockWidget" */;
+			buildPhases = (D0C000000000000000000006 /* Sources */, D0C000000000000000000007 /* Frameworks */, D0C000000000000000000008 /* Resources */, );
+			buildRules = ();
+			dependencies = ();
+			name = NotchscapeDockWidget;
+			productName = NotchscapeDockWidget;
+			productReference = D0C000000000000000000009 /* NotchscapeDockWidget.app */;
+			productType = "com.apple.product-type.application";
+		};
+		FACE00000000000000000003 = { "isa" = "PBXNativeTarget"; "buildConfigurationList" = "FACE00000000000000000008"; "buildPhases" = ("FACE00000000000000000005", "FACE00000000000000000006", "FACE00000000000000000007", ); "buildRules" = (); "dependencies" = (); "name" = "NotchscapeFaceVault"; "productName" = "NotchscapeFaceVault"; "productReference" = "FACE00000000000000000078"; "productType" = "com.apple.product-type.xpc-service"; };
 		11F7484E2EC9AABA00F841DB /* NotchscapeHelper */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 11F7485D2EC9AABA00F841DB /* Build configuration list for PBXNativeTarget "NotchscapeHelper" */;
@@ -948,10 +1126,13 @@
 				14CEF4102C5CAED300855D72 /* Resources */,
 				B1ECFA062C6FE58A002ACD87 /* Embed Frameworks */,
 				11F748412EC8051E00F841DB /* Embed XPC Services */,
+				D0C00000000000000000000C /* Embed Helpers */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				FACE00000000000000000004,
+				D0C00000000000000000000B /* Dock widget dependency */,
 				11F7485A2EC9AABA00F841DB /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
@@ -988,6 +1169,7 @@
 				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1640;
 				TargetAttributes = {
+					D0C000000000000000000002 = {CreatedOnToolsVersion = 16.4; ProvisioningStyle = Manual; };
 					11F7484E2EC9AABA00F841DB = {
 						CreatedOnToolsVersion = 16.4;
 					};
@@ -1025,6 +1207,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				D0C000000000000000000002 /* NotchscapeDockWidget */,				FACE00000000000000000003,
 				14CEF4112C5CAED300855D72 /* Notchscape */,
 				11F7484E2EC9AABA00F841DB /* NotchscapeHelper */,
 			);
@@ -1032,6 +1215,8 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		D0C000000000000000000008 /* Dock widget Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		FACE00000000000000000007 = { "isa" = "PBXResourcesBuildPhase"; "buildActionMask" = 2147483647; "files" = (); "runOnlyForDeploymentPostprocessing" = 0; };
 		11F7484D2EC9AABA00F841DB /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1043,6 +1228,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C0D3A0450000000000000045 /* FaceModels in Resources */,
+				C0D3A0590000000000000059 /* FacePreviewNotices.txt in Resources */,
 				ACCA00050000000000000005 /* AccountSDKNotices.txt in Resources */,
 				14CEF41D2C5CAED400855D72 /* Preview Assets.xcassets in Resources */,
 				14CEF41A2C5CAED400855D72 /* Assets.xcassets in Resources */,
@@ -1055,6 +1242,8 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		D0C000000000000000000006 /* Dock widget Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (D0C2A0030000000000000003, D0C2A0040000000000000004, D0C000000000000000000021, D0C000000000000000000022, D0C000000000000000000023, D0C000000000000000000024, ); runOnlyForDeploymentPostprocessing = 0; };
+		FACE00000000000000000005 = { "isa" = "PBXSourcesBuildPhase"; "buildActionMask" = 2147483647; "files" = ("FACE000000000000000000C8", "FACE000000000000000000C9", "FACE000000000000000000CA", "FACE000000000000000000CB", "FACE000000000000000000CC", ); "runOnlyForDeploymentPostprocessing" = 0; };
 		11F7484B2EC9AABA00F841DB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1066,6 +1255,43 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C0D3A04D000000000000004D /* WeatherPresentationPolicy.swift in Sources */,
+				C0D3A04C000000000000004C /* GlassPresentationPolicy.swift in Sources */,
+				C0D3A04B000000000000004B /* DockWorkspaceView.swift in Sources */,
+				C0D3A04E000000000000004E /* DockWidgetManager.swift in Sources */,
+				311D81A262F341E0A1E3837C /* DesktopSnowPolicy.swift in Sources */,
+				B96C1EE9022148DB84BC99B8 /* DesktopSnowManager.swift in Sources */,
+				28109EFF90154082A493CEF2 /* DesktopSnowSettings.swift in Sources */,
+				9CEF2768545E488D9B06EB39 /* HomeSnowDecoration.swift in Sources */,
+				C0D3A0520000000000000052 /* DockReplacementView.swift in Sources */,
+				C0D3A0510000000000000051 /* DockReplacementController.swift in Sources */,
+				D0C2A0010000000000000001,
+				D0C2A0020000000000000002,
+				C0D3A0500000000000000050 /* DockReplacementPolicy.swift in Sources */,
+				C0D3A04F000000000000004F /* DockReplacementModels.swift in Sources */,
+				C0D3A04A000000000000004A /* DockWorkspaceManager.swift in Sources */,
+				C0D3A0490000000000000049 /* DockWorkspacePolicy.swift in Sources */,
+				FACE000000000000000000D3,
+				FACE000000000000000000D2,
+				C0D3A0440000000000000044 /* FaceUnlockSettingsView.swift in Sources */,
+				C0D3A0580000000000000058 /* FaceCameraPreviewView.swift in Sources */,
+				C0D3A0480000000000000048 /* AddOnStoreView.swift in Sources */,
+				C0D3A0470000000000000047 /* AddOnCatalog.swift in Sources */,
+				C0D3A0460000000000000046 /* StatusBarMenu.swift in Sources */,
+				C0D3A0430000000000000043 /* FaceUnlockManager.swift in Sources */,
+				C0D3A0420000000000000042 /* FaceRecognitionSessionPolicy.swift in Sources */,
+				C0D3A0410000000000000041 /* ScreenUnlockAction.swift in Sources */,
+				C0D3A0400000000000000040 /* ScreenUnlockPolicy.swift in Sources */,
+				C0D3A03F000000000000003F /* FaceCameraPipeline.swift in Sources */,
+				C0D3A03E000000000000003E /* CoreMLFaceEmbeddingModel.swift in Sources */,
+				C0D3A03D000000000000003D /* FaceCameraPolicy.swift in Sources */,
+				C0D3A03C000000000000003C /* FaceUnlockVault.swift in Sources */,
+				C0D3A03B000000000000003B /* FaceUnlockPolicy.swift in Sources */,
+				C0D3A03A000000000000003A /* DisplayCompatibilityView.swift in Sources */,
+				C0D3A0390000000000000039 /* IslandClickInterceptor.swift in Sources */,
+				C0D3A0380000000000000038 /* IslandClickPolicy.swift in Sources */,
+				C0D3A0370000000000000037 /* NSScreen+DisplayGeometry.swift in Sources */,
+				C0D3A0360000000000000036 /* DisplayGeometryPolicy.swift in Sources */,
 				C0D3A0010000000000000001 /* AgentStatusManager.swift in Sources */,
 				C0D3A0020000000000000002 /* WeatherManager.swift in Sources */,
 				C0D3A0030000000000000003 /* LiveDashboardView.swift in Sources */,
@@ -1191,6 +1417,7 @@
 				B10F84A32C6C9596009F3026 /* TestView.swift in Sources */,
 				1443E7F32C609DCE0027C1FC /* matters.swift in Sources */,
 				11C5E3162DFE88510065821E /* SettingsView.swift in Sources */,
+				D35A00010000000000000001 /* AppearanceOverview.swift in Sources */,
 				1153BD932D986E4300979FB0 /* AppleMusicController.swift in Sources */,
 				11C5E3132DFE85970065821E /* SettingsWindowController.swift in Sources */,
 				110029272E84FD4C00035A57 /* TemporaryFileStorageService.swift in Sources */,
@@ -1238,6 +1465,8 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		D0C00000000000000000000B /* Dock widget dependency */ = {isa = PBXTargetDependency; target = D0C000000000000000000002; targetProxy = D0C00000000000000000000A; };
+		FACE00000000000000000004 = { "isa" = "PBXTargetDependency"; "target" = "FACE00000000000000000003"; "targetProxy" = "FACE00000000000000000002"; };
 		11F7485A2EC9AABA00F841DB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 11F7484E2EC9AABA00F841DB /* NotchscapeHelper */;
@@ -1246,22 +1475,92 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		D0C000000000000000000004 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ALLOW_ENTITLEMENTS_MODIFICATION = NO;
+				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_IDENTITY = "$(NOTCHSCAPE_DOCK_SIGNING_IDENTITY)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "$(NOTCHSCAPE_DOCK_SIGNING_IDENTITY)";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 330;
+				DEVELOPMENT_TEAM = 6H86CTRJCP;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = NotchscapeDockWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleName = "Notchscape Dock Widget";
+				INFOPLIST_KEY_CFBundleDisplayName = "Notchscape Dock Widget";
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = "2.9.6";
+				NOTCHSCAPE_DOCK_SIGNING_IDENTITY = "Apple Development: grechgraden@icloud.com (P45575RL23)";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.graden-grech.Notchscape.DockWidget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = NO;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		D0C000000000000000000005 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ALLOW_ENTITLEMENTS_MODIFICATION = NO;
+				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_IDENTITY = "$(NOTCHSCAPE_DOCK_SIGNING_IDENTITY)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "$(NOTCHSCAPE_DOCK_SIGNING_IDENTITY)";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 330;
+				DEVELOPMENT_TEAM = 6H86CTRJCP;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = NotchscapeDockWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleName = "Notchscape Dock Widget";
+				INFOPLIST_KEY_CFBundleDisplayName = "Notchscape Dock Widget";
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = "2.9.6";
+				NOTCHSCAPE_DOCK_SIGNING_IDENTITY = "Apple Development: grechgraden@icloud.com (P45575RL23)";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.graden-grech.Notchscape.DockWidget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = NO;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		FACE00000000000000000009 = { "isa" = "XCBuildConfiguration"; "buildSettings" = { "ALWAYS_SEARCH_USER_PATHS" = "NO"; "CODE_SIGN_ENTITLEMENTS" = "NotchscapeFaceVault/NotchscapeFaceVault.entitlements"; "CODE_SIGN_IDENTITY" = "Apple Development"; "CODE_SIGN_INJECT_BASE_ENTITLEMENTS" = "NO"; "CODE_SIGN_STYLE" = "Automatic"; "CURRENT_PROJECT_VERSION" = 330; "DEVELOPMENT_TEAM" = "6H86CTRJCP"; "ENABLE_HARDENED_RUNTIME" = "YES"; "GENERATE_INFOPLIST_FILE" = "YES"; "INFOPLIST_FILE" = "NotchscapeFaceVault/Info.plist"; "INFOPLIST_KEY_CFBundleDisplayName" = "Notchscape Face Vault"; "MACOSX_DEPLOYMENT_TARGET" = "15.0"; "MARKETING_VERSION" = "2.9.6"; "PRODUCT_BUNDLE_IDENTIFIER" = "com.graden-grech.Notchscape.FaceVault"; "PRODUCT_NAME" = "$(TARGET_NAME)"; "SKIP_INSTALL" = "YES"; "SWIFT_VERSION" = "6.0"; "SWIFT_STRICT_CONCURRENCY" = "complete"; }; "name" = "Debug"; };
+		FACE0000000000000000000A = { "isa" = "XCBuildConfiguration"; "buildSettings" = { "ALWAYS_SEARCH_USER_PATHS" = "NO"; "CODE_SIGN_ENTITLEMENTS" = "NotchscapeFaceVault/NotchscapeFaceVault.entitlements"; "CODE_SIGN_IDENTITY" = "Apple Development"; "CODE_SIGN_INJECT_BASE_ENTITLEMENTS" = "NO"; "CODE_SIGN_STYLE" = "Automatic"; "CURRENT_PROJECT_VERSION" = 330; "DEVELOPMENT_TEAM" = "6H86CTRJCP"; "ENABLE_HARDENED_RUNTIME" = "YES"; "GENERATE_INFOPLIST_FILE" = "YES"; "INFOPLIST_FILE" = "NotchscapeFaceVault/Info.plist"; "INFOPLIST_KEY_CFBundleDisplayName" = "Notchscape Face Vault"; "MACOSX_DEPLOYMENT_TARGET" = "15.0"; "MARKETING_VERSION" = "2.9.6"; "PRODUCT_BUNDLE_IDENTIFIER" = "com.graden-grech.Notchscape.FaceVault"; "PRODUCT_NAME" = "$(TARGET_NAME)"; "SKIP_INSTALL" = "YES"; "SWIFT_VERSION" = "6.0"; "SWIFT_STRICT_CONCURRENCY" = "complete"; }; "name" = "Release"; };
 		11F7485E2EC9AABA00F841DB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = NotchscapeHelper/NotchscapeHelper.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Apple Development: grechgraden@icloud.com (P45575RL23)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development: grechgraden@icloud.com (P45575RL23)";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 297;
-				DEVELOPMENT_TEAM = "";
+				CURRENT_PROJECT_VERSION = 330;
+				DEVELOPMENT_TEAM = 6H86CTRJCP;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NotchscapeHelper/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = NotchscapeHelper;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = "2.9.4";
+				MARKETING_VERSION = "2.9.6";
 				PRODUCT_BUNDLE_IDENTIFIER = theboringteam.boringnotch.BoringNotchXPCHelper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -1275,18 +1574,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = NotchscapeHelper/NotchscapeHelper.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Apple Development: grechgraden@icloud.com (P45575RL23)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development: grechgraden@icloud.com (P45575RL23)";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 297;
-				DEVELOPMENT_TEAM = "";
+				CURRENT_PROJECT_VERSION = 330;
+				DEVELOPMENT_TEAM = 6H86CTRJCP;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NotchscapeHelper/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = NotchscapeHelper;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = "2.9.4";
+				MARKETING_VERSION = "2.9.6";
 				PRODUCT_BUNDLE_IDENTIFIER = theboringteam.boringnotch.BoringNotchXPCHelper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -1429,14 +1728,14 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ALLOW_ENTITLEMENTS_MODIFICATION = YES;
 				CODE_SIGN_ENTITLEMENTS = Notchscape/Notchscape.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Apple Development: grechgraden@icloud.com (P45575RL23)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development: grechgraden@icloud.com (P45575RL23)";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 297;
+				CURRENT_PROJECT_VERSION = 330;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Notchscape/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 6H86CTRJCP;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -1454,7 +1753,7 @@
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "This app uses AppleEvents to control music";
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "This app uses the calendar to display your calendar events";
-				INFOPLIST_KEY_NSCameraUsageDescription = "This app uses the camera to display a live camera view";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Notchscape uses the camera when you start Mirror or opt into local Face Unlock. Face Unlock images are processed on this Mac and are not saved.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSRemindersUsageDescription = "This app uses Reminders to display your scheduled reminder in the calendar";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1462,7 +1761,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = "2.9.4";
+				MARKETING_VERSION = "2.9.6";
 				PRODUCT_BUNDLE_IDENTIFIER = theboringteam.boringnotch;
 				PRODUCT_MODULE_NAME = Notchscape;
 				PRODUCT_NAME = Notchscape;
@@ -1487,14 +1786,14 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ALLOW_ENTITLEMENTS_MODIFICATION = YES;
 				CODE_SIGN_ENTITLEMENTS = Notchscape/Notchscape.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Apple Development: grechgraden@icloud.com (P45575RL23)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development: grechgraden@icloud.com (P45575RL23)";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 297;
+				CURRENT_PROJECT_VERSION = 330;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Notchscape/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 6H86CTRJCP;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				EXECUTABLE_NAME = Notchscape;
@@ -1511,7 +1810,7 @@
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "This app uses AppleEvents to control music";
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "This app uses the calendar to display your calendar events";
-				INFOPLIST_KEY_NSCameraUsageDescription = "This app uses the camera to display a live camera view";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Notchscape uses the camera when you start Mirror or opt into local Face Unlock. Face Unlock images are processed on this Mac and are not saved.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSRemindersUsageDescription = "This app uses Reminders to display your scheduled reminder in the calendar";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1519,7 +1818,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = "2.9.4";
+				MARKETING_VERSION = "2.9.6";
 				PRODUCT_BUNDLE_IDENTIFIER = theboringteam.boringnotch;
 				PRODUCT_MODULE_NAME = Notchscape;
 				PRODUCT_NAME = Notchscape;
@@ -1538,6 +1837,8 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		D0C000000000000000000003 /* Build configuration list for PBXNativeTarget "NotchscapeDockWidget" */ = {isa = XCConfigurationList; buildConfigurations = (D0C000000000000000000004, D0C000000000000000000005, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		FACE00000000000000000008 = { "isa" = "XCConfigurationList"; "buildConfigurations" = ("FACE00000000000000000009", "FACE0000000000000000000A", ); "defaultConfigurationIsVisible" = 0; "defaultConfigurationName" = "Release"; };
 		11F7485D2EC9AABA00F841DB /* Build configuration list for PBXNativeTarget "NotchscapeHelper" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

@@ -82,6 +82,51 @@ import CoreGraphics
             leftArea: left.offsetBy(dx: -1000, dy: 0), rightArea: right) == nil,
               "out-of-screen measurements do not create a physical cover")
 
+        // A normal screenshot cannot reveal pixels hidden by the real camera.
+        // Compare visible lane edges against measured physical housing edges.
+        let hud = InlineHUDLayoutPolicy.lanes(sideWidth: 88, physicalNotchWidth: cutout.width)!
+        check(hud.totalWidth == 381, "closed HUD reserves compact controls and the full measured camera plus clearance")
+        let oldHUDGapRight = (cutout.width - 20) / 2 + 8
+        check(oldHUDGapRight < cutout.width / 2,
+              "regression fixture exposes the old slider start behind the physical notch")
+        for requestedScale in [0.6, 0.8, 1, 1.2] {
+            let actual = NotchGestureLayoutPolicy.horizontalScale(requested: requestedScale, hasPhysicalNotch: true)
+            let paintedSliderStart = hud.cutoutWidth / 2 * actual
+            check(paintedSliderStart >= cutout.width / 2 + 10,
+                  "the final gesture transform cannot shrink the slider behind stationary hardware")
+            check(NotchGestureLayoutPolicy.horizontalScale(requested: requestedScale, hasPhysicalNotch: false) == requestedScale,
+                  "notchless displays retain their existing gesture animation")
+        }
+        for width in [185.0, 204.5, 226] {
+            for side in [88.0, 100, 128] {
+                for offset in [-12.0, 0, 12] {
+                    let lanes = InlineHUDLayoutPolicy.lanes(sideWidth: side,
+                        physicalNotchWidth: width, centerOffset: offset)!
+                    let hudOrigin = -lanes.totalWidth / 2
+                    let leftVisibleEnd = hudOrigin + lanes.leadingWidth
+                    let rightVisibleStart = leftVisibleEnd + lanes.cutoutWidth
+                    check(leftVisibleEnd <= offset - width / 2 - 10,
+                          "HUD icon/label clears the measured housing on its left")
+                    check(rightVisibleStart >= offset + width / 2 + 10,
+                          "HUD slider start clears the measured housing on its right")
+                    check(lanes.leadingWidth >= side && lanes.trailingWidth >= side,
+                          "hover/gesture changes cannot compress either visible control lane")
+                    check((leftVisibleEnd + rightVisibleStart) / 2 == offset,
+                          "noncentral housing remains reserved at its actual screen location")
+                }
+            }
+        }
+        for invalid in [Double.nan, .infinity, -1, 0] {
+            check(InlineHUDLayoutPolicy.lanes(sideWidth: invalid, physicalNotchWidth: 185) == nil,
+                  "invalid HUD controls cannot produce invisible or unbounded lanes")
+            check(InlineHUDLayoutPolicy.lanes(sideWidth: 88, physicalNotchWidth: invalid) == nil,
+                  "invalid physical widths cannot create a HUD camera reservation")
+        }
+        check(InlineHUDLayoutPolicy.lanes(sideWidth: 88, physicalNotchWidth: 185, centerOffset: .nan) == nil,
+              "invalid center offsets are rejected")
+        check(InlineHUDLayoutPolicy.lanes(sideWidth: .greatestFiniteMagnitude,
+            physicalNotchWidth: .greatestFiniteMagnitude) == nil, "overflow is rejected")
+
         let batteryContentWidth = 612.0
         let batteryLanes = BatteryNotificationLayoutPolicy.compactLanes(
             leadingContentWidth: 22, trailingContentWidth: 34, physicalNotchWidth: cutout.width)!
@@ -169,6 +214,6 @@ import CoreGraphics
         }
         check(BatteryNotificationLayoutPolicy.lanes(contentWidth: 100, physicalNotchWidth: 185) == nil,
               "a camera gap cannot silently produce negative visible side widths")
-        print("PASS: \(checks) fresh-install/upgrade defaults, header and battery-notification layout checks")
+        print("PASS: \(checks) defaults, header, physical HUD and battery-notification layout checks")
     }
 }

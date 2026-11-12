@@ -104,15 +104,21 @@ struct ContentView: View {
         NotchShape(
             topCornerRadius: topCornerRadius,
             bottomCornerRadius: ((vm.notchState == .open) && Defaults[.cornerRadiusScaling])
-                ? cornerRadiusInsets.opened.bottom
+                ? expandedBottomCornerRadius
                 : cornerRadiusInsets.closed.bottom
         )
     }
 
-    private var sportsUsesPhysicalNotchLayout: Bool {
-        let screen = vm.screenUUID.flatMap { NSScreen.screen(withUUID: $0) }
-        return (screen?.safeAreaInsets.top ?? 0) > 0
+    // Round only the expanded lower shoulders. Top attachment, outer size and
+    // every closed/HUD geometry stay on the existing measured values.
+    private var expandedBottomCornerRadius: CGFloat { cornerRadiusInsets.opened.bottom + 6 }
+
+    private var displayGeometry: DisplayGeometrySnapshot? {
+        guard let screen = vm.screenUUID.flatMap({ NSScreen.screen(withUUID: $0) }) else { return nil }
+        return NSScreenDisplayGeometryAdapter.snapshot(for: screen)
     }
+
+    private var sportsUsesPhysicalNotchLayout: Bool { displayGeometry?.usesLegacyNotchLayout == true }
 
     private var usesFloatingIslandLayout: Bool {
         !sportsUsesPhysicalNotchLayout
@@ -295,23 +301,9 @@ struct ContentView: View {
                         ZStack(alignment: .top) {
                             sportsUsesFloatingIsland ? Color.clear : Color.black
                             if appTheme.hasHomeScene {
-                                // Keep the photo at its expanded dimensions while
-                                // the outer mask contracts. Replacing/remapping the
-                                // background on close caused a flash and image jump.
-                                HomeThemeScene(theme: appTheme, vaderArtwork: starWarsVaderArtwork,
-                                               imageAlignment: .top)
-                                    .frame(width: getOpenNotchSize().width, height: getOpenNotchSize().height, alignment: .top)
-                                    .clipped()
-                                    .overlay {
-                                        LinearGradient(stops: [
-                                            .init(color: .black.opacity(0.76), location: 0),
-                                            .init(color: .black.opacity(0.54), location: 0.78),
-                                            .init(color: .black.opacity(0.03), location: 0.86)
-                                        ], startPoint: .leading, endPoint: .trailing)
-                                    }
-                                    .opacity(vm.notchState == .open && coordinator.currentView == .home ? 1 : 0)
-                                    .animation(.easeOut(duration: 0.24), value: vm.notchState)
-                                    .animation(.easeOut(duration: 0.2), value: coordinator.currentView)
+                                ExpandedMenuThemeBackground(theme: appTheme, vaderArtwork: starWarsVaderArtwork,
+                                    size: getOpenNotchSize(), isExpanded: vm.notchState == .open,
+                                    isHome: coordinator.currentView == .home)
                             }
                         }
                         .allowsHitTesting(false)
@@ -340,7 +332,7 @@ struct ContentView: View {
                                 RoundedRectangle(
                                     cornerRadius: vm.notchState == .closed
                                         ? floatingIslandHeight / 2
-                                        : cornerRadiusInsets.opened.bottom,
+                                        : expandedBottomCornerRadius,
                                     style: .continuous
                                 )
                             )
@@ -459,7 +451,8 @@ struct ContentView: View {
         .frame(maxWidth: windowSize.width, maxHeight: windowSize.height, alignment: .top)
         .compositingGroup()
         .scaleEffect(
-            x: gestureScale,
+            x: CGFloat(NotchGestureLayoutPolicy.horizontalScale(
+                requested: Double(gestureScale), hasPhysicalNotch: sportsUsesPhysicalNotchLayout)),
             y: gestureScale,
             anchor: .top
         )
@@ -747,14 +740,13 @@ struct ContentView: View {
 
     private var batteryNotificationLanes: BatteryNotificationLanes? {
         let screen = vm.screenUUID.flatMap { NSScreen.screen(withUUID: $0) } ?? NSScreen.main
-        guard let screen, screen.safeAreaInsets.top > 0 else { return nil }
-        let physical = PhysicalNotchGeometry.resolve(
-            screenFrame: screen.frame, safeTop: Double(screen.safeAreaInsets.top),
-            leftArea: screen.auxiliaryTopLeftArea, rightArea: screen.auxiliaryTopRightArea)
+        guard let screen, let geometry = NSScreenDisplayGeometryAdapter.snapshot(for: screen),
+              geometry.usesLegacyNotchLayout else { return nil }
+        let gap = geometry.reportedTopGap
         return BatteryNotificationLayoutPolicy.compactLanes(
             presentation: batteryNotificationPresentation, level: Double(batteryModel.levelBattery),
-            physicalNotchWidth: physical?.width ?? Double(vm.closedNotchSize.width),
-            centerOffset: physical?.centerOffset ?? 0)
+            physicalNotchWidth: gap?.width ?? Double(vm.closedNotchSize.width),
+            centerOffset: gap?.centerOffset ?? 0)
     }
 
     private func batteryNotification() -> some View {
@@ -903,7 +895,6 @@ struct ContentView: View {
                 }
             }
             .padding(.trailing, agentDetailExpanded ? 7 : 0)
-            .background(.black.opacity(0.74), in: Capsule())
             .liquidGlassCapsule(tint: accent)
         }
         .buttonStyle(.plain)
@@ -966,7 +957,6 @@ struct ContentView: View {
                 }
                 .padding(.horizontal, 9)
                 .frame(width: 154, height: side, alignment: .leading)
-                .background(.black.opacity(0.72), in: Capsule())
                 .liquidGlassCapsule(tint: .blue)
             }
             .buttonStyle(.plain)
@@ -1001,7 +991,6 @@ struct ContentView: View {
                 }
                 .padding(.horizontal, 10)
                 .frame(width: 154, height: side, alignment: .leading)
-                .background(.black.opacity(0.72), in: Capsule())
                 .liquidGlassCapsule(tint: finished ? .green : .orange)
             }
             .buttonStyle(.plain)
@@ -1068,7 +1057,6 @@ struct ContentView: View {
                 }
                 .padding(.horizontal, 9)
                 .frame(width: 154, height: side, alignment: .leading)
-                .background(.black.opacity(0.72), in: Capsule())
                 .liquidGlassCapsule(tint: finished ? .green : .blue)
             }
             .buttonStyle(.plain)
@@ -1270,8 +1258,7 @@ struct ContentView: View {
             }
             .padding(.horizontal, 10)
             .frame(width: 154, height: side, alignment: .leading)
-            .background(.black.opacity(0.72), in: Capsule())
-            .liquidGlassCapsule(tint: .indigo)
+            .liquidGlassCapsule(tint: .indigo, interactive: false)
         }
         .frame(height: vm.effectiveClosedNotchHeight)
     }
@@ -1593,17 +1580,36 @@ struct LockedNotchHomeView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var expanded = false
     @State private var hoverTask: Task<Void, Never>?
+    @ObservedObject private var faceActivity = FaceUnlockActivityCenter.shared
 
     private var height: CGFloat { max(usesIsland ? 18 : 22, closedSize.height) }
     private var width: CGFloat { closedSize.width }
+    private var faceActivityVisible: Bool { endPreview == nil && faceActivity.isVisible }
+    private var compactWidth: CGFloat { faceActivityVisible && hasPhysicalNotch ? width + 68 : width }
+    private var faceSymbol: String {
+        switch faceActivity.phase {
+        case .hidden: "lock.fill"
+        case .scanning: faceActivity.symbol
+        case .recognized: "checkmark"
+        case .unavailable: "lock.fill"
+        }
+    }
 
     var body: some View {
         VStack(spacing: 8) {
             if expanded {
                 Spacer(minLength: hasPhysicalNotch ? height + 10 : 18)
-                Image(systemName: "lock.fill")
+                Image(systemName: faceActivityVisible ? faceSymbol : "lock.fill")
                     .font(.system(size: 24, weight: .medium))
                     .accessibilityLabel("Mac locked. Unlock your Mac to see Home.")
+                if faceActivityVisible && faceActivity.expandedGuidance {
+                    Text(faceActivity.message).font(.callout).multilineTextAlignment(.center)
+                        .padding(.horizontal, 18)
+                }
+                if endPreview == nil && faceActivity.canRetry {
+                    Button("Try Face Unlock") { faceActivity.retry?() }
+                        .buttonStyle(.bordered).controlSize(.small)
+                }
                 if let endPreview {
                     Button("End Preview", action: endPreview)
                         .buttonStyle(.bordered)
@@ -1611,13 +1617,25 @@ struct LockedNotchHomeView: View {
                 }
                 Spacer(minLength: 14)
             } else {
-                // The closed notch stays plain and at its original width.
-                // Only the expanded Home dropdown shows the lock symbol.
-                Color.clear.accessibilityHidden(true)
+                // Plain unless an explicitly authorized face session has a
+                // transient status. The measured camera lane stays empty.
+                if faceActivityVisible {
+                    HStack(spacing: 0) {
+                        Image(systemName: faceSymbol)
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(faceActivity.phase == .recognized ? Color.green : Color.white)
+                            .frame(width: hasPhysicalNotch ? 34 : width)
+                            .accessibilityLabel(faceActivity.message)
+                        if hasPhysicalNotch {
+                            Color.clear.frame(width: width).accessibilityHidden(true)
+                            Color.clear.frame(width: 34).accessibilityHidden(true)
+                        }
+                    }
+                } else { Color.clear.accessibilityHidden(true) }
             }
         }
         .foregroundStyle(.white)
-        .frame(width: expanded ? max(320, width) : width,
+        .frame(width: expanded ? max(320, width) : compactWidth,
                height: expanded ? (hasPhysicalNotch ? height + 156 : 176) : height)
         .background(.black)
         .conditionalModifier(usesIsland) { view in
@@ -1634,7 +1652,10 @@ struct LockedNotchHomeView: View {
         .onTapGesture { expanded.toggle() }
         .onHover { hovering in
             hoverTask?.cancel()
-            guard hovering else { expanded = false; return }
+            guard hovering else {
+                if !(faceActivityVisible && faceActivity.expandedGuidance) { expanded = false }
+                return
+            }
             guard Defaults[.openNotchOnHover] else { return }
             hoverTask = Task { @MainActor in
                 do { try await Task.sleep(for: .seconds(Defaults[.minimumHoverDuration])) }
@@ -1643,6 +1664,14 @@ struct LockedNotchHomeView: View {
             }
         }
         .animation(reduceMotion ? nil : .spring(response: 0.38, dampingFraction: 0.88), value: expanded)
+        .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: faceActivity.phase)
+        .onChange(of: faceActivity.phase) { _, phase in
+            if endPreview == nil, faceActivity.expandedGuidance, phase == .scanning { expanded = true }
+            if phase == .hidden { expanded = false }
+        }
+        .onAppear {
+            if endPreview == nil, faceActivity.expandedGuidance, faceActivity.phase == .scanning { expanded = true }
+        }
         .frame(maxWidth: windowSize.width, maxHeight: windowSize.height, alignment: .top)
         .preferredColorScheme(.dark)
         .onDisappear { hoverTask?.cancel() }
