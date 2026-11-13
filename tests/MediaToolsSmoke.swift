@@ -4,6 +4,10 @@ import ImageIO
 
 // Standalone fixture stubs: no live app, screen, account or permission access.
 enum WorkspaceAccess { @MainActor static var privateToolsAllowed: Bool { true } }
+@MainActor final class DesktopSnowManager {
+    static let shared = DesktopSnowManager()
+    func setCaptureSuppressed(_ suppressed: Bool) {}
+}
 @MainActor final class CaptureStudioController {
     static let shared = CaptureStudioController()
     var window: NSWindow? { nil }
