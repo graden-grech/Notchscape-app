@@ -1,5 +1,13 @@
 import Foundation
 
+/// Input direction is independent of the computers' physical arrangement.
+enum ScreenBridgeControlDirection: String, CaseIterable {
+    case both, macToWindows, windowsToMac
+
+    var allowsMacToWindows: Bool { self != .windowsToMac }
+    var allowsWindowsToMac: Bool { self != .macToWindows }
+}
+
 /// Cheap validation only. Key derivation stays on the network queue.
 enum ScreenBridgeConnectionPolicy {
     static func validHost(_ value: String) -> Bool {

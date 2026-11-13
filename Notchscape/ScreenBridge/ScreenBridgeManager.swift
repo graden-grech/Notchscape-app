@@ -11,6 +11,7 @@ protocol ScreenBridgeTransport: AnyObject {
 }
 extension SBLink: ScreenBridgeTransport {}
 protocol ScreenBridgeInputRouting: AnyObject {
+    var direction: ScreenBridgeControlDirection { get set }
     var side: SBSide { get set }
     var displayID: String? { get set }
     var displays: [SBDisplayInfo] { get }
@@ -37,6 +38,7 @@ final class ScreenBridgeManager: ObservableObject {
     @Published private(set) var connecting = false
     @Published private(set) var status = "Not connected"
     @Published private(set) var side: SBSide
+    @Published private(set) var direction: ScreenBridgeControlDirection
     @Published private(set) var macDisplays: [SBDisplayInfo] = []
     @Published private(set) var windowsDisplays: [SBDisplayInfo] = []
     @Published private(set) var macDisplay: String = ""
@@ -62,6 +64,8 @@ final class ScreenBridgeManager: ObservableObject {
         self.otherClientRunning = otherClientRunning
         host = defaults.string(forKey: "screenBridgeHost") ?? ""
         side = SBSide(rawValue: defaults.string(forKey: "screenBridgeSide") ?? "") ?? .right
+        direction = ScreenBridgeControlDirection(rawValue: defaults.string(forKey: "screenBridgeDirection") ?? "") ?? .both
+        self.input.direction = direction
         self.input.side = side
         macDisplay = defaults.string(forKey: "screenBridgeMacDisplay") ?? ""
         windowsDisplay = defaults.string(forKey: "screenBridgeWindowsDisplay") ?? ""
@@ -132,6 +136,14 @@ final class ScreenBridgeManager: ObservableObject {
         windowsDisplays = []; status = reason
     }
     func returnControl() { input.returnLocal(notify: true) }
+    func setDirection(_ value: ScreenBridgeControlDirection) {
+        guard direction != value else { return }
+        // Release remote keys/buttons before changing which handoffs are allowed.
+        // The authenticated socket and physical display layout stay unchanged.
+        input.returnLocal(notify: true)
+        input.direction = value; direction = value
+        defaults.set(value.rawValue, forKey: "screenBridgeDirection")
+    }
     func setSide(_ value: SBSide) {
         input.returnLocal(notify: true); side = value; input.side = value
         defaults.set(value.rawValue, forKey: "screenBridgeSide")

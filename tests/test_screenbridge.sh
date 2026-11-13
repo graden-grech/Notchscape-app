@@ -12,7 +12,7 @@ trap cleanup EXIT
 swiftc Notchscape/ScreenBridge/ScreenBridgeConnectionPolicy.swift Notchscape/ScreenBridge/ScreenBridgeWire.swift Notchscape/ScreenBridge/ScreenBridgeInput.swift Notchscape/ScreenBridge/ScreenBridgeManager.swift tests/ScreenBridgeIntegrationTests.swift -o "$TMP/integration"
 "$TMP/integration"
 "$DOTNET" build companions/ScreenBridge/tests/ProtocolHarness -o "$TMP/harness" --artifacts-path "$TMP/artifacts"
-swiftc Notchscape/ScreenBridge/ScreenBridgeWire.swift Notchscape/ScreenBridge/ScreenBridgeInput.swift tests/ScreenBridgeProtocolTests.swift -framework Cocoa -framework Network -framework CryptoKit -o "$TMP/protocol"
+swiftc Notchscape/ScreenBridge/ScreenBridgeConnectionPolicy.swift Notchscape/ScreenBridge/ScreenBridgeWire.swift Notchscape/ScreenBridge/ScreenBridgeInput.swift tests/ScreenBridgeProtocolTests.swift -framework Cocoa -framework Network -framework CryptoKit -o "$TMP/protocol"
 "$DOTNET" "$TMP/harness/ProtocolHarness.dll" "$TMP/frame.txt" > "$TMP/harness.log" 2>&1 &
 HARNESS_PID=$!
 for ((i=0;i<50;i++)); do

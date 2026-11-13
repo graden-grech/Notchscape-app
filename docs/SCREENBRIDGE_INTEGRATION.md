@@ -32,3 +32,11 @@ The custom ScreenBridge protocol has not received an independent security audit 
 ## Recoverable cleanup
 
 After local integration checks, three standalone ScreenBridge compiler outputs (1,027,216 bytes) were moved to Trash. The original app/source and Windows companion remain for the deferred physical test. The external checkpoint folder holds the original-to-Trash manifest; no settings, credentials, biometric data or source were deleted.
+
+## Control direction
+
+The local direction update adds a native Control direction picker: Both computers (the compatibility default), Mac controls Windows, and Windows controls Mac. It is separate from Windows' physical screen position. A direction change releases current keys/buttons and returns control locally before applying the new rule; it does not disconnect the socket or swap monitor arrangement. Windows' existing v1 enter/reject messages remain compatible, so no companion replacement is needed for this setting.
+
+The user confirmed Mac-to-Windows control on November13. Windows-to-Mac physical validation is deferred because the user left the PC. Read-only Windows checks confirmed the existing opposite-edge portal and outgoing enter/move/key handling. Synthetic direction/lifecycle/persistence checks and exact Swift/.NET interoperability passed. The expired local Face helper development profile was renewed on the existing team through November20; it remains device-bound and excluded from public downloads. No camera, vault, password or biometric test was performed.
+
+Direction update local334 was installed and visually checked. The picker was tested with Windows controls Mac and restored to Both computers. Signed identity,114 repository checks, protocol/lifecycle tests and three HUD runtime checks passed;68 checked existing app settings and2 native Dock values stayed unchanged. Physical reverse control remains untested pending the user’s return to Windows.

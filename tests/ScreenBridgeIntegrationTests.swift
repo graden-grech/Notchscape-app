@@ -10,17 +10,18 @@ final class FakeBridgeTransport: ScreenBridgeTransport {
     func send(_ message: [String: Any]) {}
 }
 final class FakeBridgeInput: ScreenBridgeInputRouting {
+    var direction = ScreenBridgeControlDirection.both
     var side = SBSide.right
     var displayID: String?
     var displays: [SBDisplayInfo] = []
     var send: (([String: Any]) -> Void)?
     var status: ((String) -> Void)?
-    var starts = 0, stops = 0
+    var starts = 0, stops = 0, returns = 0
     var succeeds = true
     func refreshDisplays() {}
     func start() -> Bool { starts += 1; return succeeds }
     func stop() { stops += 1 }
-    func returnLocal(notify: Bool, position: Double?) {}
+    func returnLocal(notify: Bool, position: Double?) { returns += 1 }
     func receive(_ message: [String: Any]) {}
 }
 
@@ -34,6 +35,9 @@ final class FakeBridgeInput: ScreenBridgeInputRouting {
         }
         for code in ["ABCDE-FGHJK", "abcde fghjk", "OIL23-45678"] { precondition(ScreenBridgeConnectionPolicy.validCode(code)) }
         for code in ["", "123456", "ABCDE-FGHIU", "ABCDE-FGHJKX"] { precondition(!ScreenBridgeConnectionPolicy.validCode(code)) }
+        precondition(ScreenBridgeControlDirection.both.allowsMacToWindows && ScreenBridgeControlDirection.both.allowsWindowsToMac)
+        precondition(ScreenBridgeControlDirection.macToWindows.allowsMacToWindows && !ScreenBridgeControlDirection.macToWindows.allowsWindowsToMac)
+        precondition(!ScreenBridgeControlDirection.windowsToMac.allowsMacToWindows && ScreenBridgeControlDirection.windowsToMac.allowsWindowsToMac)
         var before: UInt32 = 0
         CGGetEventTapList(0, nil, &before)
         let bridge = ScreenBridgeManager()
@@ -60,6 +64,13 @@ final class FakeBridgeInput: ScreenBridgeInputRouting {
         precondition(!simulated.connected && routing.starts == 0)
         connect(); transport.onReady?()
         precondition(simulated.connected && !simulated.connecting && routing.starts == 1 && simulated.code.isEmpty)
+        let returnsBeforeDirectionChange = routing.returns
+        simulated.setDirection(.windowsToMac)
+        precondition(simulated.connected && routing.direction == .windowsToMac && routing.returns == returnsBeforeDirectionChange + 1)
+        precondition(defaults.string(forKey: "screenBridgeDirection") == "windowsToMac")
+        let restored = ScreenBridgeManager(link: FakeBridgeTransport(), input: FakeBridgeInput(), defaults: defaults,
+            isLocked: { false }, canCapture: { true }, otherClientRunning: { false })
+        precondition(restored.direction == .windowsToMac && !restored.connected && !restored.connecting)
         locked = true; transport.onMessage?(["type": "move", "dx": 1, "dy": 1])
         precondition(!simulated.connected && routing.stops > 0)
         locked = false; routing.succeeds = false; connect(); transport.onReady?()

@@ -64,6 +64,7 @@ func SBpointOnEdge(_ n:Double,_ r:CGRect,_ s:SBSide) -> CGPoint {
     case .below:return CGPoint(x:r.minX+n*(r.width-1),y:r.maxY-2) }
 }
 final class SBInputBridge {
+    var direction: ScreenBridgeControlDirection = .both
     var side:SBSide = .right
     var displayID:String?
     var displays:[SBDisplayInfo]=SBlocalDisplays()
@@ -138,6 +139,7 @@ final class SBInputBridge {
             if type == .keyDown || type == .keyUp || type == .flagsChanged { return false }
             returnLocal(notify:true);return false
         }
+        guard direction.allowsMacToWindows else { return false }
         let moves = [.mouseMoved,.leftMouseDragged,.rightMouseDragged,.otherMouseDragged].contains(type)
         if moves {
             let dx=Double(event.getIntegerValueField(.mouseEventDeltaX)), dy=Double(event.getIntegerValueField(.mouseEventDeltaY))
@@ -190,6 +192,7 @@ final class SBInputBridge {
         let r=selectedBounds
         switch type {
         case "enter":
+            guard direction.allowsWindowsToMac else { send?(["type":"reject"]); return }
             // Mac wins a simultaneous crossing; the loser resumes local control.
             if remote { send?(["type":"reject"]); return }
             receiving=true; enteredAt=Date(); releaseInjected()

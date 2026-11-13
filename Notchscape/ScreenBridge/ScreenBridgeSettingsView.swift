@@ -29,6 +29,15 @@ struct ScreenBridgeSettingsView: View {
                 Text("Open the Windows ScreenBridge companion and use its current address and code. The code is used for this encrypted session and is never saved. Clipboard and files are not shared.")
             }
             Section {
+                Picker("Control direction", selection: Binding(get: { bridge.direction }, set: bridge.setDirection)) {
+                    Text("Both computers").tag(ScreenBridgeControlDirection.both)
+                    Text("Mac controls Windows").tag(ScreenBridgeControlDirection.macToWindows)
+                    Text("Windows controls Mac").tag(ScreenBridgeControlDirection.windowsToMac)
+                }
+            } header: { Text("Mouse & Keyboard") } footer: {
+                Text("Both computers lets either mouse and keyboard cross to the other screen. Choose Windows controls Mac to use the PC’s mouse and keyboard on your Mac. This does not change the display arrangement. Windows must be connected and unlocked; the Mac must be unlocked too.")
+            }
+            Section {
                 Picker("Windows is", selection: Binding(get: { bridge.side }, set: bridge.setSide)) {
                     Text("Right of Mac").tag(SBSide.right)
                     Text("Left of Mac").tag(SBSide.left)
