@@ -107,6 +107,7 @@ class FaceVaultSigningTests(unittest.TestCase):
             app=pathlib.Path(directory)/"Notchscape.app"
             info=app/"Contents/XPCServices/Renamed.xpc/Contents/Info.plist";info.parent.mkdir(parents=True)
             info.write_bytes(plistlib.dumps({"CFBundleIdentifier":gate.BROKER}))
+            (app/"Contents/Info.plist").write_bytes(plistlib.dumps({"NotchFaceUnlockEnabled":False,"NotchAccountsEnabled":False}))
             with self.assertRaisesRegex(ValueError,"local-only"):gate.public_release_app(app)
 
     @unittest.skipUnless(os.environ.get("FACE_VAULT_TEST_PROFILE"), "local authenticated-Xcode profile fixture not supplied")
