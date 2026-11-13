@@ -1,0 +1,39 @@
+Physical acceptance checks
+
+Observed on 2026-10-09: both apps paired through Tailscale. User confirmed
+Mac mouse clicks/minimizes ScreenBridge on Windows without freezing, moves
+between both Windows monitors, returns to Mac, and no longer sees Mac cursor
+mirroring Windows movement. Windows executable SHA-256:
+974f1c35f5562a0e52dd8f3ef6d546aad0b209e028c4a9ffef49be9efcf445ac
+
+Other acceptance checks below still require their own recorded observations.
+
+Start with an ordinary text editor open on each machine.
+1. Pair, then test all four layout positions in both directions.
+2. Type normal text, Shift capitals, punctuation, arrows, Backspace,
+   Command/Ctrl copy and paste within the active computer, and Alt/Option.
+3. Click each mouse button, scroll vertically/horizontally, and drag within
+   the receiving desktop. Crossing while a mouse button is held should wait
+   until the drag ends.
+4. Hold a modifier while crossing; release it remotely. Confirm it does not
+   remain stuck. Use both emergency keyboard shortcuts during remote control.
+5. Disconnect networking during a held key or mouse button. After timeout,
+   verify the receiving side releases inputs and the controlling side's
+   physical keyboard/mouse works locally.
+6. While receiving, verify both keyboards type on the active computer.
+   The receiving computer's physical mouse should reclaim local control.
+   Check emergency return and simultaneous crossings from both computers.
+7. Sleep/wake and restart either app; verify manual reconnect and new pairing
+   code behavior.
+8. With multiple monitors, select each exposed bridge monitor/side. Cross
+   local monitor seams without switching computers. Confirm remote return
+   happens only on the selected exposed edge; test negative coordinates.
+   Confirm the controlling computer cursor stays hidden/parked and restores
+   at the chosen edge without mirroring remote motion.
+9. From the Mac mouse, click ScreenBridge's own Windows controls, minimize
+   and restore its window, and drag its title bar. Confirm clicks complete
+   immediately and the connection and input thread stay responsive.
+10. Confirm secure/elevated windows fail safely and retain local control.
+
+Do not mark these checks passed merely because the apps compile or the
+protocol tests pass. Record actual observations from both devices.

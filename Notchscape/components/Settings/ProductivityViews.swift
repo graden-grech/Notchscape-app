@@ -446,6 +446,7 @@ struct ProductivitySettings: View {
     var body: some View {
         Form {
             Section("Shortcuts & Files") {
+                SettingsSubpageLink(destinationID: "ScreenBridge")
                 SettingsSubpageLink(destinationID: "Shortcuts")
                 SettingsSubpageLink(destinationID: "Shelf")
             }

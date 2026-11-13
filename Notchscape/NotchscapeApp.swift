@@ -251,6 +251,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        ScreenBridgeManager.shared.disconnect()
         DesktopSnowManager.shared.stop()
         DockReplacementController.shared.stop()
         DockWidgetManager.shared.stop()
@@ -301,6 +302,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         cleanupDragDetectors()
         // Stop only this app's Mirror camera. No system camera permission changes.
         WebcamManager.shared.stopSession()
+        ScreenBridgeManager.shared.disconnect("Mac locked. Remote control stopped.")
         FaceUnlockManager.shared.systemDidLock()
         for (_, model) in notchWindowModels { model.isCameraExpanded = false }
         if !Defaults[.showOnLockScreen] {

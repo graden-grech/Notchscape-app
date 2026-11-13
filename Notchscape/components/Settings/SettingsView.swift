@@ -128,6 +128,8 @@ struct SettingsView: View {
                     Media()
                 case "Calendar":
                     CalendarSettings()
+                case "ScreenBridge":
+                    ScreenBridgeSettingsView()
                 case "Tools":
                     ProductivitySettings()
                 case "Wallpapers":

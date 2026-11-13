@@ -48,7 +48,7 @@ struct NotchSettingsDestination: Identifiable {
         case "Weather", "Themes", "HomeLayout", "AppIcon", "Effects": "Appearance"
         case "MediaAppearance": "Media"
         case "Agents", "Sports": "Activities"
-        case "Shortcuts", "Shelf": "Tools"
+        case "Shortcuts", "Shelf", "ScreenBridge": "Tools"
         case "Battery", "HUD": "System"
         default: id
         }
@@ -110,6 +110,7 @@ struct NotchSettingsDestination: Identifiable {
         .init(id: "Media", title: "Media", symbol: "play.rectangle.fill", color: "pink", keywords: "music spotify playback album lightsaber override"),
         .init(id: "Calendar", title: "Calendar", symbol: "calendar", color: "red", keywords: "events appointments permissions"),
         .init(id: "Tools", title: "Tools & Shortcuts", symbol: "square.grid.2x2.fill", color: "indigo", keywords: "clipboard notes devices bluetooth audio text capture ocr links tracking color picker eyedropper utilities"),
+        .init(id: "ScreenBridge", title: "Connected Devices", symbol: "desktopcomputer", color: "blue", keywords: "screenbridge windows pc mouse keyboard sharing pairing monitors"),
         .init(id: "Wallpapers", title: "Wallpapers", symbol: "photo.on.rectangle.angled", color: "cyan", keywords: "macscapes background desktop rotation shuffle favorites macos windows seasons"),
         .init(id: "Agents", title: "AI Agents", symbol: "sparkles", color: "purple", keywords: "codex claude limits usage tokens hooks status"),
         .init(id: "Weather", title: "Weather", symbol: "cloud.sun.fill", color: "blue", keywords: "location forecast city temperature celsius fahrenheit"),

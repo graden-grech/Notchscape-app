@@ -545,6 +545,7 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		5CB123450000000000000001 /* ScreenBridge */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Notchscape/ScreenBridge; sourceTree = "<group>"; };
 		112FB72F2CCF12CC0015238C /* private */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = private; sourceTree = "<group>"; };
 		11F748502EC9AABA00F841DB /* NotchscapeHelper */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (11F7485C2EC9AABA00F841DB /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = NotchscapeHelper; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -811,6 +812,7 @@
 		14CEF4092C5CAED200855D72 = {
 			isa = PBXGroup;
 			children = (
+				5CB123450000000000000001 /* ScreenBridge */,
 				FACE00000000000000000001,
 				D0C000000000000000000001 /* NotchscapeDockWidget */,
 				112B0EB62E30DD0F00562D6C /* mediaremote-adapter */,
@@ -1136,6 +1138,7 @@
 				11F7485A2EC9AABA00F841DB /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
+				5CB123450000000000000001 /* ScreenBridge */,
 				112FB72F2CCF12CC0015238C /* private */,
 			);
 			name = Notchscape;
