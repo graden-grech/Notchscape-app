@@ -3,6 +3,25 @@
     <channel>
         <title>Notchscape</title>
         <item>
+            <title>2.9.6</title>
+            <pubDate>Thu, 12 Nov 2026 13:20:14 -0500</pubDate>
+            <sparkle:version>330</sparkle:version>
+            <sparkle:shortVersionString>2.9.6</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <description><![CDATA[<h2>Notchscape 2.9.6</h2>
+<ul>
+<li>A more native Settings experience with sidebar search, visible page titles, clearer navigation and refined controls.</li>
+<li>Restored music-card layout and larger Mirror and Settings glass buttons.</li>
+<li>Optional Dock Bar, Dock widgets, desktop snow, expanded themes and landmark scenes.</li>
+<li>Improved weather, display compatibility, privacy controls and local workspace tools.</li>
+</ul>
+<p>Accounts remain disabled. Face Unlock is not included in the public download while its protected companion is limited to local development. This update preserves saved settings.</p>
+<p>Requires macOS 15 or later. This development-signed release is not notarized; supported-device and optional-feature testing limits are documented in the repository.</p>
+]]></description>
+            <enclosure url="https://github.com/graden-grech/Notchscape-app/releases/download/v2.9.6/Notchscape.zip" length="127685364" type="application/octet-stream" sparkle:edSignature="7RtyLUCD+uDgaFHdegTjNXFyGG9q8i0XX8NXUKxID3ZQjzg+vxVFxPb7j8PwbnEVbPv5eghAI/wc8VuOqHlEBA=="/>
+        </item>
+        <item>
             <title>2.9.4</title>
             <pubDate>Tue, 27 Oct 2026 19:24:35 -0400</pubDate>
             <link>https://github.com/graden-grech/Notchscape-app/releases/tag/v2.9.4</link>
