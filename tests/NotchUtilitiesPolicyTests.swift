@@ -94,7 +94,7 @@ struct NotchUtilitiesPolicyTests {
         check(results("App Icon").first?.id == "AppIcon", "Icon controls are directly addressable")
         check(results("Player Appearance").first?.id == "MediaAppearance", "Player styling remains grouped under Media")
         let parentTitles = ["Themes": "Appearance", "HomeLayout": "Appearance", "AppIcon": "Appearance", "Effects": "Appearance", "MediaAppearance": "Media", "Weather": "Appearance", "Agents": "Live Activities", "Sports": "Live Activities",
-                            "Shortcuts": "Tools & Shortcuts", "Shelf": "Tools & Shortcuts", "Battery": "System & Power", "HUD": "System & Power"]
+                            "ScreenBridge": "Tools & Shortcuts", "Shortcuts": "Tools & Shortcuts", "Shelf": "Tools & Shortcuts", "Battery": "System & Power", "HUD": "System & Power"]
         for destination in NotchSettingsDestination.all {
             check(destination.parentTitle == parentTitles[destination.id], "Only child results carry their existing parent breadcrumb")
         }
