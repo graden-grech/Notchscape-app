@@ -3,6 +3,25 @@
     <channel>
         <title>Notchscape</title>
         <item>
+            <title>2.9.7</title>
+            <pubDate>Fri, 13 Nov 2026 18:51:21 -0500</pubDate>
+            <sparkle:version>335</sparkle:version>
+            <sparkle:shortVersionString>2.9.7</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <description><![CDATA[<h2>Notchscape 2.9.7</h2>
+<ul>
+<li>ScreenBridge is integrated into Settings → Tools &amp; Shortcuts → Connected Devices.</li>
+<li>Pair with a Windows PC and choose your bridge monitors and display arrangement.</li>
+<li>Choose Both computers, Mac controls Windows, or Windows controls Mac independently of screen position.</li>
+<li>Sharing stays off until you connect. Disconnect, lock, sleep and quitting return local control.</li>
+</ul>
+<p>The compatible existing Windows companion is included with the GitHub release. Mac-to-Windows control was confirmed by the maintainer; physical Windows-to-Mac and minimized-window testing remain incomplete.</p>
+<p>Accounts remain off. Public Face Unlock is excluded while its helper has device-bound development provisioning. Saved settings are preserved. Apple silicon and macOS15 or later are required. The Mac app is development-signed, not notarized.</p>
+]]></description>
+            <enclosure url="https://github.com/graden-grech/Notchscape-app/releases/download/v2.9.7/Notchscape.zip" length="127766022" type="application/octet-stream" sparkle:edSignature="dYQKnQzAAYsNBrvXhKWp+aTfTIGdZSw0ltSqtPOaIPvdp/WNqxoqZrwZbviJJOjqK+J8okSS1fjhZj3AJSG3CQ=="/>
+        </item>
+        <item>
             <title>2.9.6</title>
             <pubDate>Thu, 12 Nov 2026 13:20:14 -0500</pubDate>
             <sparkle:version>330</sparkle:version>
