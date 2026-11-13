@@ -6,6 +6,8 @@
 	<string>Notchscape</string>
 	<key>CFBundleName</key>
 	<string>Notchscape</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Notchscape connects to the Windows computer you choose to share your mouse and keyboard through ScreenBridge. It does not scan for other devices.</string>
 	<key>NSAppleEventsUsageDescription</key>
 	<string>Notchscape needs permission to save and sync your Quick Notes with its dedicated folder in Apple Notes. Other Notes folders are not read.</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>

@@ -69,9 +69,8 @@ enum SettingsTourChapter: String, CaseIterable, Identifiable {
             .init(sectionID: "HUD", summary: "Show volume and brightness changes inside Notchscape.", suggestion: "Replacing the system HUD needs Accessibility access. You can leave it off.")
         ]
         case .workspace: [
-            .init(sectionID: "ScreenBridge", summary: "Share a mouse and keyboard with a trusted Windows PC.", suggestion: "Pair explicitly using the Windows companion. Sharing stays off until you connect and stops when this Mac locks or sleeps."),
             .init(sectionID: "Dock", summary: "Keep chosen apps, folders and widget cards in an optional native workspace.", suggestion: "Enable it here and open it when needed. Your Mac's Dock settings stay under your control."),
-            .init(sectionID: "Tools", summary: "Explore quick notes, text recognition, clipboard, capture and other utilities.", suggestion: "Private features such as clipboard history and recording require an explicit choice."),
+            .init(sectionID: "Tools", summary: "Explore quick notes, text recognition, clipboard, capture and other utilities.", suggestion: "Private features such as input sharing, clipboard history and recording require an explicit choice.", subpageIDs: ["ScreenBridge"]),
             .init(sectionID: "Wallpapers", summary: "Browse wallpapers, save favorites and optionally rotate your desktop.", suggestion: "Preview first; Apply changes your wallpaper. Automatic rotation is optional."),
             .init(sectionID: "Shelf", summary: "Keep files close by and choose how drag-and-drop and sharing behave.", suggestion: "Use the Shelf when you need it; your Home layout stays separate."),
             .init(sectionID: "Shortcuts", summary: "Choose keyboard shortcuts for the actions you use often.", suggestion: "Start with one or two shortcuts you will remember.")

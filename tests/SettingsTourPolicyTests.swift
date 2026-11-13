@@ -25,7 +25,7 @@ struct SettingsTourPolicyTests {
         }
         let covered = allTopics.flatMap { [$0.sectionID] + $0.subpageIDs }
         check(Set(covered).count == covered.count, "Focused subpages are covered once without adding tour cards")
-        check(Set(allTopics.flatMap(\.subpageIDs)) == Set(["Themes", "HomeLayout", "AppIcon", "Effects", "MediaAppearance"]), "New appearance pages remain discoverable from their parent tour topic")
+        check(Set(allTopics.flatMap(\.subpageIDs)) == Set(["Themes", "HomeLayout", "AppIcon", "Effects", "MediaAppearance", "ScreenBridge"]), "New appearance pages remain discoverable from their parent tour topic")
         var progress = SettingsTourProgress()
         progress.back()
         check(progress.index == 0 && progress.isFirst && !progress.isFinished, "Back cannot run before the first page")
