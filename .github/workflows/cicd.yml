@@ -33,6 +33,12 @@ jobs:
     - name: Code Checkout
       # TODO: pin to immutable SHA
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+    - name: Set up .NET 10 for ScreenBridge tests
+      uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # actions/setup-dotnet v6
+      with:
+        dotnet-version: 10.0.x
+    - name: Check ScreenBridge protocol and lifecycle
+      run: bash tests/test_screenbridge.sh
     - name: Keep unfinished accounts out of public builds
       run: python3 .github/scripts/verify_public_feature_flags.py Notchscape/Info.plist
     - name: Check customization policies

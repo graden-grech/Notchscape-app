@@ -1489,7 +1489,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "$(NOTCHSCAPE_DOCK_SIGNING_IDENTITY)";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 330;
+				CURRENT_PROJECT_VERSION = 335;
 				DEVELOPMENT_TEAM = 6H86CTRJCP;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1498,7 +1498,7 @@
 				INFOPLIST_KEY_CFBundleName = "Notchscape Dock Widget";
 				INFOPLIST_KEY_CFBundleDisplayName = "Notchscape Dock Widget";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = "2.9.6";
+				MARKETING_VERSION = "2.9.7";
 				NOTCHSCAPE_DOCK_SIGNING_IDENTITY = "Apple Development: grechgraden@icloud.com (P45575RL23)";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.graden-grech.Notchscape.DockWidget";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1523,7 +1523,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "$(NOTCHSCAPE_DOCK_SIGNING_IDENTITY)";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 330;
+				CURRENT_PROJECT_VERSION = 335;
 				DEVELOPMENT_TEAM = 6H86CTRJCP;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1532,7 +1532,7 @@
 				INFOPLIST_KEY_CFBundleName = "Notchscape Dock Widget";
 				INFOPLIST_KEY_CFBundleDisplayName = "Notchscape Dock Widget";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = "2.9.6";
+				MARKETING_VERSION = "2.9.7";
 				NOTCHSCAPE_DOCK_SIGNING_IDENTITY = "Apple Development: grechgraden@icloud.com (P45575RL23)";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.graden-grech.Notchscape.DockWidget";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1556,14 +1556,14 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development: grechgraden@icloud.com (P45575RL23)";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 330;
+				CURRENT_PROJECT_VERSION = 335;
 				DEVELOPMENT_TEAM = 6H86CTRJCP;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NotchscapeHelper/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = NotchscapeHelper;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = "2.9.6";
+				MARKETING_VERSION = "2.9.7";
 				PRODUCT_BUNDLE_IDENTIFIER = theboringteam.boringnotch.BoringNotchXPCHelper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -1581,14 +1581,14 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development: grechgraden@icloud.com (P45575RL23)";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 330;
+				CURRENT_PROJECT_VERSION = 335;
 				DEVELOPMENT_TEAM = 6H86CTRJCP;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NotchscapeHelper/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = NotchscapeHelper;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = "2.9.6";
+				MARKETING_VERSION = "2.9.7";
 				PRODUCT_BUNDLE_IDENTIFIER = theboringteam.boringnotch.BoringNotchXPCHelper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -1735,7 +1735,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development: grechgraden@icloud.com (P45575RL23)";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 330;
+				CURRENT_PROJECT_VERSION = 335;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Notchscape/Preview Content\"";
 				DEVELOPMENT_TEAM = 6H86CTRJCP;
@@ -1764,7 +1764,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = "2.9.6";
+				MARKETING_VERSION = "2.9.7";
 				PRODUCT_BUNDLE_IDENTIFIER = theboringteam.boringnotch;
 				PRODUCT_MODULE_NAME = Notchscape;
 				PRODUCT_NAME = Notchscape;
@@ -1793,7 +1793,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development: grechgraden@icloud.com (P45575RL23)";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 330;
+				CURRENT_PROJECT_VERSION = 335;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Notchscape/Preview Content\"";
 				DEVELOPMENT_TEAM = 6H86CTRJCP;
@@ -1821,7 +1821,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = "2.9.6";
+				MARKETING_VERSION = "2.9.7";
 				PRODUCT_BUNDLE_IDENTIFIER = theboringteam.boringnotch;
 				PRODUCT_MODULE_NAME = Notchscape;
 				PRODUCT_NAME = Notchscape;

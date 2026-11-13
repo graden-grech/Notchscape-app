@@ -28,16 +28,21 @@ Published by **Notchscape**. Maintained by [Graden Grech](https://github.com/gra
 - An optional six-chapter Settings tour, with Skip and replay from General or Help.
 
 See the [latest release](https://github.com/graden-grech/Notchscape-app/releases/latest)
-for the current public download and verification status. **2.9.6 (330)** source
-adds native Settings refinements, the restored music card, larger glass header
-controls, optional Dock and snow previews, landmark scenes and local tools.
-See the [release notes](docs/releases/2.9.6.md). Accounts remain disabled and
+for the current public download and verification status. **2.9.7 (335)** adds
+Connected Devices: optional ScreenBridge mouse and keyboard sharing with Windows,
+monitor selection and independent control-direction choices. Native Settings,
+music, Dock, snow, themes and local tools remain available.
+See the [release notes](docs/releases/2.9.7.md). Accounts remain disabled and
 Face Unlock is excluded from the public download; no app account is required.
 
 ## Download and updates
 
+The Mac app and compatible Windows companion are available together in the
+release assets. Windows-to-Mac physical control and the previously reported
+Windows-minimized issue remain separate testing limits; see the release notes.
+
 [Public releases](https://github.com/graden-grech/Notchscape-app/releases)
-include version-specific notes and known testing limits. Version 2.9.6 requires
+include version-specific notes and known testing limits. Version 2.9.7 requires
 Apple silicon and macOS 15 or later, matching its linked media framework. Native Liquid Glass is
 available on macOS 26 or later; earlier systems use lighter standard materials.
 
