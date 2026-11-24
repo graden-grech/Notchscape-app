@@ -354,7 +354,19 @@ struct ContentView: View {
                             .animation(vm.notchState == .open ? openAnimation : closeAnimation, value: vm.notchState)
                             .animation(.smooth, value: gestureProgress)
                     }
-                    .contentShape(Rectangle())
+                    .conditionalModifier(usesNotchlessIslandPresentation) { view in
+                        view.contentShape(
+                            RoundedRectangle(
+                                cornerRadius: vm.notchState == .closed
+                                    ? floatingIslandHeight / 2
+                                    : expandedBottomCornerRadius,
+                                style: .continuous
+                            )
+                        )
+                    }
+                    .conditionalModifier(!usesNotchlessIslandPresentation) { view in
+                        view.contentShape(currentNotchShape)
+                    }
                     .accessibilityElement(children: .contain)
                     .accessibilityLabel("Notch menu")
                     .accessibilityAction(named: "Open menu") {

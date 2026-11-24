@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		51A0A0010000000000000002 /* DesktopSnowScenery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51A0F0010000000000000002; };
+		51A0A0010000000000000001 /* DesktopSnowEditingPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51A0F0010000000000000001; };
 		D0C2A0010000000000000001 /* DockVisibilityPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C2F0010000000000000001; };
 		D0C2A0020000000000000002 /* DockVisibilityController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C2F0020000000000000002; };
 		D0C2A0030000000000000003 /* DockVisibilityPolicy.swift in Guardian Sources */ = {isa = PBXBuildFile; fileRef = D0C2F0010000000000000001; };
@@ -299,6 +301,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		51A0F0010000000000000002 /* DesktopSnowScenery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/components/Settings/DesktopSnowScenery.swift"; sourceTree = SOURCE_ROOT; };
+		51A0F0010000000000000001 /* DesktopSnowEditingPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopSnowEditingPolicy.swift; sourceTree = "<group>"; };
 		D0C2F0010000000000000001 /* DockVisibilityPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/models/DockVisibilityPolicy.swift"; sourceTree = SOURCE_ROOT; };
 		D0C2F0020000000000000002 /* DockVisibilityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notchscape/managers/DockVisibilityController.swift"; sourceTree = SOURCE_ROOT; };
 		D0C2F0030000000000000003 /* DockVisibilityGuardian.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotchscapeDockWidget/DockVisibilityGuardian.swift"; sourceTree = SOURCE_ROOT; };
@@ -744,6 +748,7 @@
 				C0D3F04E000000000000004E /* DockWidgetManager.swift */,
 				7DA3BEB6275348D5BE2384C2 /* DesktopSnowPolicy.swift */,
 				819712B4AF674F9D9E1E1A8C /* DesktopSnowManager.swift */,
+				51A0F0010000000000000002 /* DesktopSnowScenery.swift */,
 				E7D4627E184649F88F9A5FBC /* DesktopSnowSettings.swift */,
 				FA700E92A19D4A858B9401C2 /* HomeSnowDecoration.swift */,
 				C0D3F0520000000000000052 /* DockReplacementView.swift */,
@@ -905,6 +910,7 @@
 		14D570C72C5F38760011E668 /* models */ = {
 			isa = PBXGroup;
 			children = (
+				51A0F0010000000000000001 /* DesktopSnowEditingPolicy.swift */,
 				C0D3F04D000000000000004D /* WeatherPresentationPolicy.swift */,
 				C0D3F04C000000000000004C /* GlassPresentationPolicy.swift */,
 				C0D3F0490000000000000049 /* DockWorkspacePolicy.swift */,
@@ -1258,12 +1264,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				51A0A0010000000000000001 /* DesktopSnowEditingPolicy.swift in Sources */,
 				C0D3A04D000000000000004D /* WeatherPresentationPolicy.swift in Sources */,
 				C0D3A04C000000000000004C /* GlassPresentationPolicy.swift in Sources */,
 				C0D3A04B000000000000004B /* DockWorkspaceView.swift in Sources */,
 				C0D3A04E000000000000004E /* DockWidgetManager.swift in Sources */,
 				311D81A262F341E0A1E3837C /* DesktopSnowPolicy.swift in Sources */,
 				B96C1EE9022148DB84BC99B8 /* DesktopSnowManager.swift in Sources */,
+				51A0A0010000000000000002 /* DesktopSnowScenery.swift in Sources */,
 				28109EFF90154082A493CEF2 /* DesktopSnowSettings.swift in Sources */,
 				9CEF2768545E488D9B06EB39 /* HomeSnowDecoration.swift in Sources */,
 				C0D3A0520000000000000052 /* DockReplacementView.swift in Sources */,
@@ -1489,7 +1497,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "$(NOTCHSCAPE_DOCK_SIGNING_IDENTITY)";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 335;
+				CURRENT_PROJECT_VERSION = 343;
 				DEVELOPMENT_TEAM = 6H86CTRJCP;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1498,7 +1506,7 @@
 				INFOPLIST_KEY_CFBundleName = "Notchscape Dock Widget";
 				INFOPLIST_KEY_CFBundleDisplayName = "Notchscape Dock Widget";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = "2.9.7";
+				MARKETING_VERSION = "2.9.8";
 				NOTCHSCAPE_DOCK_SIGNING_IDENTITY = "Apple Development: grechgraden@icloud.com (P45575RL23)";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.graden-grech.Notchscape.DockWidget";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1523,7 +1531,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "$(NOTCHSCAPE_DOCK_SIGNING_IDENTITY)";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 335;
+				CURRENT_PROJECT_VERSION = 343;
 				DEVELOPMENT_TEAM = 6H86CTRJCP;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1532,7 +1540,7 @@
 				INFOPLIST_KEY_CFBundleName = "Notchscape Dock Widget";
 				INFOPLIST_KEY_CFBundleDisplayName = "Notchscape Dock Widget";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = "2.9.7";
+				MARKETING_VERSION = "2.9.8";
 				NOTCHSCAPE_DOCK_SIGNING_IDENTITY = "Apple Development: grechgraden@icloud.com (P45575RL23)";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.graden-grech.Notchscape.DockWidget";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1546,8 +1554,8 @@
 			};
 			name = Release;
 		};
-		FACE00000000000000000009 = { "isa" = "XCBuildConfiguration"; "buildSettings" = { "ALWAYS_SEARCH_USER_PATHS" = "NO"; "CODE_SIGN_ENTITLEMENTS" = "NotchscapeFaceVault/NotchscapeFaceVault.entitlements"; "CODE_SIGN_IDENTITY" = "Apple Development"; "CODE_SIGN_INJECT_BASE_ENTITLEMENTS" = "NO"; "CODE_SIGN_STYLE" = "Automatic"; "CURRENT_PROJECT_VERSION" = 335; "DEVELOPMENT_TEAM" = "6H86CTRJCP"; "ENABLE_HARDENED_RUNTIME" = "YES"; "GENERATE_INFOPLIST_FILE" = "YES"; "INFOPLIST_FILE" = "NotchscapeFaceVault/Info.plist"; "INFOPLIST_KEY_CFBundleDisplayName" = "Notchscape Face Vault"; "MACOSX_DEPLOYMENT_TARGET" = "15.0"; "MARKETING_VERSION" = "2.9.7"; "PRODUCT_BUNDLE_IDENTIFIER" = "com.graden-grech.Notchscape.FaceVault"; "PRODUCT_NAME" = "$(TARGET_NAME)"; "SKIP_INSTALL" = "YES"; "SWIFT_VERSION" = "6.0"; "SWIFT_STRICT_CONCURRENCY" = "complete"; }; "name" = "Debug"; };
-		FACE0000000000000000000A = { "isa" = "XCBuildConfiguration"; "buildSettings" = { "ALWAYS_SEARCH_USER_PATHS" = "NO"; "CODE_SIGN_ENTITLEMENTS" = "NotchscapeFaceVault/NotchscapeFaceVault.entitlements"; "CODE_SIGN_IDENTITY" = "Apple Development"; "CODE_SIGN_INJECT_BASE_ENTITLEMENTS" = "NO"; "CODE_SIGN_STYLE" = "Automatic"; "CURRENT_PROJECT_VERSION" = 335; "DEVELOPMENT_TEAM" = "6H86CTRJCP"; "ENABLE_HARDENED_RUNTIME" = "YES"; "GENERATE_INFOPLIST_FILE" = "YES"; "INFOPLIST_FILE" = "NotchscapeFaceVault/Info.plist"; "INFOPLIST_KEY_CFBundleDisplayName" = "Notchscape Face Vault"; "MACOSX_DEPLOYMENT_TARGET" = "15.0"; "MARKETING_VERSION" = "2.9.7"; "PRODUCT_BUNDLE_IDENTIFIER" = "com.graden-grech.Notchscape.FaceVault"; "PRODUCT_NAME" = "$(TARGET_NAME)"; "SKIP_INSTALL" = "YES"; "SWIFT_VERSION" = "6.0"; "SWIFT_STRICT_CONCURRENCY" = "complete"; }; "name" = "Release"; };
+		FACE00000000000000000009 = { "isa" = "XCBuildConfiguration"; "buildSettings" = { "ALWAYS_SEARCH_USER_PATHS" = "NO"; "CODE_SIGN_ENTITLEMENTS" = "NotchscapeFaceVault/NotchscapeFaceVault.entitlements"; "CODE_SIGN_IDENTITY" = "Apple Development"; "CODE_SIGN_INJECT_BASE_ENTITLEMENTS" = "NO"; "CODE_SIGN_STYLE" = "Automatic"; "CURRENT_PROJECT_VERSION" = 343; "DEVELOPMENT_TEAM" = "6H86CTRJCP"; "ENABLE_HARDENED_RUNTIME" = "YES"; "GENERATE_INFOPLIST_FILE" = "YES"; "INFOPLIST_FILE" = "NotchscapeFaceVault/Info.plist"; "INFOPLIST_KEY_CFBundleDisplayName" = "Notchscape Face Vault"; "MACOSX_DEPLOYMENT_TARGET" = "15.0"; "MARKETING_VERSION" = "2.9.8"; "PRODUCT_BUNDLE_IDENTIFIER" = "com.graden-grech.Notchscape.FaceVault"; "PRODUCT_NAME" = "$(TARGET_NAME)"; "SKIP_INSTALL" = "YES"; "SWIFT_VERSION" = "6.0"; "SWIFT_STRICT_CONCURRENCY" = "complete"; }; "name" = "Debug"; };
+		FACE0000000000000000000A = { "isa" = "XCBuildConfiguration"; "buildSettings" = { "ALWAYS_SEARCH_USER_PATHS" = "NO"; "CODE_SIGN_ENTITLEMENTS" = "NotchscapeFaceVault/NotchscapeFaceVault.entitlements"; "CODE_SIGN_IDENTITY" = "Apple Development"; "CODE_SIGN_INJECT_BASE_ENTITLEMENTS" = "NO"; "CODE_SIGN_STYLE" = "Automatic"; "CURRENT_PROJECT_VERSION" = 343; "DEVELOPMENT_TEAM" = "6H86CTRJCP"; "ENABLE_HARDENED_RUNTIME" = "YES"; "GENERATE_INFOPLIST_FILE" = "YES"; "INFOPLIST_FILE" = "NotchscapeFaceVault/Info.plist"; "INFOPLIST_KEY_CFBundleDisplayName" = "Notchscape Face Vault"; "MACOSX_DEPLOYMENT_TARGET" = "15.0"; "MARKETING_VERSION" = "2.9.8"; "PRODUCT_BUNDLE_IDENTIFIER" = "com.graden-grech.Notchscape.FaceVault"; "PRODUCT_NAME" = "$(TARGET_NAME)"; "SKIP_INSTALL" = "YES"; "SWIFT_VERSION" = "6.0"; "SWIFT_STRICT_CONCURRENCY" = "complete"; }; "name" = "Release"; };
 		11F7485E2EC9AABA00F841DB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1556,14 +1564,14 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development: grechgraden@icloud.com (P45575RL23)";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 335;
+				CURRENT_PROJECT_VERSION = 343;
 				DEVELOPMENT_TEAM = 6H86CTRJCP;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NotchscapeHelper/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = NotchscapeHelper;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = "2.9.7";
+				MARKETING_VERSION = "2.9.8";
 				PRODUCT_BUNDLE_IDENTIFIER = theboringteam.boringnotch.BoringNotchXPCHelper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -1581,14 +1589,14 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development: grechgraden@icloud.com (P45575RL23)";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 335;
+				CURRENT_PROJECT_VERSION = 343;
 				DEVELOPMENT_TEAM = 6H86CTRJCP;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NotchscapeHelper/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = NotchscapeHelper;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = "2.9.7";
+				MARKETING_VERSION = "2.9.8";
 				PRODUCT_BUNDLE_IDENTIFIER = theboringteam.boringnotch.BoringNotchXPCHelper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -1735,7 +1743,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development: grechgraden@icloud.com (P45575RL23)";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 335;
+				CURRENT_PROJECT_VERSION = 343;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Notchscape/Preview Content\"";
 				DEVELOPMENT_TEAM = 6H86CTRJCP;
@@ -1764,7 +1772,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = "2.9.7";
+				MARKETING_VERSION = "2.9.8";
 				PRODUCT_BUNDLE_IDENTIFIER = theboringteam.boringnotch;
 				PRODUCT_MODULE_NAME = Notchscape;
 				PRODUCT_NAME = Notchscape;
@@ -1793,7 +1801,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development: grechgraden@icloud.com (P45575RL23)";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 335;
+				CURRENT_PROJECT_VERSION = 343;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Notchscape/Preview Content\"";
 				DEVELOPMENT_TEAM = 6H86CTRJCP;
@@ -1821,7 +1829,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = "2.9.7";
+				MARKETING_VERSION = "2.9.8";
 				PRODUCT_BUNDLE_IDENTIFIER = theboringteam.boringnotch;
 				PRODUCT_MODULE_NAME = Notchscape;
 				PRODUCT_NAME = Notchscape;

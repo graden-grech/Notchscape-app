@@ -171,6 +171,9 @@ private struct DockReplacementPresentation: View, Animatable {
         .accessibilityValue((app.isPinned ? "Pinned, " : "") + (app.isRunning ? "running" : "not running"))
         .contextMenu {
             Button("Open \(app.title)") { controller.openApp(app.id, origin: .appMenu) }
+            if app.isRunning {
+                Button("Minimized Windows…") { controller.showMinimizedWindows(app.id) }
+            }
             Divider()
             if app.isPinned {
                 Button("Remove from Dock") { controller.removeApp(app.id) }

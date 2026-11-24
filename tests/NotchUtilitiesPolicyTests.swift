@@ -19,7 +19,7 @@ struct NotchUtilitiesPolicyTests {
         }
         check(CleanLinkPolicy.clean("https://example.com/" + String(repeating: "x", count: 16_384)) == nil, "Bound link size")
         let all = WallpaperCatalog.everyWallpaper
-        check(all.count == 328, "Import 42 macOS, 265 Windows, 17 nature and 4 NASA sources")
+        check(all.count == 330, "Import 42 macOS, 265 Windows, 19 nature and 4 NASA sources")
         check(Set(all.map(\.id)).count == all.count, "Unique stable catalog IDs")
         for wallpaper in all {
             check(WallpaperPolicy.safeID(wallpaper.id), "Cache paths stay within the wallpaper directory")
@@ -39,7 +39,10 @@ struct NotchUtilitiesPolicyTests {
         check(WallpaperPolicy.pool(platform: .macOS, favorites: [one.id, two.id], previous: one.id).map(\.id) == [two.id], "Favorites preferred without immediate repeats")
         check(WallpaperPolicy.pool(platform: .macOS, favorites: [one.id], previous: one.id).map(\.id) == [one.id], "One favorite does not empty shuffle pool")
         check(!WallpaperPolicy.pool(platform: .macOS, favorites: ["not-in-catalog"], previous: nil).isEmpty, "Missing favorite falls back safely")
-        check(SeasonalWallpaperCatalog.all.count == 46, "Seasonal collection preserves curation with verified additions")
+        check(SeasonalWallpaperCatalog.all.count == 48, "Seasonal collection preserves curation with verified additions")
+        for id in ["internet-winter-teton-blue", "internet-winter-cabin-lights"] {
+            check(SeasonalWallpaperCatalog.all.contains { $0.id == id && $0.attribution != nil }, "New winter wallpaper includes photographer attribution")
+        }
         check(SpaceWallpaperCatalog.all.count == 4, "Official NASA Space collection")
         for theme in ["system", "autumn", "halloween", "christmas", "winter", "easter", "springBloom", "summerCoast", "nightSky", "botanical", "desertDusk", "graphite", "starWars", "starWarsDarkSide", "starWarsLuke", "starWarsObiWan", "starWarsAhsoka", "starWarsYoda", "starWarsMaceWindu", "starWarsRey", "starWarsVader", "starWarsMaul", "whiteHouse", "whiteHouseOvalOffice", "whiteHouseEastRoom", "whiteHouseBlueRoom", "whiteHouseRepublican", "whiteHouseRepublicanOvalOffice", "whiteHouseRepublicanEastRoom", "whiteHouseRepublicanBlueRoom", "whiteHouseDemocrat", "whiteHouseDemocratOvalOffice", "whiteHouseDemocratEastRoom", "whiteHouseDemocratBlueRoom"] {
             check(all.contains { WallpaperThemeMatch.matching(theme).contains($0) }, "Theme matching always has suggestions")

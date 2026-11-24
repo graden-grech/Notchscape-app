@@ -20,6 +20,8 @@ final class NotchWallpaperManager: ObservableObject {
     private var timer: Timer?
     private var task: Task<Void, Never>?
     private var automaticRequest = false
+    private var seasonalRequest = false
+    private var pendingSeasonalWallpaper: Wallpaper?
     private var locked = false
     private var modeObservation: AnyCancellable?
     private var previous: [(String, URL, [NSWorkspace.DesktopImageOptionKey: Any])] = []
@@ -41,7 +43,10 @@ final class NotchWallpaperManager: ObservableObject {
     func start(locked: Bool) { self.locked = locked; scheduleRotation() }
     func setLocked(_ value: Bool) {
         locked = value
-        if value { task?.cancel(); NotchWallpaperWindowController.shared.close() }
+        if value {
+            pendingSeasonalWallpaper = nil
+            task?.cancel(); NotchWallpaperWindowController.shared.close()
+        }
         scheduleRotation()
     }
     func toggleFavorite(_ wallpaper: Wallpaper) {
@@ -66,13 +71,33 @@ final class NotchWallpaperManager: ObservableObject {
         apply(wallpaper, automatic: true)
     }
     func apply(_ wallpaper: Wallpaper) { apply(wallpaper, automatic: false) }
-    private func apply(_ wallpaper: Wallpaper, automatic: Bool) {
+    func applySeasonal(_ wallpaper: Wallpaper) {
+        guard !locked, WorkspaceModeManager.shared.active?.pauseWallpapers != true else { return }
+        if busy {
+            pendingSeasonalWallpaper = wallpaper
+            if seasonalRequest || automaticRequest { task?.cancel() }
+            return
+        }
+        apply(wallpaper, automatic: true, seasonal: true)
+    }
+    func cancelSeasonalWallpaper() {
+        pendingSeasonalWallpaper = nil
+        if seasonalRequest { task?.cancel() }
+    }
+    private func apply(_ wallpaper: Wallpaper, automatic: Bool, seasonal: Bool = false) {
         guard !locked, !busy, WallpaperCatalog.everyWallpaper.contains(wallpaper),
               !automatic || WorkspaceModeManager.shared.active?.pauseWallpapers != true else { return }
         let target = display // Capture the user's choice for this request.
-        busy = true; automaticRequest = automatic; failed = false; status = "Downloading \(wallpaper.name)…"
+        busy = true; automaticRequest = automatic; seasonalRequest = seasonal
+        failed = false; status = "Downloading \(wallpaper.name)…"
         task = Task {
-            defer { busy = false; automaticRequest = false; task = nil }
+            defer {
+                busy = false; automaticRequest = false; seasonalRequest = false; task = nil
+                if let pending = pendingSeasonalWallpaper {
+                    pendingSeasonalWallpaper = nil
+                    applySeasonal(pending)
+                }
+            }
             do {
                 let file = try await WallpaperFileStore.shared.file(for: wallpaper)
                 try Task.checkCancellation()
@@ -99,8 +124,10 @@ final class NotchWallpaperManager: ObservableObject {
                 previous = old; canUndo = !old.isEmpty
                 lastApplied = wallpaper.id; defaults.set(wallpaper.id, forKey: "wallpapers.lastApplied")
                 status = "\(wallpaper.name) applied."
-            } catch is CancellationError { status = nil }
-            catch { failed = true; status = error.localizedDescription }
+            } catch {
+                if Task.isCancelled || error is CancellationError { status = nil }
+                else { failed = true; status = error.localizedDescription }
+            }
         }
     }
     func undo() {

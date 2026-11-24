@@ -5,6 +5,13 @@ import CoreGraphics
     static func main() throws {
         var checks = 0
         func check(_ condition: @autoclosure () -> Bool, _ reason: String) { precondition(condition(), reason); checks += 1 }
+        let physical = CGRect(x: -1440, y: -900, width: 1440, height: 900)
+        let reserved = CGRect(x: -1410, y: -835, width: 1410, height: 810)
+        check(DockReplacementPolicy.placementFrame(visible: reserved, display: physical, nativeDockSuppressed: false) == reserved,
+              "keeps the native Dock reservation until suppression is acknowledged")
+        let cleared = DockReplacementPolicy.placementFrame(visible: reserved, display: physical, nativeDockSuppressed: true)
+        check(cleared.minY == physical.minY && cleared.minX == reserved.minX && cleared.width == reserved.width && cleared.maxY == reserved.maxY,
+              "drops to the display edge without discarding side or menu-bar insets")
         for content in [false, true] {
             for visible in [false, true] {
                 for panel in [false, true] {

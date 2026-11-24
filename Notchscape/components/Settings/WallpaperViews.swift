@@ -370,7 +370,7 @@ private struct WallpaperSearchField: NSViewRepresentable {
     }
 }
 
-private struct WallpaperThumbnail: View {
+struct WallpaperThumbnail: View {
     let url: URL
     var contentMode: ContentMode = .fill
     var detail = false

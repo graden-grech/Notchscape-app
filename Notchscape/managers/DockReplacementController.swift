@@ -1,4 +1,5 @@
 import AppKit
+import ApplicationServices
 import OSLog
 import Combine
 import Defaults
@@ -90,6 +91,8 @@ final class DockReplacementController: NSObject, ObservableObject {
     func start() {
         guard !started else { return }; started = true
         DockVisibilityController.shared.start()
+        DockVisibilityController.shared.$isSuppressed.removeDuplicates().dropFirst().receive(on: RunLoop.main)
+            .sink { [weak self] _ in self?.positionBar() }.store(in: &subscriptions)
         locked = !consoleUnlocked
         awake = CGDisplayIsAsleep(CGMainDisplayID()) == 0
         Defaults.publisher(.dockReplacementEnabled).receive(on: RunLoop.main)
@@ -255,7 +258,9 @@ final class DockReplacementController: NSObject, ObservableObject {
 
     private func positionBar() {
         guard isVisible, permitsContent, let screen = targetScreen ?? NSScreen.main,
-              let geometry = DockReplacementPolicy.barLayout(in: screen.visibleFrame, appCount: apps.count,
+              let geometry = DockReplacementPolicy.barLayout(in: DockReplacementPolicy.placementFrame(
+                visible: screen.visibleFrame, display: screen.frame,
+                nativeDockSuppressed: DockVisibilityController.shared.isSuppressed), appCount: apps.count,
                 widgetKinds: layout.widgets.map(\.kind), iconSize: Defaults[.dockReplacementIconSize], requestedPage: page,
                 overflow: Defaults[.dockReplacementOverflow] == "stack" ? .stack : .pages) else {
             if isVisible { errorMessage = "This display does not have enough room for the Dock bar."; suspend() }
@@ -607,6 +612,54 @@ final class DockReplacementController: NSObject, ObservableObject {
         if let app = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle(url: url)?.bundleIdentifier ?? "").first {
             app.activate(options: [])
         } else { NSWorkspace.shared.open(url) }
+    }
+
+    /// macOS still owns the real minimized window. Expose that same window
+    /// through the corresponding app in this Dock, without taking it over.
+    func showMinimizedWindows(_ id: UUID) {
+        guard permitsContent, isVisible, bar?.isVisible == true, let url = appURLs[id],
+              let app = NSWorkspace.shared.runningApplications.first(where: { $0.bundleURL == url }) else { return }
+        let menu = NSMenu(title: "Minimized Windows")
+        let axApp = AXUIElementCreateApplication(app.processIdentifier)
+        var raw: CFTypeRef?
+        if AXIsProcessTrusted() {
+            AXUIElementSetMessagingTimeout(axApp, 0.05)
+            if AXUIElementCopyAttributeValue(axApp, kAXWindowsAttribute as CFString, &raw) == .success,
+               let windows = raw as? [AXUIElement] {
+                for window in windows.prefix(24) where Self.isMinimized(window) {
+                    var title: CFTypeRef?
+                    AXUIElementCopyAttributeValue(window, kAXTitleAttribute as CFString, &title)
+                    let name = (title as? String).map { String($0.prefix(120)) } ?? "Window"
+                    let item = menu.addItem(withTitle: name.isEmpty ? "Window" : name,
+                                            action: #selector(restoreMinimizedWindow(_:)), keyEquivalent: "")
+                    item.target = self; item.representedObject = window
+                }
+            }
+        }
+        if menu.items.isEmpty {
+            menu.addItem(withTitle: AXIsProcessTrusted() ? "No minimized windows" : "Accessibility access required",
+                         action: nil, keyEquivalent: "")
+        }
+        menu.popUp(positioning: nil, at: NSEvent.mouseLocation, in: nil)
+    }
+
+    private static func isMinimized(_ window: AXUIElement) -> Bool {
+        AXUIElementSetMessagingTimeout(window, 0.05)
+        var value: CFTypeRef?
+        return AXUIElementCopyAttributeValue(window, kAXMinimizedAttribute as CFString, &value) == .success &&
+            (value as? NSNumber)?.boolValue == true
+    }
+
+    @objc private func restoreMinimizedWindow(_ item: NSMenuItem) {
+        guard permitsContent, isVisible, bar?.isVisible == true, AXIsProcessTrusted(),
+              let object = item.representedObject, CFGetTypeID(object as CFTypeRef) == AXUIElementGetTypeID() else { return }
+        let window = object as! AXUIElement // Type ID checked before casting.
+        var pid: pid_t = 0
+        guard AXUIElementGetPid(window, &pid) == .success, let app = NSRunningApplication(processIdentifier: pid),
+              Self.isMinimized(window),
+              AXUIElementSetAttributeValue(window, kAXMinimizedAttribute as CFString, kCFBooleanFalse) == .success else { return }
+        app.activate(options: [])
+        AXUIElementPerformAction(window, kAXRaiseAction as CFString)
     }
     func keepApp(_ id: UUID) {
         guard permitsContent, !pinsReadOnly, pins.count < 24, let url = appURLs[id],

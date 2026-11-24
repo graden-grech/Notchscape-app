@@ -34,11 +34,14 @@ struct DockWorkspaceSettings: View {
                     hideSystemDock = false; dockVisibility.restoreNow()
                 }.notchGlassButton().disabled(!hideSystemDock && dockVisibility.statusText == nil)
                 DisclosureGroup("Layout Options") {
-                    LabeledContent("App icon size") {
-                        Slider(value: $barIconSize, in: 32...64, step: 4).frame(width: 180)
-                            .accessibilityLabel("Dock bar app icon size")
-                        Text("\(Int(barIconSize)) pt").monospacedDigit().frame(width: 44)
+                    HStack(spacing: 12) {
+                        Slider(value: $barIconSize, in: 32...64) { Text("App icon size") }
+                            .accessibilityValue("\(Int(barIconSize.rounded())) points")
+                        Text("\(Int(barIconSize.rounded())) pt").monospacedDigit().frame(width: 44)
+                            .accessibilityHidden(true)
                     }.disabled(!barEnabled)
+                    Text("The Dock bar follows the system Liquid Glass appearance and accessibility settings.")
+                        .font(.caption).foregroundStyle(.secondary)
                     Picker("More widgets", selection: $barOverflow) {
                         Text("Pages").tag("pages")
                         Text("Stack").tag("stack")

@@ -35,6 +35,19 @@ import Foundation
             check(options.speed.isFinite && (0.25...2.5).contains(options.speed), "speed remains bounded")
             check(options.wind.isFinite && (-1...1).contains(options.wind), "wind remains bounded")
         }
+        for invalid in [Double.nan, .infinity, -.infinity, -100, 100] {
+            let options = DesktopSnowOptions(moundHeight: invalid, moundWidth: invalid, moundSpacing: invalid).bounded
+            check((0.4...2).contains(options.moundHeight), "mound height preference remains in a safe finite range")
+            check((0.5...2).contains(options.moundWidth), "mound width preference remains in a safe finite range")
+            check((0.5...2).contains(options.moundSpacing), "mound spacing preference remains in a safe finite range")
+        }
+        let invalidLayout = DesktopSnowOptions(bottomLimit: .infinity, baseDepth: .nan, customBottomLayout: true,
+            authoredMounds: [.init(center: .nan, width: 1, height: 5), .init(center: 0.5, width: 0.1, height: 200)]) .bounded
+        check(invalidLayout.bottomLimit == 18 && invalidLayout.baseDepth == 0,
+              "invalid bottom depth preferences fall back to the original cap and zero base")
+        check(invalidLayout.authoredMounds.isEmpty, "invalid authored mound data is rejected before rendering")
+        check(DesktopSnowOptions(bottomLimit: 8, baseDepth: 40).bounded.baseDepth == 8,
+              "fixed base is always clipped to the selected total snow cap")
         for size in [CGSize.zero, CGSize(width: CGFloat.nan, height: 1000), CGSize(width: 1000, height: CGFloat.infinity),
                      CGSize(width: 159, height: 1000), CGSize(width: 1000, height: 16_385)] {
             check(DesktopSnowSimulation(size: size, seed: 1) == nil, "invalid display sizes refused before allocation")
@@ -99,6 +112,56 @@ import Foundation
         check((positivePeaks.max()! - positivePeaks.min()!) > 2, "saturated accumulation has coherent uneven crests rather than a ruler-flat top")
         check(DesktopSnowPolicy.moundSilhouettes(for: fullBank) == fullMounds, "unchanged bank silhouettes are exactly stable without random frame flicker")
         check(fullMounds.count >= 2, "a fully deposited window edge keeps several distinct piles")
+        check(DesktopSnowPolicy.moundSilhouettes(for: fullBank, options: .init()) == fullMounds,
+              "default mound sliders preserve the original deterministic shape exactly")
+        let tallerMounds = DesktopSnowPolicy.moundSilhouettes(for: fullBank, options: .init(moundHeight: 2))
+        let originalPeak = fullMounds.flatMap(\.points).map(\.y).max() ?? 0
+        let tallerPeak = tallerMounds.flatMap(\.points).map(\.y).max() ?? 0
+        check(tallerPeak > originalPeak * 1.8, "height control reshapes already-visible saturated piles immediately")
+        let narrowerMounds = DesktopSnowPolicy.moundSilhouettes(for: fullBank, options: .init(moundWidth: 0.5))
+        let originalSpan = fullMounds.reduce(0.0) { $0 + Double($1.points.last!.x - $1.points.first!.x) }
+        let narrowSpan = narrowerMounds.reduce(0.0) { $0 + Double($1.points.last!.x - $1.points.first!.x) }
+        check(narrowSpan < originalSpan, "width control changes the visible mound footprints")
+        let closerMounds = DesktopSnowPolicy.moundSilhouettes(for: fullBank, options: .init(moundSpacing: 0.5))
+        check(closerMounds.count >= fullMounds.count, "spacing control creates a denser bounded mound layout")
+        let bottomSurface = DesktopSnowSurface(id: 0x424f54, kind: .bottom, left: 0, right: 1_200, y: 0)
+        let emptyBottom = DesktopSnowBank(surface: bottomSurface, heights: Array(repeating: 0, count: 100))
+        let authored = [DesktopSnowAuthoredMound(center: 0.25, width: 0.1, height: 14),
+                        DesktopSnowAuthoredMound(center: 0.76, width: 0.16, height: 9)]
+        let customOptions = DesktopSnowOptions(bottomLimit: 30, baseDepth: 0, customBottomLayout: true, authoredMounds: authored)
+        let customMounds = DesktopSnowPolicy.moundSilhouettes(for: emptyBottom, options: customOptions)
+        check(customMounds.count == 2, "zero-base custom mode renders only the authored piles")
+        check(customMounds.map { Double($0.points.first!.x + $0.points.last!.x) / 2 }.sorted() == [300, 912],
+              "authored pile centers track their normalized positions exactly")
+        check(customMounds.map { $0.points.map(\.y).max()! }.sorted() == [9, 14],
+              "authored heights use individual fixed point values")
+        check(DesktopSnowPolicy.settledHeight(for: emptyBottom, at: 600, options: customOptions) == 0,
+              "zero-base custom mode has no automatic snow in clear zones")
+        let edgeOptions = DesktopSnowOptions(bottomLimit: 30, customBottomLayout: true,
+            authoredMounds: [.init(center: 0, width: 0.2, height: 14), .init(center: 1, width: 0.2, height: 11)])
+        let edgeMounds = DesktopSnowPolicy.moundSilhouettes(for: emptyBottom, options: edgeOptions)
+        check(edgeMounds.count == 2 && abs(Double(edgeMounds[0].points.first!.y) - 14) < 0.000_001 &&
+              abs(Double(edgeMounds[1].points.last!.y) - 11) < 0.000_001,
+              "mounds clipped at either display edge keep their authored peak at the authored center")
+        check(abs(DesktopSnowPolicy.settledHeight(for: emptyBottom, at: 0, options: edgeOptions) - 14) < 0.000_001 &&
+              abs(DesktopSnowPolicy.settledHeight(for: emptyBottom, at: 1_200, options: edgeOptions) - 11) < 0.000_001,
+              "edge-clipped authored peaks collide at their exact normalized centers")
+        let baseOptions = DesktopSnowOptions(bottomLimit: 22, baseDepth: 7, customBottomLayout: true)
+        let baseOnlyMounds = DesktopSnowPolicy.moundSilhouettes(for: emptyBottom, options: baseOptions)
+        check(baseOnlyMounds.count == 1 && abs(DesktopSnowPolicy.settledHeight(for: emptyBottom, at: 600, options: baseOptions) - 7) < 0.001,
+              "fixed base renders and collides across an otherwise empty display")
+        let clippedOptions = DesktopSnowOptions(bottomLimit: 20, baseDepth: 7, customBottomLayout: true,
+            authoredMounds: [.init(center: 0.5, width: 0.2, height: 80)])
+        let clippedMound = DesktopSnowPolicy.moundSilhouettes(for: emptyBottom, options: clippedOptions).last!
+        check(clippedMound.points.map(\.y).max()! <= 20 &&
+              DesktopSnowPolicy.settledHeight(for: emptyBottom, at: 600, options: clippedOptions) <= 20,
+              "authored profiles and collision respect the absolute bottom cap")
+        check(DesktopSnowPolicy.bottomRenderHeight(options: clippedOptions) == 20,
+              "renderer layer bounds use the same absolute bottom cap")
+        let automaticWithAuthored = DesktopSnowPolicy.moundSilhouettes(for: emptyBottom,
+            options: DesktopSnowOptions(authoredMounds: authored))
+        check(automaticWithAuthored == DesktopSnowPolicy.moundSilhouettes(for: emptyBottom),
+              "automatic mode retains deterministic piles and ignores custom definitions")
         let denseCoverage = fullMounds.reduce(0.0) { $0 + Double($1.points.last!.x - $1.points.first!.x) }
         check(denseCoverage < (moundSurface.right - moundSurface.left) * 0.75, "saturation cannot turn the whole supporting edge into a white strip")
         for pair in zip(fullMounds, fullMounds.dropFirst()) {
@@ -139,6 +202,75 @@ import Foundation
                 }
             }
         }
+
+        var editable = DesktopSnowSimulation(size: CGSize(width: 320, height: 220), seed: 81)!
+        let editableEdge = DesktopSnowSurface(id: 500, kind: .window, left: 0, right: 240, y: 80)
+        editable.updateSurfaces([editableEdge], accumulating: true)
+        let brushOptions = DesktopSnowOptions()
+        check(editable.editableSurface(at: CGPoint(x: 48, y: 84), radius: 18, options: brushOptions) == 500,
+              "edit hit testing identifies the nearby local snow bank")
+        check(editable.editableSurface(at: CGPoint(x: 300, y: 180), radius: 18, options: brushOptions) == nil,
+              "edit hit testing does not select distant surfaces")
+        check(editable.sculpt(surfaceID: 500, at: CGPoint(x: 48, y: 84), tool: .build,
+                              radius: 24, strength: 1, options: brushOptions),
+              "build brush deposits a bounded local mound")
+        let built = editable.banks[0].heights
+        check(built.contains(where: { $0 > 0 }) && built.filter { $0 > 0 }.count < built.count,
+              "build affects only bins inside its soft local footprint")
+        let massBeforeMove = built.reduce(0, +)
+        var fineMove = editable
+        check(fineMove.sculpt(surfaceID: 500, at: CGPoint(x: 50, y: 84), tool: .move,
+                              radius: 24, strength: 1, from: CGPoint(x: 48, y: 84), options: brushOptions),
+              "a short drag moves snow even when the pointer travels less than half a bin")
+        check(abs(fineMove.banks[0].heights.reduce(0, +) - massBeforeMove) < 0.000_01,
+              "a short drag preserves the amount of snow")
+        check(editable.sculpt(surfaceID: 500, at: CGPoint(x: 84, y: 84), tool: .move,
+                              radius: 24, strength: 1, from: CGPoint(x: 48, y: 84), options: brushOptions),
+              "move brush translates the selected local pile")
+        let moved = editable.banks[0].heights
+        check(abs(moved.reduce(0, +) - massBeforeMove) < 0.000_01,
+              "move brush preserves the amount of snow when destinations have capacity")
+        check(moved.enumerated().reduce(0.0) { $0 + Double($1.offset) * $1.element } >
+              built.enumerated().reduce(0.0) { $0 + Double($1.offset) * $1.element },
+              "move brush follows the drag direction")
+        check(editable.sculpt(surfaceID: 500, at: CGPoint(x: 84, y: 84), tool: .carve,
+                              radius: 24, strength: 1, options: brushOptions),
+              "carve brush removes a local amount")
+        check(editable.banks[0].heights.reduce(0, +) < moved.reduce(0, +), "carve reduces accumulated snow")
+        let beforeInvalidBrush = editable
+        for (point, radius, strength) in [
+            (CGPoint(x: CGFloat.nan, y: 0), 20.0, 0.5),
+            (CGPoint(x: 10, y: 10), .infinity, 0.5),
+            (CGPoint(x: 10, y: 10), 20, Double.nan)
+        ] {
+            check(!editable.sculpt(surfaceID: 500, at: point, tool: .build, radius: radius,
+                                   strength: strength, options: brushOptions),
+                  "invalid brush input is rejected")
+        }
+        check(editable == beforeInvalidBrush, "invalid brush input leaves all simulation state untouched")
+        editable.clearAccumulation()
+        check(editable.banks[0].heights.allSatisfy { $0 == 0 }, "clear removes manually sculpted snow too")
+        var tallBottom = DesktopSnowSimulation(size: CGSize(width: 1_200, height: 800), seed: 92)!
+        let tallEdge = DesktopSnowSurface(id: 501, kind: .bottom, left: 0, right: 1_200, y: 1)
+        tallBottom.updateSurfaces([tallEdge], accumulating: true)
+        let tallOptions = DesktopSnowOptions(bottomLimit: 100, baseDepth: 0)
+        check(tallBottom.editableSurface(at: CGPoint(x: 420, y: 70), radius: 12, options: tallOptions) == tallEdge.id,
+              "brush hit testing reaches banks taller than the legacy 18-point bottom")
+        for _ in 0..<12 {
+            _ = tallBottom.sculpt(surfaceID: tallEdge.id, at: CGPoint(x: 420, y: 70), tool: .build,
+                                  radius: 18, strength: 1, options: tallOptions)
+        }
+        check((tallBottom.banks[0].heights.max() ?? 0) > 18 && (tallBottom.banks[0].heights.max() ?? 0) <= 100,
+              "tall-bank sculpting uses the selected cap while retaining bounded physical mass")
+        let customBottomOptions = DesktopSnowOptions(bottomLimit: 60, baseDepth: 5, customBottomLayout: true,
+            authoredMounds: [.init(center: 0.5, width: 0.2, height: 20)])
+        let customBankHeight = tallBottom.banks[0].heights
+        check(tallBottom.editableSurface(at: CGPoint(x: 600, y: 10), radius: 12, options: customBottomOptions) == nil,
+              "custom authored bottom banks are not brush-selectable")
+        check(!tallBottom.sculpt(surfaceID: tallEdge.id, at: CGPoint(x: 600, y: 10), tool: .build,
+                                 radius: 18, strength: 1, options: customBottomOptions) &&
+              tallBottom.banks[0].heights == customBankHeight,
+              "custom authored bottom banks cannot allocate invisible sculpted bins")
         var footprintWidths = Set<Int>(), footprintPeaks = Set<Int>()
         for seed in 1...24 {
             for width in [1.0, 36, 132, 170, 240, 640, 1512, 16_384] {
@@ -266,6 +398,8 @@ import Foundation
         var first = DesktopSnowSimulation(size: tiny, seed: 42)!
         var second = DesktopSnowSimulation(size: tiny, seed: 42)!
         let standard = DesktopSnowOptions(intensity: 1, speed: 1, wind: 0.1)
+        check(!DesktopSnowOptions().pointerSweep && DesktopSnowOptions(pointerSweep: true).bounded.pointerSweep,
+              "settled-bank pointer sweep is opt-in and survives option bounding")
         first.updateSurfaces([landingEdge], accumulating: true)
         second.updateSurfaces([landingEdge], accumulating: true)
         first.seedInitialSnow(options: standard, lowImpact: false)
@@ -295,6 +429,29 @@ import Foundation
         check(first.banks.first?.heights.contains(where: { $0 > 0.25 }) == true, "falling flakes accumulate on a real top-edge surface")
         check(first.banks.allSatisfy { $0.heights.count <= DesktopSnowPolicy.maximumBinsPerSurface && $0.heights.allSatisfy { $0 <= 11 } },
               "bank bins/heights remain bounded under sustained snowfall")
+        var sweep = DesktopSnowSimulation(size: tiny, seed: 701)!
+        sweep.updateSurfaces([landingEdge], accumulating: true)
+        check(sweep.sculpt(surfaceID: landingEdge.id, at: CGPoint(x: 160, y: 105), tool: .build,
+                           radius: 30, strength: 1, options: standard), "sweep fixture builds a settled bank")
+        let bankMassBeforeSweep = sweep.banks[0].heights.reduce(0, +)
+        let sweepBin = sweep.banks[0].heights.indices.max(by: { sweep.banks[0].heights[$0] < sweep.banks[0].heights[$1] })!
+        let pointerX = sweep.banks[0].surface.left + sweep.banks[0].binWidth * (Double(sweepBin) + 0.5)
+        let pointerY = sweep.banks[0].surface.y + DesktopSnowPolicy.settledHeight(for: sweep.banks[0], at: pointerX)
+        var sweepOptions = standard; sweepOptions.pointerSweep = true
+        sweep.step(seconds: 1 / 30, options: sweepOptions, lowImpact: false, pointer: CGPoint(x: pointerX - 35, y: pointerY))
+        let beforeSweepRelease = sweep.particles.filter(\.shedding).count
+        sweep.step(seconds: 1 / 30, options: sweepOptions, lowImpact: false, pointer: CGPoint(x: pointerX + 35, y: pointerY))
+        let releasedBySweep = sweep.particles.filter(\.shedding).count - beforeSweepRelease
+        check(releasedBySweep > 0 && releasedBySweep <= DesktopSnowPolicy.maximumSweepPerStep,
+              "a click-through pointer sweep releases only a tiny bounded number of flakes")
+        check(sweep.banks[0].heights.reduce(0, +) < bankMassBeforeSweep,
+              "pointer sweep removes flakes from the visible settled bank")
+        let airborneSweepIDs = Set(sweep.particles.filter(\.shedding).map(\.id))
+        for _ in 0..<240 { sweep.step(seconds: 1 / 30, options: sweepOptions, lowImpact: false, pointer: CGPoint(x: pointerX + 35, y: pointerY)) }
+        check(airborneSweepIDs.isDisjoint(with: Set(sweep.particles.filter(\.shedding).map(\.id))),
+              "swept flakes finish their bounded fall and can settle again")
+        check(sweep.particles.filter(\.shedding).count <= DesktopSnowPolicy.maximumSheddingParticles,
+              "repeated pointer samples cannot exceed the shared shedding cap")
         var quietSwitch = first
         var unmodified = first
         var quietSource = landingEdge; quietSource.sourceFrame = sourceFrame

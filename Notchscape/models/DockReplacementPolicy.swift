@@ -104,6 +104,12 @@ enum DockReplacementPolicy {
         return !failed && age.isFinite && (-300...900).contains(age)
     }
 
+    static func placementFrame(visible: CGRect, display: CGRect, nativeDockSuppressed: Bool) -> CGRect {
+        guard nativeDockSuppressed, validRect(visible), validRect(display),
+              display.minY < visible.minY, visible.maxY <= display.maxY else { return visible }
+        return CGRect(x: visible.minX, y: display.minY, width: visible.width, height: visible.maxY - display.minY)
+    }
+
     /// No measurement callbacks or published geometry state. Width is a stable
     /// envelope computed from all pages; changing pages never moves controls.
     static func barLayout(in usableFrame: CGRect, appCount: Int,

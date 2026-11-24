@@ -119,6 +119,8 @@ enum SeasonalInternetCatalog {
         item("fall-forest-lantern", .fall, "Forest Jack-o’-Lantern", "1760199746599-12e43cbc573c", photographer: "Andrea Caramello", pageID: "hPnP1HnNcWA"),
         item("winter-christmas-snow", .winter, "Christmas in the Snow", "1767523881986-f8b55d3c5880", photographer: "Alexander Lunyov", pageID: "20u_wtTfnrI"),
         item("winter-arctic-sunrise", .winter, "Arctic Forest Sunrise", "1770287691979-6b8ec41f5331", photographer: "Harri P", pageID: "L8p9qMMiCWs"),
+        item("winter-teton-blue", .winter, "Teton Blue Hour", "1534302000698-2f5e30b10bdb", photographer: "Jeremy Bishop", pageID: "xsxc8yTZk0U"),
+        item("winter-cabin-lights", .winter, "Cabin Lights", "1677350840522-ad55f426d048", photographer: "Birk Enwald", pageID: "nbMy5UrrJcQ"),
         item("spring-mountain-meadow", .spring, "Spring Mountain Meadow", "1469474968028-56623f02e42e"),
         item("spring-misty-forest", .spring, "Spring Misty Forest", "1470071459604-3b5ec3a7fe05"),
         item("spring-lake-valley", .spring, "Spring Lake Valley", "1470770841072-f978cf4d019e"),

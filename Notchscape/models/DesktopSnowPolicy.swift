@@ -8,12 +8,48 @@ struct DesktopSnowOptions: Equatable, Sendable {
     var speed: Double = 1
     var wind: Double = 0
     var accumulation = true
+    var moundHeight: Double = 1
+    var moundWidth: Double = 1
+    var moundSpacing: Double = 1
+    var pointerSweep = false
+    var bottomLimit: Double = 18
+    var baseDepth: Double = 0
+    var customBottomLayout = false
+    var authoredMounds: [DesktopSnowAuthoredMound] = []
 
     var bounded: Self {
         .init(intensity: DesktopSnowPolicy.clamp(intensity, 0...1, fallback: 0.5),
               speed: DesktopSnowPolicy.clamp(speed, 0.25...2.5, fallback: 1),
-              wind: DesktopSnowPolicy.clamp(wind, -1...1, fallback: 0), accumulation: accumulation)
+              wind: DesktopSnowPolicy.clamp(wind, -1...1, fallback: 0), accumulation: accumulation,
+              moundHeight: DesktopSnowPolicy.clamp(moundHeight, 0.4...2, fallback: 1),
+              moundWidth: DesktopSnowPolicy.clamp(moundWidth, 0.5...2, fallback: 1),
+              moundSpacing: DesktopSnowPolicy.clamp(moundSpacing, 0.5...2, fallback: 1),
+              pointerSweep: pointerSweep,
+              bottomLimit: DesktopSnowPolicy.clamp(bottomLimit, 0...DesktopSnowPolicy.maximumBottomLimit, fallback: 18),
+              baseDepth: min(DesktopSnowPolicy.clamp(baseDepth, 0...DesktopSnowPolicy.maximumBaseDepth, fallback: 0),
+                             DesktopSnowPolicy.clamp(bottomLimit, 0...DesktopSnowPolicy.maximumBottomLimit, fallback: 18)),
+              customBottomLayout: customBottomLayout,
+              authoredMounds: Array(authoredMounds.filter(\.isValid).prefix(DesktopSnowPolicy.maximumAuthoredMounds)))
     }
+}
+
+/// A persistent bottom-edge snow pile positioned as fractions of its display.
+/// Height is an individual point value and is clipped to available space.
+struct DesktopSnowAuthoredMound: Codable, Equatable, Sendable {
+    var center: Double
+    var width: Double
+    var height: Double
+
+    var isValid: Bool {
+        center.isFinite && (0...1).contains(center) && width.isFinite && (0.01...1).contains(width) &&
+            height.isFinite && (0...DesktopSnowPolicy.maximumBottomLimit).contains(height)
+    }
+}
+
+enum DesktopSnowBrushTool: String, CaseIterable, Sendable {
+    case build
+    case carve
+    case move
 }
 
 struct DesktopSnowEligibility: Equatable, Sendable {
@@ -106,6 +142,7 @@ struct DesktopSnowSimulation: Equatable, Sendable {
     private var seed: UInt64
     private var spawnCredit: Double = 0
     private var nextParticleID: UInt64 = 0
+    private var previousPointer: CGPoint?
 
     init?(size: CGSize, seed: UInt64) {
         guard DesktopSnowPolicy.validSize(size) else { return nil }
@@ -116,6 +153,123 @@ struct DesktopSnowSimulation: Equatable, Sendable {
     mutating func clearAccumulation() {
         for index in banks.indices { banks[index].heights = Array(repeating: 0, count: banks[index].heights.count) }
         particles.removeAll { $0.shedding }
+    }
+
+    /// Returns the first bounded snow bank under a brush point. Coordinates
+    /// are local display points with the AppKit bottom-left origin.
+    func editableSurface(at point: CGPoint, radius: Double, options: DesktopSnowOptions) -> UInt64? {
+        let options = options.bounded
+        guard options.accumulation, point.x.isFinite, point.y.isFinite,
+              radius.isFinite, (1...200).contains(radius) else { return nil }
+        for bank in banks {
+            guard bank.surface.kind != .bottom || !options.customBottomLayout else { continue }
+            guard bank.surface.left.isFinite, bank.surface.right.isFinite, bank.surface.y.isFinite,
+                  !bank.heights.isEmpty, bank.heights.count <= DesktopSnowPolicy.maximumBinsPerSurface else { continue }
+            let visibleHeight = bank.surface.kind == .bottom
+                ? max(18, DesktopSnowPolicy.bottomRenderHeight(options: options))
+                : 11 * options.moundHeight
+            let x = Double(point.x), y = Double(point.y)
+            guard x >= bank.surface.left - radius, x <= bank.surface.right + radius,
+                  y >= bank.surface.y - radius,
+                  y <= bank.surface.y + visibleHeight + radius else { continue }
+            return bank.surface.id
+        }
+        return nil
+    }
+
+    /// Applies a local build/carve or translates part of an existing pile.
+    /// `strength` is normalized to 0...1; brush radii and coordinates are points.
+    /// All work is bounded by the selected bank's existing (at most 128) bins.
+    @discardableResult
+    mutating func sculpt(surfaceID: UInt64, at point: CGPoint, tool: DesktopSnowBrushTool,
+                         radius: Double, strength: Double, from previousPoint: CGPoint? = nil,
+                         options rawOptions: DesktopSnowOptions) -> Bool {
+        let options = rawOptions.bounded
+        guard options.accumulation, point.x.isFinite, point.y.isFinite,
+              radius.isFinite, (1...200).contains(radius),
+              strength.isFinite, strength > 0,
+              let bankIndex = banks.firstIndex(where: { $0.surface.id == surfaceID }),
+              banks[bankIndex].heights.count >= 2,
+              banks[bankIndex].heights.count <= DesktopSnowPolicy.maximumBinsPerSurface else { return false }
+
+        let bank = banks[bankIndex]
+        guard bank.surface.kind != .bottom || !options.customBottomLayout else { return false }
+        let bottomEditHeight = max(36, DesktopSnowPolicy.bottomRenderHeight(options: options))
+        guard bank.surface.left.isFinite, bank.surface.right.isFinite, bank.surface.y.isFinite,
+              point.x >= bank.surface.left - radius, point.x <= bank.surface.right + radius,
+              point.y >= bank.surface.y - radius,
+              point.y <= bank.surface.y + (bank.surface.kind == .bottom ? bottomEditHeight : 22) + radius else { return false }
+        let boundedStrength = min(1, strength)
+        let cap = bank.surface.kind == .bottom ? max(0, options.bottomLimit - options.baseDepth) : 11.0
+        guard cap > 0 else { return false }
+        let binWidth = bank.binWidth
+        guard binWidth.isFinite, binWidth > 0 else { return false }
+        let center = (Double(point.x) - bank.surface.left) / binWidth - 0.5
+        guard center.isFinite else { return false }
+
+        switch tool {
+        case .build, .carve:
+            let lower = max(0, Int(floor(center - radius / binWidth)))
+            let upper = min(bank.heights.count - 1, Int(ceil(center + radius / binWidth)))
+            guard lower <= upper else { return false }
+            var changed = false
+            let amplitude = cap * 0.2 * boundedStrength
+            for index in lower...upper {
+                let x = bank.surface.left + (Double(index) + 0.5) * binWidth
+                let distance = abs(x - Double(point.x))
+                guard distance <= radius else { continue }
+                let falloff = exp(-4.5 * (distance / radius) * (distance / radius))
+                let delta = amplitude * falloff
+                let old = banks[bankIndex].heights[index]
+                let next = tool == .build ? min(cap, old + delta) : max(0, old - delta)
+                if abs(next - old) > 0.000_001 {
+                    banks[bankIndex].heights[index] = next
+                    changed = true
+                }
+            }
+            return changed
+
+        case .move:
+            guard let previousPoint, previousPoint.x.isFinite, previousPoint.y.isFinite,
+                  previousPoint.x >= bank.surface.left - radius, previousPoint.x <= bank.surface.right + radius,
+                  previousPoint.y >= bank.surface.y - radius,
+                  previousPoint.y <= bank.surface.y + (bank.surface.kind == .bottom ? 36 : 22) + radius else { return false }
+            let displacement = Double(point.x - previousPoint.x) / binWidth
+            guard displacement.isFinite, displacement != 0,
+                  abs(displacement) < Double(bank.heights.count) else { return false }
+            let sourceCenter = (Double(previousPoint.x) - bank.surface.left) / binWidth - 0.5
+            let lower = max(0, Int(floor(sourceCenter - radius / binWidth)))
+            let upper = min(bank.heights.count - 1, Int(ceil(sourceCenter + radius / binWidth)))
+            guard lower <= upper else { return false }
+
+            let direction = displacement > 0 ? 1 : -1
+            let distanceInBins = abs(displacement)
+            let wholeBins = Int(distanceInBins)
+            let fraction = distanceInBins - Double(wholeBins)
+            let original = bank.heights
+            var moved = original
+            // Move the leading edge first so each source has only its original
+            // snow to give and never loses snow to a full destination.
+            for source in stride(from: direction > 0 ? upper : lower,
+                                 through: direction > 0 ? lower : upper, by: -direction) {
+                let sourceX = bank.surface.left + (Double(source) + 0.5) * binWidth
+                let distance = abs(sourceX - Double(previousPoint.x))
+                guard original[source] > 0, distance <= radius else { continue }
+                let falloff = exp(-4.5 * (distance / radius) * (distance / radius))
+                let amount = original[source] * boundedStrength * falloff
+                // Fractional-bin transfers respond to small, slow mouse moves.
+                for (offset, weight) in [(wholeBins, 1 - fraction), (wholeBins + 1, fraction)] where offset > 0 && weight > 0 {
+                    let destination = source + direction * offset
+                    guard moved.indices.contains(destination) else { continue }
+                    let accepted = min(amount * weight, max(0, cap - moved[destination]))
+                    moved[source] -= accepted
+                    moved[destination] += accepted
+                }
+            }
+            guard moved != original else { return false }
+            banks[bankIndex].heights = moved
+            return true
+        }
     }
 
     /// Only a verified move/resize may release a few gentle fragments. Focus,
@@ -158,6 +312,12 @@ struct DesktopSnowSimulation: Equatable, Sendable {
         let options = rawOptions.bounded
         elapsed = (elapsed + dt).truncatingRemainder(dividingBy: 3_600)
         if !options.accumulation && !banks.isEmpty { banks = [] }
+        if options.pointerSweep, options.accumulation, let pointer,
+           pointer.x.isFinite, pointer.y.isFinite,
+           let previousPointer, previousPointer.x.isFinite, previousPointer.y.isFinite {
+            sweepBanks(from: previousPointer, to: pointer)
+        }
+        self.previousPointer = options.pointerSweep && pointer?.x.isFinite == true && pointer?.y.isFinite == true ? pointer : nil
         let target = DesktopSnowPolicy.targetParticles(size: size, intensity: options.intensity, lowImpact: lowImpact)
         if particles.count > DesktopSnowPolicy.maximumParticles { particles.removeLast(particles.count - DesktopSnowPolicy.maximumParticles) }
         var kept: [DesktopSnowParticle] = []
@@ -190,8 +350,11 @@ struct DesktopSnowSimulation: Equatable, Sendable {
             if particle.x < -8 { particle.x = Double(size.width) + 4; particle.renderRevision &+= 1 }
             if particle.x > Double(size.width) + 8 { particle.x = -4; particle.renderRevision &+= 1 }
             if particle.y < -12 || (particle.shedding && particle.age > DesktopSnowPolicy.maximumSheddingLifetime) { continue }
-            if options.accumulation, particle.velocityY < 0, let hit = landing(x: particle.x, from: previousY, to: particle.y) {
-                deposit(at: hit.bank, bin: hit.bin, amount: particle.radius * 0.22)
+            if options.accumulation, particle.velocityY < 0,
+               let hit = landing(x: particle.x, from: previousY, to: particle.y, options: options) {
+                if banks[hit.bank].surface.kind != .bottom || !options.customBottomLayout {
+                    deposit(at: hit.bank, bin: hit.bin, amount: particle.radius * 0.22, options: options)
+                }
                 continue
             }
             kept.append(particle)
@@ -253,25 +416,59 @@ struct DesktopSnowSimulation: Equatable, Sendable {
         return count
     }
 
-    private func landing(x: Double, from: Double, to: Double) -> (bank: Int, bin: Int)? {
+    private func landing(x: Double, from: Double, to: Double,
+                         options: DesktopSnowOptions) -> (bank: Int, bin: Int)? {
         var result: (bank: Int, bin: Int)?
         var highest = -Double.infinity
         for (index, bank) in banks.enumerated() {
-            let limit = bank.surface.kind == .bottom ? 18.0 : 11.0
+            let limit = bank.surface.kind == .bottom ? DesktopSnowPolicy.bottomRenderHeight(options: options) : 11.0 * options.moundHeight
             guard x >= bank.surface.left, x <= bank.surface.right,
                   from >= bank.surface.y, to <= bank.surface.y + limit else { continue }
             let bin = min(bank.heights.count - 1, max(0, Int((x - bank.surface.left) / bank.binWidth)))
-            let y = bank.surface.y + DesktopSnowPolicy.settledHeight(for: bank, at: x - bank.surface.left)
+            let y = bank.surface.y + DesktopSnowPolicy.settledHeight(for: bank, at: x - bank.surface.left, boundedOptions: options)
             if from >= y && to <= y && y > highest { highest = y; result = (index, bin) }
         }
         return result
     }
 
-    private mutating func deposit(at index: Int, bin: Int, amount: Double) {
-        let limit = banks[index].surface.kind == .bottom ? 18.0 : 11.0
+    private mutating func deposit(at index: Int, bin: Int, amount: Double, options: DesktopSnowOptions) {
+        let limit = banks[index].surface.kind == .bottom ? max(0, options.bottomLimit - options.baseDepth) : 11.0
+        guard limit > 0 else { return }
         banks[index].heights[bin] = min(limit, banks[index].heights[bin] + amount)
         for adjacent in [bin - 1, bin + 1] where banks[index].heights.indices.contains(adjacent) {
             banks[index].heights[adjacent] = min(limit, banks[index].heights[adjacent] + amount * 0.22)
+        }
+    }
+
+    /// A click-through pointer sample can lift a few nearby settled flakes.
+    /// The sweep is capped per tick and per bank; the resulting fragments use
+    /// the same gravity, lifetime, identity, and landing path as move fragments.
+    private mutating func sweepBanks(from start: CGPoint, to end: CGPoint) {
+        let dx = Double(end.x - start.x), dy = Double(end.y - start.y)
+        let distance = hypot(dx, dy)
+        guard distance > 0.5, distance <= 160, particles.count < DesktopSnowPolicy.maximumParticles else { return }
+        let count = min(2, DesktopSnowPolicy.maximumSweepPerStep,
+                        DesktopSnowPolicy.maximumSheddingParticles - particles.filter(\.shedding).count,
+                        DesktopSnowPolicy.maximumParticles - particles.count)
+        guard count > 0 else { return }
+        var released = 0
+        for bankIndex in banks.indices where released < count {
+            let bank = banks[bankIndex]
+            guard bank.surface.kind != .bottom, bank.binWidth.isFinite, bank.binWidth > 0 else { continue }
+            for bin in bank.heights.indices where released < count && bank.heights[bin] > 0.25 {
+                let x = bank.surface.left + (Double(bin) + 0.5) * bank.binWidth
+                let y = bank.surface.y + bank.heights[bin]
+                let px = Double(start.x), py = Double(start.y)
+                let t = max(0, min(1, ((x - px) * dx + (y - py) * dy) / (distance * distance)))
+                guard hypot(x - (px + t * dx), y - (py + t * dy)) <= max(5, bank.binWidth * 0.45) else { continue }
+                let amount = min(bank.heights[bin], max(0.25, bank.heights[bin] * 0.18))
+                banks[bankIndex].heights[bin] -= amount
+                particles.append(.init(id: allocateParticleID(), x: x, y: y,
+                    velocityX: DesktopSnowPolicy.clamp(dx * 0.18, -14...14, fallback: 0) + (nextRandom() - 0.5) * 8,
+                    velocityY: -12 - nextRandom() * 8, radius: 1 + nextRandom() * 1.4,
+                    phase: nextRandom() * .pi * 2, shedding: true))
+                released += 1
+            }
         }
     }
 }
@@ -282,6 +479,7 @@ enum DesktopSnowPolicy {
     static let maximumSurfaces = 24
     static let maximumBinsPerSurface = 128
     static let maximumShedPerUpdate = 8
+    static let maximumSweepPerStep = 2
     static let maximumSheddingParticles = 12
     static let maximumSheddingSpeed = 75.0
     static let maximumSheddingLifetime = 4.0
@@ -323,15 +521,24 @@ enum DesktopSnowPolicy {
         return hypot(current.x - previous.x, current.y - previous.y) <= 160
     }
 
-    static func moundSilhouettes(for bank: DesktopSnowBank) -> [DesktopSnowMound] {
+    static func moundSilhouettes(for bank: DesktopSnowBank, options rawOptions: DesktopSnowOptions = .init()) -> [DesktopSnowMound] {
         guard let width = moundBankWidth(bank), bank.heights.allSatisfy({ $0.isFinite && $0 >= 0 }) else { return [] }
-        let count = moundCount(width: width, kind: bank.surface.kind)
+        let options = rawOptions.bounded
+        if bank.surface.kind == .bottom, options.customBottomLayout {
+            return authoredBottomSilhouettes(width: width, options: options)
+        }
+        let count = moundCount(width: width, kind: bank.surface.kind, spacing: options.moundSpacing)
         var result: [DesktopSnowMound] = []
-        result.reserveCapacity(count)
+        result.reserveCapacity(count + 1)
+        if bank.surface.kind == .bottom, options.baseDepth > 0 {
+            result.append(baseSilhouette(width: width, depth: options.baseDepth))
+        }
         for index in 0..<count {
             guard includesMound(seed: bank.surface.id, index: index, count: count) else { continue }
-            let profile = moundProfile(bank: bank, width: width, index: index, count: count)
-            let points = (0...profile.segments).map { moundPoint(bank: bank, profile: profile, index: $0) }
+            let profile = moundProfile(bank: bank, width: width, index: index, count: count, widthScale: options.moundWidth)
+            let points = (0...profile.segments).map {
+                moundPoint(bank: bank, profile: profile, index: $0, heightScale: options.moundHeight, options: options)
+            }
             if points.contains(where: { $0.y > 0 }) { result.append(.init(points: points)) }
         }
         return result
@@ -339,6 +546,53 @@ enum DesktopSnowPolicy {
 
     static let maximumMoundsPerSurface = 24
     static let maximumMoundPoints = 17
+    static let maximumBottomLimit = 120.0
+    static let maximumBaseDepth = 60.0
+    static let maximumAuthoredMounds = 24
+
+    static func bottomRenderHeight(options: DesktopSnowOptions) -> Double {
+        options.bounded.bottomLimit
+    }
+
+    private static func baseSilhouette(width: Double, depth: Double) -> DesktopSnowMound {
+        let bevel = min(2, width * 0.005)
+        return .init(points: [
+            .init(x: 0, y: 0), .init(x: bevel, y: depth),
+            .init(x: width - bevel, y: depth), .init(x: width, y: 0)
+        ])
+    }
+
+    private static func authoredBottomSilhouettes(width: Double, options: DesktopSnowOptions) -> [DesktopSnowMound] {
+        var result: [DesktopSnowMound] = []
+        if options.baseDepth > 0 { result.append(baseSilhouette(width: width, depth: options.baseDepth)) }
+        let available = max(0, options.bottomLimit - options.baseDepth)
+        guard available > 0 else { return result }
+        for mound in options.authoredMounds where mound.isValid && mound.height > 0 {
+            if let silhouette = authoredMoundSilhouette(width: width, mound: mound, options: options) {
+                result.append(silhouette)
+            }
+        }
+        return result
+    }
+
+    private static func authoredMoundSilhouette(width: Double, mound: DesktopSnowAuthoredMound,
+                                                  options: DesktopSnowOptions) -> DesktopSnowMound? {
+        let center = mound.center * width
+        let halfWidth = mound.width * width / 2
+        let originalLeft = center - halfWidth, originalRight = center + halfWidth
+        let left = max(0, originalLeft), right = min(width, originalRight)
+        guard right - left >= 1 else { return nil }
+        let segments = min(maximumMoundPoints - 1, max(8, Int(ceil((right - left) / 12))))
+        let peak = min(max(0, options.bottomLimit - options.baseDepth), mound.height)
+        let points = (0...segments).map { index -> CGPoint in
+            let x = left + (right - left) * Double(index) / Double(segments)
+            let t = min(1, max(0, (x - originalLeft) / (originalRight - originalLeft)))
+            let envelope = pow(max(0, sin(.pi * t)), 1.25)
+            let height = (t <= 0 || t >= 1) ? 0 : options.baseDepth + peak * envelope
+            return .init(x: x, y: height)
+        }
+        return .init(points: points)
+    }
 
     private struct MoundProfile {
         let left: Double
@@ -357,8 +611,8 @@ enum DesktopSnowPolicy {
         return width
     }
 
-    private static func moundCount(width: Double, kind: DesktopSnowSurface.Kind) -> Int {
-        min(maximumMoundsPerSurface, max(1, Int((width / (kind == .bottom ? 130 : 92)).rounded())))
+    private static func moundCount(width: Double, kind: DesktopSnowSurface.Kind, spacing: Double = 1) -> Int {
+        min(maximumMoundsPerSurface, max(1, Int((width / ((kind == .bottom ? 130 : 92) * spacing)).rounded())))
     }
 
     private static func includesMound(seed: UInt64, index: Int, count: Int) -> Bool {
@@ -369,7 +623,7 @@ enum DesktopSnowPolicy {
         return index != clearing && coherentBankNoise(seed: seed ^ 0x50415443, coordinate: Double(index)) >= 0.16
     }
 
-    private static func moundProfile(bank: DesktopSnowBank, width: Double, index: Int, count: Int) -> MoundProfile {
+    private static func moundProfile(bank: DesktopSnowBank, width: Double, index: Int, count: Int, widthScale: Double = 1) -> MoundProfile {
         let zone = width / Double(count)
         func noise(_ salt: UInt64) -> Double {
             coherentBankNoise(seed: bank.surface.id ^ salt, coordinate: Double(index))
@@ -377,8 +631,9 @@ enum DesktopSnowPolicy {
         // The footprint stays inside its lookup zone, but its width and
         // free position vary independently. Small neighbors can cluster near
         // their shared boundary while another part of the edge stays clear.
-        let pileWidth = min(bank.surface.kind == .bottom ? 150 : 105, zone * (0.24 + noise(0x57494454) * 0.58))
         let margin = zone * 0.04
+        let pileWidth = min(bank.surface.kind == .bottom ? 150 : 105,
+                            min(max(0, zone - 2 * margin), zone * (0.24 + noise(0x57494454) * 0.58) * widthScale))
         let left = Double(index) * zone + margin + noise(0x43454e54) * (zone - 2 * margin - pileWidth)
         return .init(left: left, right: left + pileWidth,
                      peak: 0.34 + noise(0x5045414b) * 0.32,
@@ -386,58 +641,93 @@ enum DesktopSnowPolicy {
                      segments: min(maximumMoundPoints - 1, max(8, Int(ceil(pileWidth / 8)))))
     }
 
-    private static func moundPoint(bank: DesktopSnowBank, profile: MoundProfile, index: Int) -> CGPoint {
+    private static func moundPoint(bank: DesktopSnowBank, profile: MoundProfile, index: Int,
+                                   heightScale: Double = 1, options: DesktopSnowOptions = .init()) -> CGPoint {
         let x = profile.left + Double(index) * profile.step
         guard index > 0, index < profile.segments else { return .init(x: x, y: 0) }
         let coordinate = min(Double(bank.heights.count - 1), max(0, x / bank.binWidth - 0.5))
         let lower = Int(coordinate), upper = min(bank.heights.count - 1, lower + 1)
         let a = bank.heights[lower], b = bank.heights[upper]
         guard a.isFinite, b.isFinite, a >= 0, b >= 0 else { return .init(x: x, y: 0) }
-        let limit = bank.surface.kind == .bottom ? 18.0 : 11.0
+        let limit = bank.surface.kind == .bottom ? max(0, options.bottomLimit - options.baseDepth) : 11.0
         let fraction = coordinate - Double(lower)
         let deposited = min(limit, a) * (1 - fraction) + min(limit, b) * fraction
-        guard deposited > 0.24 else { return .init(x: x, y: 0) }
+        guard deposited > 0.24, limit > 0 else { return .init(x: x, y: 0) }
         let position = Double(index) / Double(profile.segments)
         let shoulder = position < profile.peak ? position / profile.peak : (1 - position) / (1 - profile.peak)
         let envelope = pow(sin(max(0, min(1, shoulder)) * .pi / 2), 1.2)
-        let height = limit * pow(deposited / limit, 0.82) * profile.heightScale * envelope
-        return .init(x: x, y: min(limit, max(0, height)))
+        let height = limit * pow(deposited / limit, 0.82) * profile.heightScale * envelope * heightScale
+        let base = bank.surface.kind == .bottom ? options.baseDepth : 0
+        let cap = bank.surface.kind == .bottom ? options.bottomLimit : 11 * heightScale
+        return .init(x: x, y: min(cap, base + max(0, height)))
     }
 
     /// Exact height of the renderer's quadratic contour. At most three control
     /// points are evaluated: no silhouette allocation or bin scan per flake.
     /// Deliberately clear gaps land at the underlying support, never raw height.
-    static func settledHeight(for bank: DesktopSnowBank, at localX: Double) -> Double {
+    static func settledHeight(for bank: DesktopSnowBank, at localX: Double, options rawOptions: DesktopSnowOptions = .init()) -> Double {
+        settledHeight(for: bank, at: localX, boundedOptions: rawOptions.bounded)
+    }
+
+    /// Hot-path overload for simulation callers that already bounded options.
+    static func settledHeight(for bank: DesktopSnowBank, at localX: Double, boundedOptions options: DesktopSnowOptions) -> Double {
         guard localX.isFinite, let width = moundBankWidth(bank), localX >= 0, localX <= width else { return 0 }
-        let count = moundCount(width: width, kind: bank.surface.kind)
+        if bank.surface.kind == .bottom, options.customBottomLayout {
+            return authoredBottomHeight(width: width, x: localX, options: options)
+        }
+        let count = moundCount(width: width, kind: bank.surface.kind, spacing: options.moundSpacing)
         let index = min(count - 1, Int(localX / (width / Double(count))))
-        guard includesMound(seed: bank.surface.id, index: index, count: count) else { return 0 }
-        let profile = moundProfile(bank: bank, width: width, index: index, count: count)
-        guard localX > profile.left, localX < profile.right else { return 0 }
-        let position = (localX - profile.left) / profile.step
-        let controlIndex = min(profile.segments, max(0, Int(floor(position + 0.5))))
-        let control = moundPoint(bank: bank, profile: profile, index: controlIndex)
-        let start: CGPoint
-        if controlIndex == 0 { start = control }
-        else {
-            let previous = moundPoint(bank: bank, profile: profile, index: controlIndex - 1)
-            start = .init(x: (previous.x + control.x) / 2, y: (previous.y + control.y) / 2)
+        let moundHeight: Double
+        if includesMound(seed: bank.surface.id, index: index, count: count) {
+            let profile = moundProfile(bank: bank, width: width, index: index, count: count, widthScale: options.moundWidth)
+            let points = (0...profile.segments).map {
+                moundPoint(bank: bank, profile: profile, index: $0, heightScale: options.moundHeight, options: options)
+            }
+            moundHeight = contourHeight(for: .init(points: points), at: localX)
+        } else { moundHeight = 0 }
+        if bank.surface.kind == .bottom, options.baseDepth > 0 {
+            return max(moundHeight, contourHeight(for: baseSilhouette(width: width, depth: options.baseDepth), at: localX))
         }
-        let end: CGPoint
-        if controlIndex == profile.segments { end = control }
-        else {
-            let next = moundPoint(bank: bank, profile: profile, index: controlIndex + 1)
-            end = .init(x: (control.x + next.x) / 2, y: (control.y + next.y) / 2)
+        return moundHeight
+    }
+
+    private static func authoredBottomHeight(width: Double, x: Double, options: DesktopSnowOptions) -> Double {
+        var height = options.baseDepth > 0 ? contourHeight(for: baseSilhouette(width: width, depth: options.baseDepth), at: x) : 0
+        guard options.bottomLimit > options.baseDepth else { return height }
+        for mound in options.authoredMounds where mound.isValid && mound.height > 0 {
+            let center = mound.center * width
+            let halfWidth = mound.width * width / 2
+            guard x >= max(0, center - halfWidth), x <= min(width, center + halfWidth),
+                  let silhouette = authoredMoundSilhouette(width: width, mound: mound, options: options) else { continue }
+            height = max(height, contourHeight(for: silhouette, at: x))
         }
-        let distance = localX - Double(start.x)
-        guard distance > 0 else { return max(0, Double(start.y)) }
-        let a = Double(start.x - 2 * control.x + end.x)
-        let b = Double(2 * (control.x - start.x))
-        let denominator = b + sqrt(max(0, b * b + 4 * a * distance))
-        guard denominator > 0 else { return 0 }
-        let t = min(1, max(0, 2 * distance / denominator))
-        let height = (1 - t) * (1 - t) * Double(start.y) + 2 * (1 - t) * t * Double(control.y) + t * t * Double(end.y)
-        return max(0, height)
+        return height
+    }
+
+    /// Evaluates the same midpoint-smoothed quadratic path used by both snow renderers.
+    private static func contourHeight(for mound: DesktopSnowMound, at x: Double) -> Double {
+        let points = mound.points
+        guard points.count >= 2, x.isFinite, x >= Double(points[0].x), x <= Double(points[points.count - 1].x) else { return 0 }
+        for controlIndex in points.indices {
+            let control = points[controlIndex]
+            let start: CGPoint = controlIndex == 0 ? control : {
+                let prior = points[controlIndex - 1]
+                return CGPoint(x: (prior.x + control.x) / 2, y: (prior.y + control.y) / 2)
+            }()
+            let end: CGPoint = controlIndex == points.count - 1 ? control : {
+                let next = points[controlIndex + 1]
+                return CGPoint(x: (control.x + next.x) / 2, y: (control.y + next.y) / 2)
+            }()
+            guard x >= Double(start.x), x <= Double(end.x) else { continue }
+            let a = Double(start.x - 2 * control.x + end.x)
+            let b = Double(2 * (control.x - start.x))
+            let distance = x - Double(start.x)
+            let denominator = b + sqrt(max(0, b * b + 4 * a * distance))
+            guard denominator > 0 else { return max(0, Double(start.y)) }
+            let t = min(1, max(0, 2 * distance / denominator)), u = 1 - t
+            return max(0, u * u * Double(start.y) + 2 * u * t * Double(control.y) + t * t * Double(end.y))
+        }
+        return 0
     }
 
     private static func coherentBankNoise(seed: UInt64, coordinate: Double) -> Double {

@@ -122,8 +122,12 @@ struct NotchscapeApp: App {
             Button("Add-ons Store…") { SettingsWindowController.shared.showWindow(section: "Store") }
             Button("Dock Bar…") { DockReplacementController.shared.show() }
             Button("Dock Workspace…") { DockWorkspaceManager.shared.show() }
-            if desktopSnowEnabled {
-                Button("Stop Snow", systemImage: "snowflake.slash") { desktopSnowEnabled = false }
+            Menu("Desktop Weather", systemImage: "snowflake") {
+                Button(desktopSnowEnabled ? "Stop Desktop Weather" : "Start Desktop Weather") { desktopSnowEnabled.toggle() }
+                Button("Weather Settings…") { SettingsWindowController.shared.showWindow(section: "Effects") }
+                if desktopSnowEnabled {
+                    Button("Clear Settled Piles") { DesktopSnowManager.shared.clearSnow() }
+                }
             }
             WorkspaceModeMenu()
             Divider()
@@ -156,8 +160,12 @@ struct NotchscapeApp: App {
                 Button("Add-ons Store…") { SettingsWindowController.shared.showWindow(section: "Store") }
                 Button("Dock Bar…") { DockReplacementController.shared.show() }
                 Button("Dock Workspace…") { DockWorkspaceManager.shared.show() }
-                if desktopSnowEnabled {
-                    Button("Stop Snow", systemImage: "snowflake.slash") { desktopSnowEnabled = false }
+                Menu("Desktop Weather", systemImage: "snowflake") {
+                    Button(desktopSnowEnabled ? "Stop Desktop Weather" : "Start Desktop Weather") { desktopSnowEnabled.toggle() }
+                    Button("Weather Settings…") { SettingsWindowController.shared.showWindow(section: "Effects") }
+                    if desktopSnowEnabled {
+                        Button("Clear Settled Piles") { DesktopSnowManager.shared.clearSnow() }
+                    }
                 }
                 RecordingMenuControl()
             }

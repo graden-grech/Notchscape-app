@@ -14,6 +14,7 @@ extension Defaults.Keys {
 @MainActor final class DockVisibilityController: ObservableObject {
     static let shared = DockVisibilityController()
     @Published private(set) var statusText: String?
+    @Published private(set) var isSuppressed = false
     private var started = false
     private var requested = false
     private var barVisible = false
@@ -148,15 +149,20 @@ extension Defaults.Keys {
             case "APPLIED":
                 DockFocusDiagnostics.shared.record("guardianApplied")
                 applied = true; applying = false
-                if wantsHide, !closing { statusText = "macOS Dock stays hidden while Dock Bar is on. System commands may still reveal it." }
+                if wantsHide, !closing {
+                    isSuppressed = true
+                    statusText = "macOS Dock stays hidden while Dock Bar is on. System commands may still reveal it."
+                }
                 else { requestRestore() }
             case "RESTORED":
                 DockFocusDiagnostics.shared.record("guardianRestored")
                 applied = false; applying = false; closing = true
+                isSuppressed = false
                 if !blocked { statusText = nil }
             case "OVERRIDDEN":
                 DockFocusDiagnostics.shared.record("guardianOverridden")
                 applied = false; applying = false; closing = true; blocked = true
+                isSuppressed = false
                 statusText = "Dock settings changed outside Notchscape. Your changes were kept; turn this option off and on to apply it again."
             default:
                 guard message.hasPrefix("ERROR:"),
@@ -222,6 +228,7 @@ extension Defaults.Keys {
         try? input?.close(); try? output?.close()
         input = nil; output = nil; process?.terminationHandler = nil; process = nil; childStart = nil
         ready = false; applying = false; applied = false; closing = false
+        if isSuppressed { isSuppressed = false }
     }
 
     private func verifiedHelper(_ url: URL) -> Bool {

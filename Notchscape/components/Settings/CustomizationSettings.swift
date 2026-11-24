@@ -177,7 +177,7 @@ struct HomeTileAppearanceSettings: View {
         .pickerStyle(.segmented)
 
         HStack(spacing: 12) {
-            Slider(value: transparencySelection, in: 0...1, step: 0.05) { Text("Tile transparency") }
+            Slider(value: transparencySelection, in: 0...1) { Text("Tile transparency") }
                 .accessibilityValue("\(Int(displayedTransparency * 100)) percent")
             Text(displayedTransparency.formatted(.percent.precision(.fractionLength(0))))
                 .monospacedDigit().foregroundStyle(.secondary)
